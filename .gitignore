@@ -79,6 +79,13 @@ Thumbs.db
 # User secrets
 secrets.json
 
+# App settings (environment-specific and local appsettings files)
+# Ignore common appsettings files at repo root and in subfolders
+appsettings.json
+appsettings.*.json
+**/appsettings.json
+**/appsettings.*.json
+
 # Temporary files
 *.tmp
 *.temp
