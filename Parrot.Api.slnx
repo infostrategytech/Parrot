@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Parrot.Api/Parrot.Api.csproj" />
+  <Project Path="Parrot.Mobile/Parrot.Mobile.csproj" />
+  <Project Path="Parrot.Web/Parrot.Web.Client/Parrot.Web.Client.csproj" />
+  <Project Path="Parrot.Web/Parrot.Web/Parrot.Web.csproj" />
+</Solution>

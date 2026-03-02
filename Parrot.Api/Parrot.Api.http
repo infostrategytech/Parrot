@@ -1,0 +1,6 @@
+@Parrot.Api_HostAddress = http://localhost:5222
+
+GET {{Parrot.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

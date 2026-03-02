@@ -1,0 +1,103 @@
+# .gitignore for .NET (including .NET MAUI, Blazor, WebAssembly)
+# Recommended for Visual Studio, VS Code, Rider and dotnet CLI
+
+# Build directories
+bin/
+obj/
+out/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+.nuget/packages/
+
+# dotnet
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Publish outputs
+publish/
+*.Publish.xml
+
+# Azure Functions
+local.settings.json
+
+# ASP.NET/Blazor/WASM
+wwwroot/_framework/
+wwwroot/**/*.pdb
+wwwroot/**/*.br
+wwwroot/**/*.gz
+wwwroot/**/*.map
+
+# Node/npm (if using npm for front-end assets)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# MAUI / Mobile platform artifacts
+# Android
+*.apk
+*.ap_ 
+*.aab
+.gradle/
+**/obj/**/android/**
+**/bin/**/android/**
+
+# iOS
+**/bin/**/ios/**
+**/obj/**/ios/**
+*.app
+*.dSYM
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Logs
+*.log
+
+# Rider and VS Code settings
+.vscode/
+
+# User secrets
+secrets.json
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Coverage and test outputs
+coverage/
+*.coverage
+*.coveragexml
+TestResults/
+
+# Generated files from build
+*.db
+*.db-shm
+*.db-wal
+
+# Other
+*.class
+*.psess
+*.vsp
+
+# End of .gitignore
