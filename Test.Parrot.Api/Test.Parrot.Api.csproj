@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Parrot.Api\Parrot.Api.csproj" />
+    <ProjectReference Include="..\Parrot.Api\Parrot.Api.Rest.csproj" />
     <ProjectReference Include="..\Parrot.Domain\Parrot.Domain.csproj" />
   </ItemGroup>
 
