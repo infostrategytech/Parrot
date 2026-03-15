@@ -1,0 +1,18 @@
+# Enforce explicit type definitions and disallow 'var'
+root = true
+
+[*.cs]
+# Require explicit types instead of var
+csharp_style_var_for_built_in_types = false:error
+csharp_style_var_when_type_is_apparent = false:error
+csharp_style_var_elsewhere = false:error
+
+# IDE0008: Use explicit type instead of var - as build error
+dotnet_diagnostic.IDE0008.severity = error
+
+# Suppress StyleCop rules that conflict with project conventions
+dotnet_diagnostic.SA1200.severity = none # usings are intentionally outside namespace
+dotnet_diagnostic.SA1309.severity = none # private fields use _camelCase per naming convention
+dotnet_diagnostic.SA1101.severity = none # this. qualification is not required
+dotnet_diagnostic.SA1600.severity = none # XML documentation not required
+dotnet_diagnostic.SA1633.severity = none # file headers not required

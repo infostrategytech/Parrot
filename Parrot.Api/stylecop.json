@@ -1,0 +1,8 @@
+{
+  "settings": {
+    "rules": {
+      "dotnet_style_require_var_for_local_variables": false,
+      "dotnet_diagnostic.IDE0007.severity": "error"
+    }
+  }
+}

@@ -1,0 +1,231 @@
+@page "/register-old"
+@using Parrot.SharedComponents.Components.InputFields
+
+<div class="register-container">
+    <div class="register-card">
+        <div class="card-header">
+            <div class="logo-icon">🦜</div>
+            <h1 class="card-title">Join Parrot</h1>
+            <p class="card-subtitle">Create an account to get started with AI-powered customer messaging.</p>
+        </div>
+
+        <form class="form-container" @onsubmit="HandleSubmit">
+            <FormInput 
+                Id="firstName"
+                Label="First name"
+                Type="text"
+                Placeholder="John"
+                Value="@formData.FirstName"
+                OnValueChanged="@((value) => formData.FirstName = value)"
+                ShowIcon="false" />
+
+            <FormInput 
+                Id="lastName"
+                Label="Last name"
+                Type="text"
+                Placeholder="Doe"
+                Value="@formData.LastName"
+                OnValueChanged="@((value) => formData.LastName = value)"
+                ShowIcon="false" />
+
+            <FormInput 
+                Id="businessName"
+                Label="Business name"
+                Type="text"
+                Placeholder="Your Business"
+                Value="@formData.BusinessName"
+                OnValueChanged="@((value) => formData.BusinessName = value)"
+                ShowIcon="false" />
+
+            <FormInput 
+                Id="businessEmail"
+                Label="Business email"
+                Type="email"
+                Placeholder="business@example.com"
+                Value="@formData.BusinessEmail"
+                OnValueChanged="@((value) => formData.BusinessEmail = value)"
+                ShowIcon="false" />
+
+            <FormInput 
+                Id="phoneNumber"
+                Label="Phone number"
+                Type="tel"
+                Placeholder="+1 (555) 000-0000"
+                Value="@formData.PhoneNumber"
+                OnValueChanged="@((value) => formData.PhoneNumber = value)"
+                ShowIcon="false" />
+
+            <FormInput 
+                Id="password"
+                Label="Password"
+                Type="@(showPassword ? "text" : "password")"
+                Placeholder="Create a secure password"
+                Value="@formData.Password"
+                OnValueChanged="@((value) => formData.Password = value)"
+                ShowIcon="true" />
+
+            <FormInput 
+                Id="confirmPassword"
+                Label="Confirm password"
+                Type="@(showConfirmPassword ? "text" : "password")"
+                Placeholder="Confirm your password"
+                Value="@formData.ConfirmPassword"
+                OnValueChanged="@((value) => formData.ConfirmPassword = value)"
+                ShowIcon="true" />
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" @bind="@formData.AgreeToTerms" />
+                <label for="terms" class="checkbox-label">
+                    I agree to the <a href="/terms" class="link">Terms of Service</a> and <a href="/privacy" class="link">Privacy Policy</a>
+                </label>
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="error-message">
+                    @errorMessage
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="success-message">
+                    @successMessage
+                </div>
+            }
+
+            <button type="submit" class="submit-button" disabled="@isSubmitting">
+                @if (isSubmitting)
+                {
+                    <span>Creating account...</span>
+                }
+                else
+                {
+                    <span>Create Account</span>
+                }
+            </button>
+
+            <p class="login-link">
+                Already have an account? <a href="/login" class="link">Sign in here</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+@code {
+    private RegisterForm formData = new();
+    private bool showPassword = false;
+    private bool showConfirmPassword = false;
+    private string errorMessage = string.Empty;
+    private string successMessage = string.Empty;
+    private bool isSubmitting = false;
+
+    private void HandleSubmit()
+    {
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+
+        // Validation
+        if (string.IsNullOrWhiteSpace(formData.FirstName))
+        {
+            errorMessage = "First name is required.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(formData.LastName))
+        {
+            errorMessage = "Last name is required.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(formData.BusinessName))
+        {
+            errorMessage = "Business name is required.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(formData.BusinessEmail))
+        {
+            errorMessage = "Business email is required.";
+            return;
+        }
+
+        if (!IsValidEmail(formData.BusinessEmail))
+        {
+            errorMessage = "Please enter a valid email address.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(formData.PhoneNumber))
+        {
+            errorMessage = "Phone number is required.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(formData.Password))
+        {
+            errorMessage = "Password is required.";
+            return;
+        }
+
+        if (formData.Password.Length < 8)
+        {
+            errorMessage = "Password must be at least 8 characters long.";
+            return;
+        }
+
+        if (!HasPasswordStrength(formData.Password))
+        {
+            errorMessage = "Password must contain at least one uppercase letter, one lowercase letter, and one number.";
+            return;
+        }
+
+        if (formData.Password != formData.ConfirmPassword)
+        {
+            errorMessage = "Passwords do not match.";
+            return;
+        }
+
+        if (!formData.AgreeToTerms)
+        {
+            errorMessage = "You must agree to the Terms of Service and Privacy Policy.";
+            return;
+        }
+
+        // TODO: Submit form data to API
+        isSubmitting = true;
+        successMessage = "Account created successfully! Redirecting...";
+    }
+
+    private bool IsValidEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool HasPasswordStrength(string password)
+    {
+        return password.Any(char.IsUpper) && 
+               password.Any(char.IsLower) && 
+               password.Any(char.IsDigit);
+    }
+
+    private class RegisterForm
+    {
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string BusinessName { get; set; } = string.Empty;
+        public string BusinessEmail { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string ConfirmPassword { get; set; } = string.Empty;
+        public bool AgreeToTerms { get; set; }
+    }
+}

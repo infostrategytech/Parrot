@@ -86,6 +86,11 @@ appsettings.*.json
 **/appsettings.json
 **/appsettings.*.json
 
+# Environment variable files (contain secrets)
+.env
+.env.*
+!.env.example
+
 # Temporary files
 *.tmp
 *.temp

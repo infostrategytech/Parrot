@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <!-- Treat nullable reference warnings as errors -->
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    
+    <!-- Enable strict null reference analysis -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn></NoWarn>
+  </PropertyGroup>
+</Project>

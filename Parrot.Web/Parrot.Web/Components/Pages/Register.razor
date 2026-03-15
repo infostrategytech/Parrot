@@ -1,0 +1,61 @@
+@page "/register"
+@layout MinimalLayout
+@using Parrot.SharedComponents.Components.Forms
+@using Parrot.SharedComponents.Components.InputFields
+
+<div class="registration-container">
+    <div class="registration-card">
+        <h1 class="registration-title">Create your account</h1>
+        <p class="registration-subtitle">Set up your account to start handling customer messages with AI.</p>
+
+        <GenericForm Fields="@formFields" 
+                     SubmitButtonText="Create Account" 
+                     OnSubmit="HandleRegistration" />
+    </div>
+</div>
+
+@code {
+    private List<FormInputModel> formFields = new()
+    {
+        new FormInputModel
+        {
+            Id = "businessName",
+            Label = "Business name",
+            Type = "text",
+            Placeholder = "Oma's kitchen"
+        },
+        new FormInputModel
+        {
+            Id = "email",
+            Label = "Email address",
+            Type = "email",
+            Placeholder = "you@example.com"
+        },
+        new FormInputModel
+        {
+            Id = "password",
+            Label = "Password",
+            Type = "password",
+            Placeholder = "Create a secure password",
+            ShowIcon = true
+        },
+        new FormInputModel
+        {
+            Id = "confirmPassword",
+            Label = "Confirm password",
+            Type = "password",
+            Placeholder = "Create a secure password",
+            ShowIcon = true
+        }
+    };
+
+    private async Task HandleRegistration(Dictionary<string, string> formData)
+    {
+        // TODO: Implement registration logic
+        Console.WriteLine("Registration submitted:");
+        foreach (var kvp in formData)
+        {
+            Console.WriteLine($"  {kvp.Key}: {kvp.Value}");
+        }
+    }
+}

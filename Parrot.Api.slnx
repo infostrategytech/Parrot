@@ -1,6 +1,9 @@
 <Solution>
   <Project Path="Parrot.Api/Parrot.Api.csproj" />
+  <Project Path="Parrot.Domain/Parrot.Domain.csproj" />
   <Project Path="Parrot.Mobile/Parrot.Mobile.csproj" />
+  <Project Path="Parrot.SharedCompnents/Parrot.SharedComponents.csproj" Id="1334198f-f6d7-46f2-a588-e28d34bbc044" />
   <Project Path="Parrot.Web/Parrot.Web.Client/Parrot.Web.Client.csproj" />
   <Project Path="Parrot.Web/Parrot.Web/Parrot.Web.csproj" />
+  <Project Path="Test.Parrot.Api/Test.Parrot.Api.csproj" />
 </Solution>

@@ -1,0 +1,20 @@
+﻿@using Parrot.SharedComponents.Components.InputFields
+
+<div class="generic-form-container">
+    <form @onsubmit="HandleSubmit">
+        <div class="generic-form-input">
+            @foreach (var field in Fields)
+            {
+                <FormInput Id="@field.Id"
+                           Label="@field.Label"
+                           Type="@field.Type"
+                           Placeholder="@field.Placeholder"
+                           Value="@field.Value"
+                           ShowIcon="@field.ShowIcon"
+                           Disabled="@field.Disabled"
+                           OnValueChanged="@((value) => UpdateFieldValue(field.Id, value))" />
+            }
+        </div>
+        <button type="submit" class="submit-button">@SubmitButtonText</button>
+    </form>
+</div>
