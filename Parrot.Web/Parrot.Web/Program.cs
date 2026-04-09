@@ -1,5 +1,16 @@
-using Parrot.Web.Client.Pages;
 using Parrot.Web.Components;
+using Parrot.Web.Features.Auth.ForgotPassword.Services;
+using Parrot.Web.Features.Auth.ForgotPassword.State;
+using Parrot.Web.Features.Auth.Login.Services;
+using Parrot.Web.Features.Auth.Login.State;
+using Parrot.Web.Features.Auth.Register.Services;
+using Parrot.Web.Features.Auth.Register.State;
+using Parrot.Web.Features.Auth.ResetPassword.Services;
+using Parrot.Web.Features.Auth.ResetPassword.State;
+using Parrot.Web.Features.Auth.State;
+using Parrot.Web.Features.Auth.VerifyEmail.Services;
+using Parrot.Web.Features.Auth.VerifyEmail.State;
+using Parrot.Web.State;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +18,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+string apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"]!;
+
+builder.Services.AddHttpClient<ILoginService, LoginService>(c => c.BaseAddress = new Uri(apiBaseUrl));
+builder.Services.AddHttpClient<IRegisterService, RegisterService>(c => c.BaseAddress = new Uri(apiBaseUrl));
+builder.Services.AddHttpClient<IForgotPasswordService, ForgotPasswordService>(c => c.BaseAddress = new Uri(apiBaseUrl));
+builder.Services.AddHttpClient<IResetPasswordService, ResetPasswordService>(c => c.BaseAddress = new Uri(apiBaseUrl));
+builder.Services.AddHttpClient<IVerifyEmailService, VerifyEmailService>(c => c.BaseAddress = new Uri(apiBaseUrl));
+
+builder.Services.AddScoped<AuthState>();
+builder.Services.AddScoped<LoginState>();
+builder.Services.AddScoped<RegisterState>();
+builder.Services.AddScoped<ForgotPasswordState>();
+builder.Services.AddScoped<ResetPasswordState>();
+builder.Services.AddScoped<VerifyEmailState>();
+builder.Services.AddScoped<AppState>();
 
 var app = builder.Build();
 

@@ -1,0 +1,71 @@
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+@if (_visible)
+{
+    <div class="ob-backdrop" @onclick="Dismiss">
+        <div class="ob-modal" @onclick:stopPropagation>
+            <img src="assets/images/gifs/welcome-owl.gif" alt="Owl" />
+            <h2 class="ob-title">Let's get you started</h2>
+            <p class="ob-subtitle">Set up your workspace in a few simple steps.</p>
+            <a href="/dashboard/ai-agents" class="ob-btn ob-btn--primary" @onclick="Dismiss">Create your first AI agent</a>
+            <a href="/dashboard/channels" class="ob-btn ob-btn--secondary" @onclick="Dismiss">Connect a channel</a>
+            <p class="ob-skip">You can always do this later from the <a href="/dashboard" @onclick="Dismiss">dashboard</a>
+            </p>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _visible = false;
+    private DotNetObjectReference<OnboardingModal>? _dotNetRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("eval", """
+                window._parrotObRegister = function(ref) {
+                    window._parrotObRef = ref;
+                    if (!window._parrotObHandler) {
+                        window._parrotObHandler = function(e) {
+                            if (e.ctrlKey && e.shiftKey && e.key === 'O') {
+                                e.preventDefault();
+                                if (window._parrotObRef) window._parrotObRef.invokeMethodAsync('ShowModal');
+                            }
+                        };
+                        document.addEventListener('keydown', window._parrotObHandler);
+                    }
+                };
+            """);
+            await JS.InvokeVoidAsync("window._parrotObRegister", _dotNetRef);
+
+            var seen = await JS.InvokeAsync<string>("localStorage.getItem", "parrot_onboarded");
+            if (string.IsNullOrEmpty(seen))
+            {
+                _visible = true;
+                StateHasChanged();
+            }
+        }
+    }
+
+    [JSInvokable]
+    public void ShowModal()
+    {
+        _visible = true;
+        StateHasChanged();
+    }
+
+    private async Task Dismiss()
+    {
+        _visible = false;
+        await JS.InvokeVoidAsync("localStorage.setItem", "parrot_onboarded", "1");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await JS.InvokeVoidAsync("eval", "window._parrotObRef = null; if(window._parrotObHandler){ document.removeEventListener('keydown', window._parrotObHandler); window._parrotObHandler = null; }");
+        _dotNetRef?.Dispose();
+    }
+}

@@ -16,6 +16,15 @@ namespace Parrot.SharedComponents.Components.Forms
         [Parameter]
         public EventCallback<Dictionary<string, string>> OnSubmit { get; set; }
 
+        [Parameter]
+        public EventCallback<(string FieldId, string Value)> OnFieldChanged { get; set; }
+
+        [Parameter]
+        public RenderFragment? AdditionalContent { get; set; }
+
+        [Parameter]
+        public bool PrimaryButton { get; set; }
+
         protected async Task HandleSubmit()
         {
             var formData = new Dictionary<string, string>();
@@ -27,6 +36,12 @@ namespace Parrot.SharedComponents.Components.Forms
                 }
             }
             await OnSubmit.InvokeAsync(formData);
+        }
+
+        protected async Task UpdateFieldValueAndNotify(string fieldId, string value)
+        {
+            UpdateFieldValue(fieldId, value);
+            await OnFieldChanged.InvokeAsync((fieldId, value));
         }
 
         protected void UpdateFieldValue(string id, string fieldValue)

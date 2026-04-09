@@ -1,6 +1,19 @@
 ﻿<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }" NotFoundPage="typeof(Pages.NotFound)">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Dashboard.DashboardLayout)" />
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
 </Router>
+
+@code {
+    [Inject] NavigationManager Nav { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(Nav.Uri);
+        if (uri.AbsolutePath == "/" || uri.AbsolutePath == string.Empty)
+        {
+            Nav.NavigateTo("/login", replace: true);
+        }
+    }
+}

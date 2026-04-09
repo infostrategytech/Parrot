@@ -35,6 +35,9 @@ publish/
 # Azure Functions
 local.settings.json
 
+# vscode
+.github/
+
 # ASP.NET/Blazor/WASM
 wwwroot/_framework/
 wwwroot/**/*.pdb

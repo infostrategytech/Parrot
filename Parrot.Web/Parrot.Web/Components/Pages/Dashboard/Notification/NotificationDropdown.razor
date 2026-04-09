@@ -1,0 +1,104 @@
+﻿@using System.Globalization
+
+<div class="notif-wrap">
+    <button class="@BellClass" @onclick="Toggle" title="Notifications">
+        <img src="assets/images/icons/bell-notification.svg" alt="" class="notif-bell-icon" />
+        @if (_notifications.Any(n => !n.IsRead))
+        {
+            <span class="notif-badge"></span>
+        }
+    </button>
+
+    @if (_open)
+    {
+        <div class="notif-backdrop" @onclick="Close"></div>
+        <div class="notif-panel" @onclick:stopPropagation>
+            <div class="notif-header">
+                <span class="notif-header-title">Notifications</span>
+                <button class="notif-mark-all" @onclick="MarkAllRead">Mark all as read</button>
+            </div>
+            <div class="notif-list">
+                @foreach (var item in _notifications)
+                {
+                    <div class="@(item.IsRead ? "notif-item" : "notif-item notif-item--unread")">
+                        <div class="notif-item-icon">
+                            @if (item.Type == "task")
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="5" y="2" width="14" height="20" rx="2" />
+                                    <line x1="9" y1="9" x2="15" y2="9" />
+                                    <line x1="9" y1="13" x2="15" y2="13" />
+                                    <line x1="9" y1="17" x2="11" y2="17" />
+                                </svg>
+                            }
+                            else if (item.Type == "channel")
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="18" cy="5" r="3" />
+                                    <circle cx="6" cy="12" r="3" />
+                                    <circle cx="18" cy="19" r="3" />
+                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                                </svg>
+                            }
+                            else
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                                </svg>
+                            }
+                        </div>
+                        <div class="notif-item-body">
+                            <span class="notif-item-title">@item.Title</span>
+                            <span class="notif-item-desc">@item.Description</span>
+                            <span class="notif-item-time">@item.Time</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool _open = false;
+
+    private string BellClass => _open ? "notif-bell notif-bell--active" : "notif-bell";
+
+    private List<NotifItem> _notifications = new()
+    {
+        new() { Type = "task", Title = "New task created", Description = "Order #TR-1043 generated from Place Food Order flow.",Time = "2 hours ago", IsRead = false },
+        new() { Type = "channel", Title = "Channel connected", Description = "Whatsapp business connected successfully", Time =
+"2 hours ago", IsRead = true },
+        new() { Type = "task", Title = "New task created", Description = "Order #TR-1043 generated from Place Food Order flow.",Time = "2 hours ago", IsRead = false },
+    };
+
+    private void Toggle()
+    {
+        _open = !_open;
+    }
+
+    private void Close()
+    {
+        _open = false;
+    }
+
+    private void MarkAllRead()
+    {
+        foreach (var n in _notifications)
+            n.IsRead = true;
+    }
+
+    private class NotifItem
+    {
+        public string Type { get; set; } = "default";
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Time { get; set; } = "";
+        public bool IsRead { get; set; }
+    }
+}

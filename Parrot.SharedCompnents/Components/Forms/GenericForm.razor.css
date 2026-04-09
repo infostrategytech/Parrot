@@ -1,0 +1,33 @@
+.submit-button {
+    width: 100%;
+    padding: 0.875rem;
+    background-color: #C4B5E4;
+    color: #ffffff;
+    border: none;
+    border-radius: 0.625rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 0.75rem;
+    transition: background-color 0.2s ease;
+}
+
+.submit-button:hover {
+    background-color: #B3A0D8;
+}
+
+.submit-button:active {
+    background-color: #9F8AC8;
+}
+
+.submit-button--primary {
+    background-color: #5B21B6;
+}
+
+.submit-button--primary:hover {
+    background-color: #4C1D95;
+}
+
+.submit-button--primary:active {
+    background-color: #3B1580;
+}

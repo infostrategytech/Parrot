@@ -1,0 +1,97 @@
+@page "/verify-email"
+@layout AuthLayout
+@inject NavigationManager Navigation
+
+<div class="ve-wrapper">
+    @if (_state == "pending")
+    {
+        <div class="ve-card ve-card--mascot">
+            <div class="ve-mascot">
+                <img src="assets/images/gifs/owl-animation.gif" alt="Owl" />
+            </div>
+            <h1 class="ve-title">Check your email</h1>
+            <p class="ve-body">
+                We've sent a verification link to
+                <a href="mailto:@_email" class="ve-email-link">@_email</a>.
+                Follow the link to verify your account.
+            </p>
+            <p class="ve-hint">Didn't get the email? Check your spam folder or try again.</p>
+            <button class="ve-btn-primary" @onclick="HandleResend" disabled="@_resending">
+                @(_resending ? "Sending..." : "Resend email")
+            </button>
+        </div>
+        <div class="ve-footer-pill">
+            Already verified? <a href="/login">Sign in</a>
+        </div>
+    }
+    else if (_state == "verifying")
+    {
+        <div class="ve-card">
+            <div class="ve-icon-wrap">
+                <span class="ve-spinner"></span>
+            </div>
+            <h1 class="ve-title">Verifying your email...</h1>
+            <p class="ve-subtitle">Please wait while we confirm your email address.</p>
+        </div>
+    }
+    else if (_state == "success")
+    {
+        <div class="ve-card ve-card--mascot">
+            <div class="ve-mascot">
+                <img src="assets/images/gifs/owl-animation.gif" alt="Owl" />
+            </div>
+            <div class="ve-icon-wrap ve-icon-wrap--success">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+            </div>
+            <h1 class="ve-title">Email verified!</h1>
+            <p class="ve-body">Your email address has been successfully verified. You can now sign in to your account.</p>
+            <a href="/login" class="ve-btn-primary">Go to Sign In</a>
+        </div>
+        <div class="ve-footer-pill">
+            Back to <a href="/login">Sign in</a>
+        </div>
+    }
+    else if (_state == "error")
+    {
+        <div class="ve-card">
+            <div class="ve-icon-wrap ve-icon-wrap--error">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </div>
+            <h1 class="ve-title">Verification failed</h1>
+            <p class="ve-subtitle">The verification link is invalid or has expired. Please request a new one.</p>
+            <a href="/login" class="ve-btn-primary">Back to Sign In</a>
+        </div>
+        <div class="ve-footer-pill">
+            Back to <a href="/login">Sign in</a>
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? UserId { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? Token { get; set; }
+
+    private string _state = "pending";
+    private string _email = "your email address";
+    private bool _resending = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(UserId) && !string.IsNullOrWhiteSpace(Token))
+        {
+            _state = "verifying";
+        }
+    }
+
+    private async Task HandleResend()
+    {
+        _resending = true;
+    }
+}
