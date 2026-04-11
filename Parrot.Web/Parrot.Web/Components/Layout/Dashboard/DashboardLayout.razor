@@ -1,0 +1,67 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager Nav
+@implements IDisposable
+@using Parrot.Web.Components.Pages.Dashboard.Notification
+
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+        <NavMenu />
+    </aside>
+
+    <div class="dashboard-main">
+        <header class="dashboard-topbar">
+            <span class="dashboard-topbar-title">@GetPageTitle()</span>
+            <NotificationDropdown />
+        </header>
+
+        <article class="dashboard-content">
+            @Body
+        </article>
+    </div>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Nav.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Nav.LocationChanged -= OnLocationChanged;
+    }
+
+    private string GetPageTitle()
+    {
+        var uri = new Uri(Nav.Uri);
+        var segment = uri.AbsolutePath
+            .Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .LastOrDefault() ?? string.Empty;
+
+        return segment switch
+        {
+            "" or "dashboard" => "Dashboard",
+            "ai-agents" => "AI Agents",
+            "catalog" => "Catalog",
+            "contacts" => "Contacts",
+            "task-requests" => "Task Requests",
+            "channels" => "Channels",
+            "conversations" => "Conversations",
+            "team" => "Team",
+            "qa-insights" => "QA & Conversation Insight",
+            _ => System.Globalization.CultureInfo.CurrentCulture.TextInfo
+                    .ToTitleCase(segment.Replace("-", " "))
+        };
+    }
+}

@@ -12,9 +12,17 @@
                            Value="@field.Value"
                            ShowIcon="@field.ShowIcon"
                            Disabled="@field.Disabled"
-                           OnValueChanged="@((value) => UpdateFieldValue(field.Id, value))" />
+                           ErrorMessage="@field.ErrorMessage"
+                           ShowPasswordStrength="@field.ShowPasswordStrength"
+                           LabelLinkText="@field.LabelLinkText"
+                           LabelLinkHref="@field.LabelLinkHref"
+                           OnValueChanged="@((value) => UpdateFieldValueAndNotify(field.Id, value))" />
             }
         </div>
-        <button type="submit" class="submit-button">@SubmitButtonText</button>
+        @if (AdditionalContent != null)
+        {
+            @AdditionalContent
+        }
+        <button type="submit" class="submit-button @(PrimaryButton ? "submit-button--primary" : "")">@SubmitButtonText</button>
     </form>
 </div>

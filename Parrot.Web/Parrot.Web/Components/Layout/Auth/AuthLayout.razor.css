@@ -1,0 +1,52 @@
+.auth-layout {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('assets/images/background-image.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    padding: 5rem 1rem 3rem;
+}
+
+.auth-brand-logo {
+    position: fixed;
+    top: 1.25rem;
+    left: 1.25rem;
+    width: 5rem;
+    height: 5rem;
+    /* background: #5B21B6; */
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.auth-brand-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.auth-main {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

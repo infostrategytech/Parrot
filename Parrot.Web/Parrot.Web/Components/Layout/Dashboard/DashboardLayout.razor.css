@@ -1,0 +1,44 @@
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.dashboard-sidebar {
+    width: 225px;
+    flex-shrink: 0;
+}
+
+.dashboard-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: #f9fafb;
+}
+
+.dashboard-topbar {
+    height: 3.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: #ffffff;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 50;
+}
+
+.dashboard-topbar-title {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+
+
+.dashboard-content {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}

@@ -1,0 +1,86 @@
+@page "/register"
+@layout AuthLayout
+@using Parrot.SharedComponents.Components.Forms
+@using Parrot.SharedComponents.Components.InputFields
+
+<div class="register-wrapper">
+    <div class="register-card">
+        <div class="register-mascot">
+            <img src="assets/images/gifs/owl-animation.gif" alt="Owl" />
+        </div>
+        <h1 class="register-title">Create your account</h1>
+        <p class="register-subtitle">Set up your account to start handling customer messages with AI.</p>
+
+        <GenericForm Fields="@formFields"
+                     SubmitButtonText="Create account"
+                     OnSubmit="HandleRegistration"
+                     OnFieldChanged="HandleFieldChanged" />
+    </div>
+
+    <div class="register-footer-pill">
+        Already have an account? <a href="/login">Sign in</a>
+    </div>
+</div>
+
+@code {
+    private List<FormInputModel> formFields = new()
+    {
+        new FormInputModel
+        {
+            Id = "businessName",
+            Label = "Business name",
+            Type = "text",
+            Placeholder = "Oma's kitchen",
+            ShowIcon = false
+        },
+        new FormInputModel
+        {
+            Id = "email",
+            Label = "Email address",
+            Type = "email",
+            Placeholder = "you@example.com",
+            ShowIcon = false
+        },
+        new FormInputModel
+        {
+            Id = "password",
+            Label = "Password",
+            Type = "password",
+            Placeholder = "Create a secure password",
+            ShowIcon = true,
+            ShowPasswordStrength = true
+        },
+        new FormInputModel
+        {
+            Id = "confirmPassword",
+            Label = "Confirm password",
+            Type = "password",
+            Placeholder = "Create a secure password",
+            ShowIcon = true
+        }
+    };
+
+    private void HandleFieldChanged((string FieldId, string Value) change)
+    {
+        if (change.FieldId == "password" || change.FieldId == "confirmPassword")
+        {
+            var passwordField = formFields.Find(f => f.Id == "password");
+            var confirmField = formFields.Find(f => f.Id == "confirmPassword");
+
+            if (passwordField != null && confirmField != null)
+            {
+                var passwordValue = passwordField.Value;
+                var confirmValue = confirmField.Value;
+
+                confirmField.ErrorMessage = (!string.IsNullOrEmpty(confirmValue) && passwordValue != confirmValue)
+                    ? "Password mismatch"
+                    : string.Empty;
+            }
+        }
+    }
+
+    private async Task HandleRegistration(Dictionary<string, string> formData)
+    {
+        await Task.CompletedTask;
+    }
+}

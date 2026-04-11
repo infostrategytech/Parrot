@@ -9,5 +9,9 @@ namespace Parrot.SharedComponents.Components.InputFields
         public string Value { get; set; } = string.Empty;
         public bool Disabled { get; set; }
         public bool ShowIcon { get; set; } = true;
+        public string ErrorMessage { get; set; } = string.Empty;
+        public bool ShowPasswordStrength { get; set; }
+        public string LabelLinkText { get; set; } = string.Empty;
+        public string LabelLinkHref { get; set; } = string.Empty;
     }
 }
