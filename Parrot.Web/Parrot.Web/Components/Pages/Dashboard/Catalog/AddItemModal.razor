@@ -1,0 +1,93 @@
+@using Parrot.Web.Components.Pages.Dashboard.Catalog
+@using System.Linq
+
+<ModalShell Visible="Visible" Title="Add item"
+            Subtitle="Add pricing information your AI agent can use to answer customer questions and complete requests."
+            SubtitleInline="true" OnClose="OnCancel">
+    <BodyContent>
+        <div class="modal-field">
+            <label class="modal-label">Item name</label>
+            <input class="modal-input" placeholder="e.g. Jollof rice" @bind="_item.Name" />
+        </div>
+        <div class="modal-field">
+            <label class="modal-label">Description <span class="modal-optional">(Optional)</span></label>
+            <textarea class="modal-textarea" placeholder="Short description of this product or service"
+                      @bind="_item.Description"></textarea>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label-row">
+                <label class="modal-label">Category <span class="modal-optional">(Optional)</span></label>
+                <button class="modal-link-btn" @onclick="OnCreateCategory">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                    Create category
+                </button>
+            </div>
+            <AppDropdown Value="@_item.Category" ValueChanged="@(v => _item.Category = v)"
+                         Options="@Categories.Select(c => new DropdownOption(c.Name, c.Name))"
+                         Placeholder="-- Select a category --" />
+            @if (!Categories.Any())
+            {
+                <span class="modal-hint">No categories yet. Create a category to organise your items.</span>
+            }
+        </div>
+        <div class="modal-row">
+            <div class="modal-field modal-field--half">
+                <label class="modal-label">Currency</label>
+                <AppDropdown Value="@_item.Currency" ValueChanged="@(v => _item.Currency = v)"
+                             Options="@_currencyOptions" />
+            </div>
+            <div class="modal-field modal-field--half">
+                <label class="modal-label">Price</label>
+                <input class="modal-input" type="number" min="0" step="0.01" placeholder="0.00" @bind="_item.Price" />
+            </div>
+        </div>
+        <div class="modal-availability">
+            <div>
+                <span class="modal-avail-title">Availability</span>
+                <p class="modal-avail-sub">Inactive items won't be used by your AI agents.</p>
+            </div>
+            <label class="dt-toggle">
+                <input type="checkbox" @bind="_item.IsAvailable" />
+                <span class="dt-toggle-track"></span>
+                <span class="dt-toggle-thumb"></span>
+            </label>
+        </div>
+    </BodyContent>
+    <FooterContent>
+        <button class="modal-btn modal-btn--save" @onclick="HandleSave"
+                disabled="@string.IsNullOrWhiteSpace(_item.Name)">Save</button>
+    </FooterContent>
+</ModalShell>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public List<CatalogCategory> Categories { get; set; } = new();
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback<CatalogItem> OnSave { get; set; }
+    [Parameter] public EventCallback OnCreateCategory { get; set; }
+
+    private CatalogItem _item = new();
+
+    private static readonly List<DropdownOption> _currencyOptions =
+    [
+        new("NGN", "NGN"),
+        new("USD", "USD"),
+        new("GBP", "GBP"),
+    ];
+
+    protected override void OnParametersSet()
+    {
+        if (Visible) _item = new CatalogItem();
+    }
+
+    private async Task HandleSave()
+    {
+        if (string.IsNullOrWhiteSpace(_item.Name)) return;
+        await OnSave.InvokeAsync(_item);
+    }
+}

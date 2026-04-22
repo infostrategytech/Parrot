@@ -1,0 +1,82 @@
+@using Parrot.Web.Components.Pages.Dashboard.Catalog
+
+<ModalShell Visible="Visible" Title="Category"
+            Subtitle="Create and manage categories used to organize your catalog items." Size="sm" OnClose="OnCancel">
+    <BodyContent>
+        <div class="modal-field">
+            <label class="modal-label">Category name</label>
+            <div class="cat-input-row">
+                <input class="modal-input" placeholder="e.g. main dish" @bind="_newName" @bind:event="oninput"
+                       @onkeydown="HandleKey" />
+                <button class="cat-add-btn" @onclick="AddCategory"
+                        disabled="@string.IsNullOrWhiteSpace(_newName)">Add</button>
+            </div>
+        </div>
+        <div class="cat-existing">
+            <span class="cat-existing-title">Existing categories</span>
+            @if (!_working.Any())
+            {
+                <div class="cat-empty">
+                    <span>No categories yet. Add one above to get started.</span>
+                </div>
+            }
+            else
+            {
+                <div class="cat-grid">
+                    @foreach (var cat in _working)
+                    {
+                        <div class="cat-chip">
+                            <span class="cat-chip-name">@cat.Name</span>
+                            <button class="cat-chip-del" @onclick="() => RemoveCategory(cat)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                    <path d="M10 11v6M14 11v6" />
+                                    <path d="M9 6V4h6v2" />
+                                </svg>
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </BodyContent>
+    <FooterContent>
+        <button class="modal-btn modal-btn--cancel" @onclick="OnCancel">Cancel</button>
+        <button class="modal-btn modal-btn--save" @onclick="HandleSave">Save</button>
+    </FooterContent>
+</ModalShell>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public List<CatalogCategory> Categories { get; set; } = new();
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback<List<CatalogCategory>> OnSave { get; set; }
+
+    private string _newName = string.Empty;
+    private List<CatalogCategory> _working = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Visible) _working = Categories.Select(c => new CatalogCategory { Id = c.Id, Name = c.Name }).ToList();
+    }
+
+    private void AddCategory()
+    {
+        var name = _newName.Trim();
+        if (string.IsNullOrEmpty(name)) return;
+        if (_working.Any(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase))) return;
+        _working.Add(new CatalogCategory { Name = name });
+        _newName = string.Empty;
+    }
+
+    private void RemoveCategory(CatalogCategory cat) => _working.Remove(cat);
+
+    private void HandleKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") AddCategory();
+    }
+
+    private async Task HandleSave() => await OnSave.InvokeAsync(_working);
+}

@@ -1,0 +1,412 @@
+/* ── Page shell ── */
+.tr-detail-page {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.tr-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #6B7280;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.15s;
+}
+
+.tr-back-btn:hover { color: #111827; }
+
+/* ── Two-column layout ── */
+.tr-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.tr-detail-left,
+.tr-detail-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* ── White cards ── */
+.tr-detail-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+}
+
+/* ── Card header row ── */
+.tr-detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.tr-detail-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+}
+
+.tr-detail-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.tr-detail-menu-btn {
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid #E5E7EB;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9CA3AF;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.tr-detail-menu-btn:hover { background: #F3F4F6; }
+
+/* ── Section titles ── */
+.tr-section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 0.75rem;
+}
+
+.tr-section-sub {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    margin: 0 0 0.75rem;
+}
+
+/* ── Status badge (reused from list) ── */
+.tr-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.tr-status-badge--pending   { color: #B45309; }
+.tr-status-badge--completed { color: #16A34A; }
+.tr-status-badge--cancelled { color: #9CA3AF; }
+
+/* ── Summary grid ── */
+.tr-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem 1.25rem;
+}
+
+.tr-summary-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.tr-summary-label {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    font-weight: 500;
+}
+
+.tr-summary-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+.tr-summary-channel {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+/* ── Notes ── */
+.tr-notes-list {
+    list-style: disc;
+    padding-left: 1.25rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.tr-notes-list li { font-size: 0.875rem; color: #374151; }
+
+.tr-empty-notes {
+    text-align: center;
+    color: #9CA3AF;
+    font-size: 0.8125rem;
+    padding: 1rem 0;
+}
+
+/* ── Activity log ── */
+.tr-activity-log {
+    background: #111827;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.tr-activity-log .tr-section-title { color: #F9FAFB; }
+.tr-activity-log .tr-section-sub    { color: #6B7280; }
+
+.tr-log-item {
+    display: flex;
+    gap: 0.875rem;
+    position: relative;
+    padding-bottom: 1.125rem;
+}
+
+.tr-log-item:last-child { padding-bottom: 0; }
+
+.tr-log-line-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 0.875rem;
+}
+
+.tr-log-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: #7C3AED;
+    border: 2px solid #4C1D95;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+}
+
+.tr-log-connector {
+    width: 2px;
+    flex: 1;
+    background: #374151;
+    margin-top: 0.25rem;
+    min-height: 1rem;
+}
+
+.tr-log-item:last-child .tr-log-connector { display: none; }
+
+.tr-log-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.tr-log-desc {
+    font-size: 0.8125rem;
+    color: #F9FAFB;
+    font-weight: 500;
+}
+
+.tr-log-time {
+    font-size: 0.75rem;
+    color: #6B7280;
+}
+
+/* ── Conversation card ── */
+.tr-convo-card .tr-section-title { margin-bottom: 0.25rem; }
+
+.tr-convo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.tr-open-convo {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #7C3AED;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.tr-open-convo:hover { text-decoration: underline; }
+
+.tr-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-bottom: 0.25rem;
+    padding-right: 0.25rem;
+    scrollbar-width: thin;
+    scrollbar-color: #D1D5DB transparent;
+}
+
+.tr-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.tr-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tr-messages::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 999px;
+}
+
+.tr-messages::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF;
+}
+
+.tr-msg {
+    display: flex;
+    align-items: flex-start;
+}
+
+.tr-msg--customer { justify-content: flex-start; gap: 0.5rem; align-items: flex-start; }
+.tr-msg--agent    { justify-content: flex-end;   gap: 0.5rem; align-items: flex-end; }
+
+.tr-msg-avatar {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.tr-msg-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    max-width: 80%;
+}
+
+.tr-msg--customer .tr-msg-wrap { align-items: flex-start; }
+.tr-msg--agent    .tr-msg-wrap { align-items: flex-end; }
+
+.tr-msg-bubble {
+    padding: 0.5rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+}
+
+.tr-msg--customer .tr-msg-bubble {
+    background: #F3F4F6;
+    color: #111827;
+    border-bottom-left-radius: 0.25rem;
+}
+
+.tr-msg--agent .tr-msg-bubble {
+    background: #7C3AED;
+    color: #fff;
+    border-bottom-right-radius: 0.25rem;
+}
+
+.tr-msg-time {
+    font-size: 0.7rem;
+    color: #9CA3AF;
+    padding: 0 0.25rem;
+}
+
+/* ── Customer details ── */
+.tr-customer-detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.tr-customer-icon { color: #9CA3AF; flex-shrink: 0; }
+
+.tr-customer-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+.tr-customer-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-top: 0.875rem;
+}
+
+.tr-customer-note-icon { color: #F59E0B; flex-shrink: 0; margin-top: 0.1rem; }
+
+.tr-customer-note-text {
+    font-size: 0.8125rem;
+    color: #92400E;
+    line-height: 1.45;
+}
+
+/* ── Detail action menu ── */
+.tr-detail-action-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.tr-action-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    z-index: 50;
+    min-width: 10rem;
+    overflow: hidden;
+}
+
+.tr-action-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+    color: #374151;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    transition: background 0.12s;
+}
+
+.tr-action-item:hover { background: #F9FAFB; }
+.tr-action-item--danger { color: #DC2626; }
+.tr-action-item--danger:hover { background: #FEF2F2; }

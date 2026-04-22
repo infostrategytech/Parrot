@@ -1,0 +1,321 @@
+.db-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* ── Upgrade Banner ── */
+.db-upgrade-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: linear-gradient(110deg, #3B1578 0%, #53279E 60%, #6D35C3 100%);
+    border-radius: 0.875rem;
+    padding: 1.5rem 1.25rem;
+    overflow: hidden;
+}
+
+.db-upgrade-wave {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 60%;
+    object-fit: cover;
+    object-position: left center;
+    pointer-events: none;
+    /* opacity: 0.18; */
+    mix-blend-mode: screen;
+}
+
+.db-upgrade-left {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.db-upgrade-left-text{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.db-upgrade-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.db-upgrade-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.db-upgrade-sub {
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.db-upgrade-btn {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1.125rem;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #53279E;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s ease;
+}
+
+.db-upgrade-btn:hover {
+    background: #f3f0ff;
+    color: #53279E;
+}
+
+/* ── Setup Card ── */
+.db-setup-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.875rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.db-setup-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.db-setup-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.25rem;
+}
+
+.db-setup-sub {
+    font-size: 0.8125rem;
+    color: #6B7280;
+    margin: 0;
+}
+
+.db-setup-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #53279E;
+    background: #F3EEFF;
+    border-radius: 2rem;
+    padding: 0.25rem 0.75rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.db-setup-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.625rem;
+}
+
+.db-setup-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.625rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    text-decoration: none;
+}
+
+.db-setup-item:hover {
+    border-color: #C4B5FD;
+    background: #FAFAFA;
+}
+
+.db-setup-item--done {
+    background: #F9FAFB;
+}
+
+.db-setup-item--done .db-setup-label {
+    color: #9CA3AF;
+    text-decoration: line-through;
+}
+
+.db-setup-check {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.3rem;
+    background: #53279E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.db-setup-check--empty {
+    background: transparent;
+    border: 1.5px solid #D1D5DB;
+}
+
+.db-setup-label {
+    flex: 1;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.db-setup-arrow {
+    color: #9CA3AF;
+    flex-shrink: 0;
+}
+
+/* ── Stats Grid ── */
+.db-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.db-stat-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.875rem;
+    padding: 1.125rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.db-stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.375rem;
+}
+
+.db-stat-label {
+    font-size: 0.8125rem;
+    color: #6B7280;
+    font-weight: 500;
+}
+
+.db-stat-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.db-stat-icon img,
+.db-stat-icon svg {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.db-stat-icon--purple { background: #F3EEFF; color: #7C3AED; }
+.db-stat-icon--blue   { background: #EFF6FF; color: #3B82F6; }
+.db-stat-icon--green  { background: #F0FDF4; color: #22C55E; }
+.db-stat-icon--amber  { background: #FFFBEB; color: #F59E0B; }
+.db-stat-icon--orange { background: #FFF7ED; color: #F97316; }
+.db-stat-icon--indigo { background: #EEF2FF; color: #6366F1; }
+
+.db-stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.1;
+}
+
+.db-stat-value--sm {
+    font-size: 1.375rem;
+}
+
+.db-stat-desc {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+}
+
+/* ── Chart ── */
+.db-chart-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.875rem;
+    padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.db-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    gap: 1rem;
+}
+
+.db-chart-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.db-chart-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.db-chart-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.625rem;
+}
+
+.db-chart-select-label {
+    font-size: 0.75rem;
+    color: #6B7280;
+    font-weight: 500;
+}
+
+.db-chart-select {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #111827;
+    border: none;
+    background: transparent;
+    outline: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.db-chart-wrap {
+    position: relative;
+    height: 320px;
+}

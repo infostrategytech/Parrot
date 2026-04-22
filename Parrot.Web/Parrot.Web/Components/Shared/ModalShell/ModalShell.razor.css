@@ -1,0 +1,411 @@
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 1000;
+    animation: modal-fade-in 0.15s ease;
+}
+
+@keyframes modal-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.modal-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    background: #fff;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    pointer-events: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    animation: modal-slide-in 0.18s ease;
+}
+
+.modal-dialog--sm { max-width: 390px; }
+.modal-dialog--contact { max-width: 560px; }
+
+@keyframes modal-slide-in {
+    from { opacity: 0; transform: translate(-50%, calc(-50% + 14px)); }
+    to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.modal-header {
+    padding: 1.25rem 1.5rem 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.modal-header-top {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.modal-header-sub {
+    flex: 1;
+    font-size: 0.8125rem;
+    color: #6B7280;
+    line-height: 1.5;
+    padding-top: 0.125rem;
+}
+
+.modal-close {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    background: transparent;
+    color: #9CA3AF;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.modal-close:hover {
+    background: #F3F4F6;
+    color: #374151;
+}
+
+.modal-divider {
+    height: 1px;
+    background: #E5E7EB;
+    margin-top: 1rem;
+    flex-shrink: 0;
+} 
+
+.modal-body {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    overscroll-behavior: contain;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    border-top: 1px solid #E5E7EB;
+    flex-shrink: 0;
+}
+
+.modal-footer--confirm { padding: 0.5rem 1.5rem 1.5rem; }
+
+.modal-dialog--confirm {
+    max-width: 360px;
+    text-align: left;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.modal-dialog--confirm .modal-footer { padding: 0.75rem 0 0; }
+
+
+::deep .modal-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.25rem;
+}
+
+::deep .modal-sub {
+    font-size: 0.8125rem;
+    color: #6B7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+::deep .modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+::deep .modal-field--half { flex: 1; }
+
+::deep .modal-row {
+    display: flex;
+    gap: 0.875rem;
+}
+
+::deep .modal-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+::deep .modal-optional {
+    font-weight: 400;
+    color: #9CA3AF;
+}
+
+::deep .modal-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+::deep .modal-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #7C3AED;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: none;
+}
+
+::deep .modal-link-btn:hover { text-decoration: underline; }
+
+::deep .modal-input {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #111827;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease;
+}
+
+::deep .modal-input:focus {
+    border-color: #7C3AED;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
+}
+
+::deep .modal-textarea {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #111827;
+    resize: vertical;
+    min-height: 5.5rem;
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    transition: border-color 0.15s ease;
+}
+
+::deep .modal-textarea:focus {
+    border-color: #7C3AED;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
+}
+
+::deep .modal-select-wrap { position: relative; }
+
+::deep .modal-select {
+    width: 100%;
+    padding: 0.625rem 2rem 0.625rem 0.875rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #111827;
+    background: #fff;
+    appearance: none;
+    outline: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+
+::deep .modal-select:focus { border-color: #7C3AED; }
+
+::deep .modal-select-arrow {
+    position: absolute;
+    right: 0.625rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+    pointer-events: none;
+}
+
+::deep .modal-hint {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    font-style: italic;
+}
+
+::deep .modal-availability {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.625rem;
+    gap: 1rem;
+}
+
+::deep .modal-avail-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+::deep .modal-avail-sub {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    margin: 0;
+}
+
+::deep .modal-btn {
+    padding: 0.625rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+::deep .modal-btn--cancel {
+    background: #fff;
+    border: 1.5px solid #E5E7EB;
+    color: #374151;
+}
+
+::deep .modal-btn--cancel:hover { background: #F9FAFB; }
+
+::deep .modal-btn--save {
+    background: #7C3AED;
+    color: #fff;
+}
+
+::deep .modal-btn--save:hover:not(:disabled) { background: #6D28D9; }
+::deep .modal-btn--save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+::deep .modal-btn--delete {
+    background: #DC2626;
+    color: #fff;
+}
+
+::deep .modal-btn--delete:hover { background: #B91C1C; }
+
+::deep .modal-confirm-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+}
+
+::deep .modal-confirm-icon--warn { background: #FEF3C7; }
+
+::deep .cat-input-row {
+    display: flex;
+    gap: 0.625rem;
+}
+
+::deep .cat-input-row .modal-input { flex: 1; }
+
+::deep .cat-add-btn {
+    padding: 0.625rem 1.125rem;
+    background: #fff;
+    border: 1.5px solid #D1D5DB;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+::deep .cat-add-btn:hover:not(:disabled) {
+    border-color: #7C3AED;
+    color: #7C3AED;
+}
+
+::deep .cat-add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+::deep .cat-existing {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.625rem;
+    padding: 0.875rem;
+}
+
+::deep .cat-existing-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+::deep .cat-empty {
+    text-align: center;
+    padding: 1.25rem 0;
+    font-size: 0.8125rem;
+    color: #9CA3AF;
+}
+
+::deep .cat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+::deep .cat-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.625rem;
+}
+
+::deep .cat-chip-name {
+    font-size: 0.8125rem;
+    color: #374151;
+}
+
+::deep .cat-chip-del {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity 0.12s ease;
+}
+
+::deep .cat-chip-del:hover { opacity: 1; }

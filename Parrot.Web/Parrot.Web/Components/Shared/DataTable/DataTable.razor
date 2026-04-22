@@ -1,0 +1,121 @@
+@namespace Parrot.Web.Components.Shared
+@typeparam TItem
+
+@if (Items == null || !Items.Any())
+{
+    @EmptyContent
+}
+else
+{
+    <div class="dt-root">
+        <div class="dt-table-wrap">
+            <table class="dt-table">
+                <thead>
+                    <tr>
+                        @foreach (var col in Columns)
+                        {
+                            <th class="dt-th" style="@col.HeaderStyle">@col.Header</th>
+                        }
+                        @if (RowActions != null)
+                        {
+                            <th class="dt-th dt-th--actions"></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in PagedItems)
+                    {
+                        <tr class="dt-tr">
+                            @foreach (var col in Columns)
+                            {
+                                <td class="dt-td" style="@col.CellStyle">
+                                    @col.Template(item)
+                                </td>
+                            }
+                            @if (RowActions != null)
+                            {
+                                <td class="dt-td dt-td--actions">
+                                    @RowActions(item)
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (ShowPagination && TotalPages > 1)
+        {
+            <div class="dt-pagination">
+                <span class="dt-page-info">Showing @PageStart–@PageEnd of @TotalCount items</span>
+                <div class="dt-page-controls">
+                    <button class="dt-page-btn" disabled="@(_page == 1)" @onclick="PrevPage">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 18l-6-6 6-6" />
+                        </svg>
+                    </button>
+                    @foreach (var p in VisiblePages)
+                    {
+                        @if (p == -1)
+                        {
+                            <span class="dt-page-dots">…</span>
+                        }
+                        else
+                        {
+                            <button class="dt-page-btn @(p == _page ? "dt-page-btn--active" : "")" @onclick="() => GoTo(p)">@p</button>
+                        }
+                    }
+                    <button class="dt-page-btn" disabled="@(_page == TotalPages)" @onclick="NextPage">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public List<TItem> Items { get; set; } = new();
+    [Parameter, EditorRequired] public List<DataTableColumn<TItem>> Columns { get; set; } = new();
+    [Parameter] public RenderFragment? EmptyContent { get; set; }
+    [Parameter] public RenderFragment<TItem>? RowActions { get; set; }
+    [Parameter] public int PageSize { get; set; } = 10;
+    [Parameter] public bool ShowPagination { get; set; } = true;
+
+    private int _page = 1;
+
+    private int TotalCount => Items.Count;
+    private int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
+    private int PageStart => TotalCount == 0 ? 0 : (_page - 1) * PageSize + 1;
+    private int PageEnd => Math.Min(_page * PageSize, TotalCount);
+    private IEnumerable<TItem> PagedItems => Items.Skip((_page - 1) * PageSize).Take(PageSize);
+
+    private List<int> VisiblePages
+    {
+        get
+        {
+            var pages = new List<int>();
+            if (TotalPages <= 7)
+            {
+                for (int i = 1; i <= TotalPages; i++) pages.Add(i);
+                return pages;
+            }
+            pages.Add(1);
+            if (_page > 3) pages.Add(-1);
+            for (int i = Math.Max(2, _page - 1); i <= Math.Min(TotalPages - 1, _page + 1); i++) pages.Add(i);
+            if (_page < TotalPages - 2) pages.Add(-1);
+            pages.Add(TotalPages);
+            return pages;
+        }
+    }
+
+    private void PrevPage() { if (_page > 1) _page--; }
+    private void NextPage() { if (_page < TotalPages) _page++; }
+    private void GoTo(int p) => _page = p;
+
+    protected override void OnParametersSet() => _page = 1;
+}

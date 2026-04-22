@@ -1,0 +1,191 @@
+@page "/dashboard/task-requests/{RequestId}"
+@layout DashboardLayout
+@using Parrot.Web.Components.Pages.Dashboard.TaskRequests
+@inject NavigationManager Nav
+
+@if (_task == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="tr-detail-page">
+        <button class="tr-back-btn" @onclick="GoBack">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+            </svg>
+            Back
+        </button>
+
+        <div class="tr-detail-layout">
+            <div class="tr-detail-left">
+                <div class="tr-detail-card">
+                    <div class="tr-detail-header">
+                        <div class="tr-detail-title-row">
+                            <h2 class="tr-detail-title">Request #@_task.RequestId</h2>
+                            <span class="tr-status-badge tr-status-badge--@_task.Status.ToLower()">
+                                <svg width="8" height="8" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="4" fill="currentColor" />
+                                </svg>
+                                @_task.Status
+                            </span>
+                        </div>
+                        <button class="tr-detail-menu-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="5" r="1.5" />
+                                <circle cx="12" cy="12" r="1.5" />
+                                <circle cx="12" cy="19" r="1.5" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tr-detail-card">
+                    <h3 class="tr-section-title">Request Summary</h3>
+                    <div class="tr-summary-grid">
+                        <div class="tr-summary-row">
+                            <span class="tr-summary-label">Item(s):</span>
+                            <span class="tr-summary-value">@string.Join(", ", _task.Items)</span>
+                        </div>
+                        <div class="tr-summary-row">
+                            <span class="tr-summary-label">Total amount:</span>
+                            <span class="tr-summary-value">@_task.Amount</span>
+                        </div>
+                        <div class="tr-summary-row">
+                            <span class="tr-summary-label">Channel:</span>
+                            <span class="tr-summary-value tr-summary-channel">
+                                <img src="assets/images/icons/@(_task.ChannelIcon).png" width="16" height="16"
+                                     alt="@_task.Channel" />
+                                @_task.Channel
+                            </span>
+                        </div>
+                        <div class="tr-summary-row">
+                            <span class="tr-summary-label">AI agent:</span>
+                            <span class="tr-summary-value">@_task.AiAgent</span>
+                        </div>
+                        <div class="tr-summary-row">
+                            <span class="tr-summary-label">Date &amp; time created:</span>
+                            <span class="tr-summary-value">@_task.DateCreated</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tr-detail-card">
+                    <h3 class="tr-section-title">Conversation Notes</h3>
+                    <p class="tr-section-sub">Additional details collected by your AI during the conversation.</p>
+                    @if (_task.ConversationNotes.Any())
+                    {
+                        <ul class="tr-notes-list">
+                            @foreach (var note in _task.ConversationNotes)
+                            {
+                                <li>@note</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="tr-empty-notes">No additional notes were captured during this conversation.</div>
+                    }
+                </div>
+
+                <div class="tr-activity-log">
+                    <h3 class="tr-section-title">Activity Log</h3>
+                    <p class="tr-section-sub">A timeline of actions related to this task</p>
+                    @if (_task.ActivityLog.Any())
+                    {
+                        @foreach (var log in _task.ActivityLog)
+                        {
+                            <div class="tr-log-item">
+                                <div class="tr-log-line-wrap">
+                                    <div class="tr-log-dot"></div>
+                                    <div class="tr-log-connector"></div>
+                                </div>
+                                <div class="tr-log-body">
+                                    <span class="tr-log-time">@log.Timestamp</span>
+                                    <span class="tr-log-desc">@log.Description</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="tr-empty-notes">Actions and updates related to this task will appear here.</div>
+                    }
+                </div>
+            </div>
+
+            <div class="tr-detail-right">
+                <div class="tr-detail-card tr-convo-card">
+                    <div class="tr-convo-header">
+                        <h3 class="tr-section-title">Conversation Context</h3>
+                        <a href="#" class="tr-open-convo">Open full conversation</a>
+                    </div>
+                    <p class="tr-section-sub">Messages that led to this task being created.</p>
+                    <div class="tr-messages">
+                        @foreach (var msg in _task.Messages)
+                        {
+                            @if (msg.IsAgent)
+                            {
+                                <div class="tr-msg tr-msg--agent">
+                                    <div class="tr-msg-wrap">
+                                        <div class="tr-msg-bubble">@msg.Text</div>
+                                    </div>
+                                    <img class="tr-msg-avatar" src="assets/images/icons/ai-agent.png" alt=""  />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="tr-msg tr-msg--customer">
+                                    <img class="tr-msg-avatar" src="assets/images/icons/avatar.png" alt="" />
+                                    <div class="tr-msg-wrap">
+                                        <div class="tr-msg-bubble">@msg.Text</div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="tr-detail-card">
+                    <h3 class="tr-section-title">Customer Details</h3>
+                    <div class="tr-summary-grid">
+                        <div class="tr-summary-row">
+                            <span class="tr-summary-label">Name:</span>
+                            <span class="tr-summary-value">@_task.CustomerName</span>
+                        </div>
+                        <div class="tr-summary-row">
+                            <span class="tr-summary-label">Contact</span>
+                            <span class="tr-summary-value">@_task.CustomerContact</span>
+                        </div>
+                    </div>
+                    <div class="tr-customer-note">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        Customers details are collected from the conversation on the connected channel and may vary
+                        depending on what the customer shared
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string RequestId { get; set; } = string.Empty;
+
+    private TaskRequest? _task;
+
+    private static readonly List<TaskRequest> _allTasks = TaskRequestsData.All;
+
+    protected override void OnParametersSet()
+    {
+        _task = _allTasks.FirstOrDefault(t => t.RequestId == RequestId);
+    }
+
+    private void GoBack() => Nav.NavigateTo("/dashboard/task-requests");
+}

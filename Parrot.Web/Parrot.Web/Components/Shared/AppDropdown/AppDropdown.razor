@@ -1,0 +1,30 @@
+@namespace Parrot.Web.Components.Shared
+
+<div class="appdrop-wrap">
+    <select class="appdrop-select" value="@Value" @onchange="HandleChange">
+        @if (!string.IsNullOrEmpty(Placeholder))
+        {
+            <option value="">@Placeholder</option>
+        }
+        @foreach (var opt in Options)
+        {
+            <option value="@opt.Value">@opt.Label</option>
+        }
+    </select>
+    <svg class="appdrop-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9l6 6 6-6" />
+    </svg>
+</div>
+
+@code {
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public IEnumerable<DropdownOption> Options { get; set; } = [];
+    [Parameter] public string Placeholder { get; set; } = "";
+
+    private async Task HandleChange(ChangeEventArgs e)
+    {
+        await ValueChanged.InvokeAsync(e.Value?.ToString() ?? "");
+    }
+}

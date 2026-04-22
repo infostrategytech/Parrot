@@ -1,9 +1,401 @@
 @page "/dashboard/task-requests"
 @layout DashboardLayout
+@using Parrot.Web.Components.Pages.Dashboard.TaskRequests
+@inject NavigationManager Nav
 
-<div class="dashboard-placeholder-page">
-    <h2>Task Requests</h2>
-    <p>Review and manage task requests here.</p>
-</div>
+<div class="tr-toolbar">
+    <div class="tr-search-wrap">
+        <svg class="tr-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input class="tr-search" placeholder="search by name or item..." @bind="_search" @bind:event="oninput" />
+    </div>
+    <div class="tr-toolbar-right">
+        <div class="tr-dropdown-wrap" @onclick:stopPropagation>
+            <button class="tr-filter-btn" @onclick="OpenStatusDropdown">
+                <span class="tr-filter-label">Status:</span>
+                <span class="tr-filter-value">@(_statusFilter == "" ? "All status" : _statusFilter)</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round"
+                     class="tr-chevron @(_openDropdown == "status" ? "tr-chevron--open" : "")">
+                    <path d="M6 9l6 6 6-6" />
+                </svg>
+            </button>
+            @if (_openDropdown == "status")
+            {
+                <div class="tr-dropdown-menu">
+                    @foreach (var opt in _statusOptions)
+                    {
+                        var val = opt.Value;
+                        <button class="tr-dropdown-item @(_statusFilter == val ? "tr-dropdown-item--active" : "")"
+                                @onclick="() => SelectStatus(val)">
+                            @opt.Label
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+        <div class="tr-dropdown-wrap" @onclick:stopPropagation>
+            <button class="tr-filter-btn" @onclick="OpenChannelDropdown">
+                <span class="tr-filter-label">Channel:</span>
+                <span class="tr-filter-value">@(_channelFilter == "" ? "All channels" : _channelFilter == "Whatsapp Business" ? "WhatsApp" : _channelFilter == "Facebook Marketplace" ? "Facebook" :
+                                        _channelFilter)</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         class="tr-chevron @(_openDropdown == "channel" ? "tr-chevron--open" : "")">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </button>
+                @if (_openDropdown == "channel")
+                {
+                    <div class="tr-dropdown-menu">
+                        @foreach (var opt in _channelOptions)
+                        {
+                            var val = opt.Value;
+                            <button class="tr-dropdown-item @(_channelFilter == val ? "tr-dropdown-item--active" : "")"
+                                    @onclick="() => SelectChannel(val)">
+                                @opt.Label
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="tr-dropdown-wrap" @onclick:stopPropagation>
+                <button class="tr-filter-btn" @onclick="OpenAgentDropdown">
+                    <span class="tr-filter-label">Agent:</span>
+                    <span class="tr-filter-value">@(_agentFilter == "" ? "All agents" : _agentFilter)</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         class="tr-chevron @(_openDropdown == "agent" ? "tr-chevron--open" : "")">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </button>
+                @if (_openDropdown == "agent")
+                {
+                    <div class="tr-dropdown-menu">
+                        @foreach (var opt in _agentOptions)
+                        {
+                            var val = opt.Value;
+                            <button class="tr-dropdown-item @(_agentFilter == val ? "tr-dropdown-item--active" : "")"
+                                    @onclick="() => SelectAgent(val)">
+                                @opt.Label
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="tr-dropdown-wrap" @onclick:stopPropagation>
+                <button class="tr-filter-btn tr-date-btn" @onclick="() => _showDatePicker = !_showDatePicker">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                    Date range
+                </button>
+                @if (_showDatePicker)
+                {
+                    <div class="tr-datepicker-backdrop" @onclick="() => _showDatePicker = false"></div>
+                    <div class="tr-datepicker-popup" @onclick:stopPropagation>
+                        <div class="tr-dp-left">
+                            @foreach (var preset in _presets)
+                            {
+                                <button class="tr-dp-preset @(_activePreset == preset ? "tr-dp-preset--active" : "")"
+                                        @onclick="() => SelectPreset(preset)">
+                                    <span class="tr-dp-radio @(_activePreset == preset ? "tr-dp-radio--active" : "")"></span>
+                                    @preset
+                                </button>
+                            }
+                            <div class="tr-dp-actions">
+                                <button class="tr-dp-reset" @onclick="ResetDate">Reset</button>
+                                <button class="tr-dp-filter" @onclick="ApplyDate">Filter</button>
+                            </div>
+                        </div>
+                        <div class="tr-dp-right">
+                            <div class="tr-dp-inputs">
+                                <div class="tr-dp-input-wrap">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                        <line x1="16" y1="2" x2="16" y2="6" />
+                                        <line x1="8" y1="2" x2="8" y2="6" />
+                                        <line x1="3" y1="10" x2="21" y2="10" />
+                                    </svg>
+                                    <span>@(_startDate.HasValue? _startDate.Value.ToString("MMM d") : "Start date")</span>
+                                </div>
+                                <div class="tr-dp-input-wrap">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                        <line x1="16" y1="2" x2="16" y2="6" />
+                                        <line x1="8" y1="2" x2="8" y2="6" />
+                                        <line x1="3" y1="10" x2="21" y2="10" />
+                                    </svg>
+                                    <span>@(_endDate.HasValue? _endDate.Value.ToString("MMM d") : "End date")</span>
+                                </div>
+                            </div>
+                            <div class="tr-dp-cal-header">
+                                <button class="tr-dp-nav" @onclick="PrevMonth">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M15 18l-6-6 6-6" />
+                                    </svg>
+                                </button>
+                                <span class="tr-dp-month-label">@_calMonth.ToString("MMM yyyy")</span>
+                                <button class="tr-dp-nav" @onclick="NextMonth">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 18l6-6-6-6" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="tr-dp-cal-grid">
+                                @foreach (var dow in new[] { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" })
+                                {
+                                    <span class="tr-dp-dow">@dow</span>
+                                }
+                                @for (int blank = 0; blank < (int)new DateTime(_calMonth.Year, _calMonth.Month, 1).DayOfWeek;
+                                                        blank++)
+                                {
+                                    <span></span>
+                                }
+                                @for (int d = 1; d <= DateTime.DaysInMonth(_calMonth.Year, _calMonth.Month); d++)
+                                {
+                                    var day = new DateTime(_calMonth.Year, _calMonth.Month, d);
+                                    var isSelected = day == _startDate || day == _endDate;
+                                    var inRange = _startDate.HasValue && _endDate.HasValue && day > _startDate && day < _endDate;
+                                    var dayStr = d.ToString();
+                                    <button
+                                    class="tr-dp-day @(isSelected ? "tr-dp-day--sel" : "") @(inRange ? "tr-dp-day--range" : "")"
+                                    @onclick="() => PickDay(day)">@dayStr</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 
-@code { }
+    <div class="tr-table-wrap">
+        <table class="tr-table">
+            <thead>
+                <tr>
+                    <th>Request ID</th>
+                    <th>Item</th>
+                    <th>Channel</th>
+                    <th>AI Agent</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date Creaated</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var req in PagedRequests)
+                {
+                    <tr class="tr-tr">
+                        <td class="tr-td tr-td--id">@req.RequestId</td>
+                        <td class="tr-td">@req.Item</td>
+                        <td class="tr-td">
+                            <div class="tr-channel-cell">
+                                <img src="assets/images/icons/@(req.ChannelIcon).png" width="18" height="18"
+                                     alt="@req.Channel" />
+                                @req.Channel
+                            </div>
+                        </td>
+                        <td class="tr-td">@req.AiAgent</td>
+                        <td class="tr-td">@req.Amount</td>
+                        <td class="tr-td">
+                            <span class="tr-status-badge tr-status-badge--@req.Status.ToLower()">
+                                <svg width="8" height="8" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="4" fill="currentColor" />
+                                </svg>
+                                @req.Status
+                            </span>
+                        </td>
+                        <td class="tr-td tr-td--muted">@req.DateCreated</td>
+                        <td class="tr-td tr-td--actions">
+                            <div class="tr-action-wrap">
+                                <button class="tr-action-btn" @onclick="() => ToggleMenu(req.Id)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <circle cx="12" cy="5" r="1.5" />
+                                        <circle cx="12" cy="12" r="1.5" />
+                                        <circle cx="12" cy="19" r="1.5" />
+                                    </svg>
+                                </button>
+                                @if (_openMenuId == req.Id)
+                                {
+                                    <div class="tr-action-menu">
+                                        <button class="tr-action-item" @onclick="() => ViewDetails(req)">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                            View details
+                                        </button>
+                                        <button class="tr-action-item" @onclick="() => MarkCompleted(req)">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                            Mark as completed
+                                        </button>
+                                        <button class="tr-action-item tr-action-item--danger" @onclick="() => CancelRequest(req)">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <line x1="15" y1="9" x2="9" y2="15" />
+                                                <line x1="9" y1="9" x2="15" y2="15" />
+                                            </svg>
+                                            Cancel request
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="tr-pagination">
+            <span class="tr-page-info">Showing @PageStart–@PageEnd of @TotalCount items</span>
+            <div class="tr-page-controls">
+                <button class="tr-page-btn" disabled="@(_page == 1)" @onclick="() => _page--">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                </button>
+                @foreach (var p in VisiblePages)
+                {
+                    @if (p == -1)
+                    {
+                        <span class="tr-page-dots">…</span>
+                    }
+                    else
+                    {
+                        var pg = p;
+
+                        <button class="tr-page-btn @(pg == _page ? "tr-page-btn--active" : "")"
+                                @onclick="() => _page = pg">@pg</button>
+                    }
+                }
+                <button class="tr-page-btn" disabled="@(_page == TotalPages)" @onclick="() => _page++">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+@code {
+    private List<TaskRequest> _requests = TaskRequestsData.All;
+    private string _search = string.Empty;
+    private string _statusFilter = string.Empty;
+    private string _channelFilter = string.Empty;
+    private string _agentFilter = string.Empty;
+    private string? _openMenuId;
+    private string? _openDropdown;
+    private int _page = 1;
+    private int _pageSize = 10;
+
+    private record FilterOption(string Value, string Label);
+    private List<FilterOption> _statusOptions = new() { new("","All status"), new("Pending","Pending"),
+new("Completed","Completed"), new("Cancelled","Cancelled") };
+    private List<FilterOption> _channelOptions = new() { new("","All channels"), new("Whatsapp Business","WhatsApp"),
+new("Instagram","Instagram"), new("Facebook Marketplace","Facebook") };
+    private List<FilterOption> _agentOptions = new() { new("","All agents"), new("BakerBot","BakerBot"),
+new("Bakerbot","Bakerbot") };
+
+    private void OpenStatusDropdown() => ToggleDropdown("status");
+    private void OpenChannelDropdown() => ToggleDropdown("channel");
+    private void OpenAgentDropdown() => ToggleDropdown("agent");
+    private void ToggleDropdown(string name) => _openDropdown = _openDropdown == name ? null : name;
+    private void SelectStatus(string val) { _statusFilter = val; _openDropdown = null; _page = 1; }
+    private void SelectChannel(string val) { _channelFilter = val; _openDropdown = null; _page = 1; }
+    private void SelectAgent(string val) { _agentFilter = val; _openDropdown = null; _page = 1; }
+
+    private bool _showDatePicker;
+    private string _activePreset = "All Time";
+    private DateTime? _startDate;
+    private DateTime? _endDate;
+    private DateTime _calMonth = new DateTime(2025, 2, 1);
+    private readonly string[] _presets = { "All Time", "Today", "Last 7 Days", "Last 30 Days", "Custom Range" };
+
+    private List<TaskRequest> FilteredRequests => _requests
+        .Where(r => string.IsNullOrEmpty(_search) ||
+                    r.RequestId.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
+                    r.Item.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
+                    r.CustomerName.Contains(_search, StringComparison.OrdinalIgnoreCase))
+        .Where(r => string.IsNullOrEmpty(_statusFilter) || r.Status == _statusFilter)
+        .Where(r => string.IsNullOrEmpty(_channelFilter) || r.Channel == _channelFilter)
+        .Where(r => string.IsNullOrEmpty(_agentFilter) || r.AiAgent == _agentFilter)
+        .ToList();
+
+    private int TotalCount => FilteredRequests.Count;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(TotalCount / (double)_pageSize));
+    private int PageStart => TotalCount == 0 ? 0 : (_page - 1) * _pageSize + 1;
+    private int PageEnd => Math.Min(_page * _pageSize, TotalCount);
+    private IEnumerable<TaskRequest> PagedRequests => FilteredRequests.Skip((_page - 1) * _pageSize).Take(_pageSize);
+
+    private List<int> VisiblePages
+    {
+        get
+        {
+            var pages = new List<int>();
+            if (TotalPages <= 7) { for (int i = 1; i <= TotalPages; i++) pages.Add(i); return pages; }
+            pages.Add(1);
+            if (_page > 3) pages.Add(-1);
+            for (int i = Math.Max(2, _page - 1); i <= Math.Min(TotalPages - 1, _page + 1); i++) pages.Add(i);
+            if (_page < TotalPages - 2) pages.Add(-1);
+            pages.Add(TotalPages);
+            return pages;
+        }
+    }
+
+    private void ToggleMenu(string id) => _openMenuId = _openMenuId == id ? null : id;
+    private void ViewDetails(TaskRequest r)
+    {
+        _openMenuId = null; Nav.NavigateTo($"/dashboard/task-requests/{r.RequestId}");
+    }
+    private void MarkCompleted(TaskRequest r) { r.Status = "Completed"; _openMenuId = null; }
+    private void CancelRequest(TaskRequest r) { r.Status = "Cancelled"; _openMenuId = null; }
+
+    private void SelectPreset(string preset)
+    {
+        _activePreset = preset;
+        var today = DateTime.Today;
+        _startDate = preset switch
+        {
+            "Today" => today,
+            "Last 7 Days" => today.AddDays(-6),
+            "Last 30 Days" => today.AddDays(-29),
+            _ => null,
+        };
+        _endDate = preset is "Today" or "Last 7 Days" or "Last 30 Days" ? today : null;
+    }
+
+    private void PickDay(DateTime day)
+    {
+        _activePreset = "Custom Range";
+        if (!_startDate.HasValue || (_startDate.HasValue && _endDate.HasValue))
+        { _startDate = day; _endDate = null; }
+        else
+        { _endDate = day < _startDate ? (_startDate = day, _endDate = _startDate).Item2 : day; }
+    }
+
+    private void ResetDate() { _activePreset = "All Time"; _startDate = null; _endDate = null; }
+    private void ApplyDate() => _showDatePicker = false;
+    private void PrevMonth() => _calMonth = _calMonth.AddMonths(-1);
+    private void NextMonth() => _calMonth = _calMonth.AddMonths(1);
+}

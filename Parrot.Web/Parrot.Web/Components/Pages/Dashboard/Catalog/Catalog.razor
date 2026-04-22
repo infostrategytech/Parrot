@@ -1,9 +1,259 @@
 @page "/dashboard/catalog"
 @layout DashboardLayout
+@using Parrot.Web.Components.Pages.Dashboard.Catalog
+@using Parrot.Web.Components.Shared
 
-<div class="dashboard-placeholder-page">
-    <h2>Catalog</h2>
-    <p>Browse and manage your product catalog here.</p>
-</div>
+@if (!_items.Any())
+{
+    <div class="cat-empty-page">
+        <div class="cat-empty-card">
+            <div class="cat-empty-checker"></div>
+            <img src="assets/images/gifs/welcome-owl.gif" alt="Owl" class="cat-empty-owl" />
+            <h2 class="cat-empty-title">Add items to your catalog</h2>
+            <p class="cat-empty-sub">Your catalog helps your AI answer price-related questions and process customer requests accurately.</p>
+            <div class="cat-empty-actions">
+                <button class="cat-btn cat-btn--ghost" @onclick="OpenCategoryModal">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    Manage categories
+                </button>
+                <button class="cat-btn cat-btn--primary" @onclick="OpenAddItem">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    Add item
+                </button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="cat-toolbar">
+        <div class="cat-search-wrap">
+            <svg class="cat-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="cat-search" placeholder="search by name..." @bind="_search" @bind:event="oninput" />
+        </div>
+        <div class="cat-toolbar-right">
+            <div class="cat-dropdown-wrap" @onclick:stopPropagation>
+                <button class="cat-filter-btn" @onclick="OpenStatusDropdown">
+                    <span class="cat-filter-label">Status:</span>
+                    <span class="cat-filter-value">@(_statusFilter == "" ? "All status" : _statusFilter == "active" ? "Active" : "Disabled")</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         class="cat-chevron @(_openDropdown == "status" ? "cat-chevron--open" : "")">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </button>
+                @if (_openDropdown == "status")
+                {
+                    <div class="cat-dropdown-menu">
+                        @foreach (var opt in _statusOptions)
+                        {
+                            var val = opt.Value;
+                            <button class="cat-dropdown-item @(_statusFilter == val ? "cat-dropdown-item--active" : "")"
+                                    @onclick="() => SelectStatus(val)">
+                                @opt.Label
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="cat-dropdown-wrap" @onclick:stopPropagation>
+                <button class="cat-filter-btn" @onclick="OpenCategoryDropdown">
+                    <span class="cat-filter-label">Category:</span>
+                    <span class="cat-filter-value">@(_categoryFilter == "" ? "All categories" : _categoryFilter)</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         class="cat-chevron @(_openDropdown == "category" ? "cat-chevron--open" : "")">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </button>
+                @if (_openDropdown == "category")
+                {
+                    <div class="cat-dropdown-menu">
+                        <button class="cat-dropdown-item @(_categoryFilter == "" ? "cat-dropdown-item--active" : "")"
+                                @onclick='() => SelectCategory("")'>
+                            All categories
+                        </button>
+                        @foreach (var cat in _categories)
+                        {
+                            var catName = cat.Name;
+                            <button class="cat-dropdown-item @(_categoryFilter == catName ? "cat-dropdown-item--active" : "")"
+                                    @onclick="() => SelectCategory(catName)">
+                                @cat.Name
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="cat-btn--ghost-wrapper">
+                <button class="cat-btn cat-btn--ghost" @onclick="OpenCategoryModal">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    Manage categories
+                </button>
+            </div>
+            <button class="cat-btn cat-btn--primary" @onclick="OpenAddItem">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                Add item
+            </button>
+        </div>
+    </div>
 
-@code { }
+    <DataTable TItem="CatalogItem" Items="FilteredItems" Columns="_columns" PageSize="10" ShowPagination="true">
+        <RowActions Context="item">
+            <div class="dt-action-wrap">
+                <button class="dt-action-btn" @onclick="() => ToggleMenu(item.Id)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+                </button>
+                @if (_openMenuId == item.Id)
+                {
+                    <div class="dt-action-menu">
+                        <button class="dt-action-item" @onclick="() => EditItem(item)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            Edit details
+                        </button>
+                        <button class="dt-action-item dt-action-item--danger" @onclick="() => PromptDelete(item)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                            Delete
+                        </button>
+                    </div>
+                }
+            </div>
+        </RowActions>
+        <EmptyContent>
+            <div class="cat-no-results">No items match your filters.</div>
+        </EmptyContent>
+    </DataTable>
+}
+
+<AddItemModal Visible="_showAddItem"
+              Categories="_categories"
+              OnCancel="CloseModals"
+              OnSave="HandleSaveItem"
+              OnCreateCategory="SwitchToCategoryModal" />
+
+<CategoryModal Visible="_showCategoryModal"
+               Categories="_categories"
+               OnCancel="CloseModals"
+               OnSave="HandleSaveCategories" />
+
+<DeleteConfirmModal Visible="_showDeleteConfirm"
+                    Title="Delete item?"
+                    Description="This item will be removed from your catalog and won't be used by your AI agents."
+                    ConfirmLabel="Delete"
+                    OnCancel="CloseModals"
+                    OnConfirm="HandleDeleteConfirmed" />
+
+@code {
+    private List<CatalogCategory> _categories = new()
+    {
+        new() { Name = "Main dish" },
+        new() { Name = "Combo meal" },
+        new() { Name = "Protein" },
+        new() { Name = "Snack" },
+        new() { Name = "Drink" },
+        new() { Name = "Add-on" },
+    };
+
+    private List<CatalogItem> _items = new()
+    {
+        new() { Name = "Jollof rice",        Category = "Main dish",  Currency = "NGN", Price = 3500, IsAvailable = true  },
+        new() { Name = "Fried Rice",         Category = "Main dish",  Currency = "NGN", Price = 3500, IsAvailable = true  },
+        new() { Name = "Chicken & Chips",    Category = "Combo meal", Currency = "NGN", Price = 6000, IsAvailable = false },
+        new() { Name = "Beef Burger",        Category = "Main dish",  Currency = "NGN", Price = 4500, IsAvailable = true  },
+        new() { Name = "Shawarma",           Category = "Main dish",  Currency = "NGN", Price = 4000, IsAvailable = true  },
+        new() { Name = "Grilled Chicken",    Category = "Protein",    Currency = "NGN", Price = 6000, IsAvailable = false },
+        new() { Name = "Meat Pie",           Category = "Snack",      Currency = "NGN", Price = 1500, IsAvailable = true  },
+        new() { Name = "Bottled Water (50cl)",Category = "Drink",     Currency = "NGN", Price = 500,  IsAvailable = true  },
+        new() { Name = "Fanta",              Category = "Drink",      Currency = "NGN", Price = 800,  IsAvailable = false },
+        new() { Name = "Extra Chicken",      Category = "Add-on",     Currency = "NGN", Price = 1500, IsAvailable = false },
+    };
+
+    private string _search = string.Empty;
+    private string _statusFilter = string.Empty;
+    private string _categoryFilter = string.Empty;
+    private string? _openDropdown;
+
+    private record FilterOption(string Value, string Label);
+    private List<FilterOption> _statusOptions = new() { new("","All status"), new("active","Active"), new("disabled","Disabled") };
+
+    private void OpenStatusDropdown()   => ToggleDropdown("status");
+    private void OpenCategoryDropdown() => ToggleDropdown("category");
+    private void ToggleDropdown(string name) => _openDropdown = _openDropdown == name ? null : name;
+    private void SelectStatus(string val)   { _statusFilter   = val; _openDropdown = null; }
+    private void SelectCategory(string val) { _categoryFilter = val; _openDropdown = null; }
+
+    private bool _showAddItem;
+    private bool _showCategoryModal;
+    private bool _showDeleteConfirm;
+
+    private CatalogItem? _pendingDelete;
+    private Guid? _openMenuId;
+
+    private List<DataTableColumn<CatalogItem>> _columns => new()
+    {
+        new() { Header = "Item Name",  Template = item => @<span class="cat-item-name">@item.Name</span> },
+        new() { Header = "Category",   Template = item => @<span>@item.Category</span> },
+        new() { Header = "Price",      Template = item => @<span>@(item.Currency == "NGN" ? "\u20A6" : item.Currency)@item.Price.ToString("N0")</span> },
+        new() { Header = "Toggle",     Template = item => @<label class="dt-toggle"><input type="checkbox" checked="@item.IsAvailable" @onchange="() => ToggleItem(item)" /><span class="dt-toggle-track"></span><span class="dt-toggle-thumb"></span></label> },
+        new() { Header = "Status",     Template = item => @<span class="dt-badge @(item.IsAvailable ? "dt-badge--active" : "dt-badge--disabled")"><svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>@(item.IsAvailable ? "Active" : "Disabled")</span> },
+    };
+
+    private List<CatalogItem> FilteredItems => _items
+        .Where(i => string.IsNullOrEmpty(_search) || i.Name.Contains(_search, StringComparison.OrdinalIgnoreCase))
+        .Where(i => string.IsNullOrEmpty(_statusFilter) ||
+                    (_statusFilter == "active" && i.IsAvailable) ||
+                    (_statusFilter == "disabled" && !i.IsAvailable))
+        .Where(i => string.IsNullOrEmpty(_categoryFilter) || i.Category == _categoryFilter)
+        .ToList();
+
+    private void OpenAddItem() { CloseModals(); _showAddItem = true; }
+    private void OpenCategoryModal() { CloseModals(); _showCategoryModal = true; }
+
+    private void SwitchToCategoryModal()
+    {
+        _showAddItem = false;
+        _showCategoryModal = true;
+    }
+
+    private void CloseModals()
+    {
+        _showAddItem = false;
+        _showCategoryModal = false;
+        _showDeleteConfirm = false;
+        _openMenuId = null;
+    }
+
+    private void HandleSaveItem(CatalogItem item)
+    {
+        _items.Add(item);
+        CloseModals();
+    }
+
+    private void HandleSaveCategories(List<CatalogCategory> updated)
+    {
+        _categories = updated;
+        CloseModals();
+    }
+
+    private void ToggleItem(CatalogItem item) => item.IsAvailable = !item.IsAvailable;
+
+    private void ToggleMenu(Guid id) => _openMenuId = _openMenuId == id ? null : id;
+
+    private void EditItem(CatalogItem item)
+    {
+        _openMenuId = null;
+    }
+
+    private void PromptDelete(CatalogItem item)
+    {
+        _pendingDelete = item;
+        _openMenuId = null;
+        _showDeleteConfirm = true;
+    }
+
+    private void HandleDeleteConfirmed()
+    {
+        if (_pendingDelete != null) _items.Remove(_pendingDelete);
+        _pendingDelete = null;
+        CloseModals();
+    }
+}
