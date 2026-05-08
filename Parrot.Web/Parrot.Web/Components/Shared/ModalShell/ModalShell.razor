@@ -1,0 +1,90 @@
+@namespace Parrot.Web.Components.Shared
+@inject IJSRuntime JS
+
+@if (Visible)
+{
+    <div class="modal-backdrop" @onclick="OnClose"></div>
+    <div class="@_dialogClass" @onclick="HandleDialogClick" @onclick:stopPropagation="true">
+
+        @if (!string.IsNullOrEmpty(Title))
+        {
+            <div class="modal-header">
+                <div class="modal-header-top">
+                    <h2 class="modal-title">@Title</h2>
+                    @if (ShowCloseButton)
+                    {
+                        <button class="modal-close" @onclick="OnClose" aria-label="Close">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    }
+                    @if (SubtitleInline && !string.IsNullOrEmpty(Subtitle))
+                    {
+                        <p class="modal-header-sub">@Subtitle</p>
+                    }
+                </div>
+                @if (!SubtitleInline && !string.IsNullOrEmpty(Subtitle))
+                {
+                    <p class="modal-sub">@Subtitle</p>
+                }
+            </div>
+            @if (ShowDivider)
+            {
+                <div class="modal-divider"></div>
+            }
+        }
+
+        <div class="modal-body">
+            @BodyContent
+        </div>
+
+        @if (FooterContent != null)
+        {
+            <div class="modal-footer @FooterClass">
+                @FooterContent
+            </div>
+        }
+
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Subtitle { get; set; } = string.Empty;
+    [Parameter] public string Size { get; set; } = string.Empty;
+    [Parameter] public string ExtraClass { get; set; } = string.Empty;
+    [Parameter] public string FooterClass { get; set; } = string.Empty;
+    [Parameter] public bool ShowCloseButton { get; set; } = false;
+    [Parameter] public bool ShowDivider { get; set; } = true;
+    [Parameter] public bool SubtitleInline { get; set; } = false;
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public RenderFragment? BodyContent { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
+
+    private string _dialogClass => string.Join(" ", new[]
+    {
+        "modal-dialog",
+        string.IsNullOrEmpty(Size) ? null : $"modal-dialog--{Size}",
+        ExtraClass
+    }.Where(c => !string.IsNullOrEmpty(c)));
+
+    private bool _prevVisible;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Visible && !_prevVisible)
+            await JS.InvokeVoidAsync("modalBodyLock.lock");
+        else if (!Visible && _prevVisible)
+            await JS.InvokeVoidAsync("modalBodyLock.unlock");
+
+        _prevVisible = Visible;
+    }
+
+    private void HandleDialogClick()
+    {
+    }
+}

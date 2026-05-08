@@ -1,0 +1,233 @@
+/* Styles moved to app.css to avoid Blazor scoped CSS issues inside @foreach */
+
+.channels-info-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.875rem 1rem;
+    background: #FFFBEB;
+    border: 1.5px dashed #F59E0B;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.channels-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+}
+
+.channel-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.75rem;
+    background: #fff;
+}
+
+.channel-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.channel-card-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: contain;
+}
+
+.channel-card-status {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: #6B7280;
+}
+
+.channel-card-status--connected {
+    color: #16A34A;
+}
+
+.channel-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #9CA3AF;
+    display: inline-block;
+}
+
+.channel-card-status--connected .channel-status-dot {
+    background: #16A34A;
+}
+
+.channel-card-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0.25rem 0 0;
+}
+
+.channel-card-desc {
+    font-size: 0.8125rem;
+    color: #6B7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.channel-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #F3F4F6;
+}
+
+.channel-card-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: #6B7280;
+}
+
+.channel-card-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.5rem;
+    background: #fff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    margin-top: 0.25rem;
+    transition: background 0.15s;
+}
+
+.channel-card-btn:hover {
+    background: #F9FAFB;
+}
+
+.channel-card-btn--disconnect {
+    color: #DC2626;
+    border-color: #FECACA;
+}
+
+.channel-card-btn--disconnect:hover {
+    background: #FEF2F2;
+}
+
+/* Connect Whatsapp Intro Modal */
+.cwm-video-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.cwm-video-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cwm-video-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+.cwm-video-sub {
+    font-size: 0.75rem;
+    color: #6B7280;
+}
+
+.cwm-watch-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border: 1.5px solid #6B21A8;
+    border-radius: 0.375rem;
+    background: #fff;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #6B21A8;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.cwm-checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.cwm-checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    font-size: 0.875rem;
+    color: #374151;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+.cwm-checklist-item:last-child {
+    border-bottom: none;
+}
+
+.cwm-check-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.cwm-info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #FFFBEB;
+    border: 1.5px dashed #F59E0B;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    color: #374151;
+    margin-top: 1rem;
+}
+
+.cwm-btn {
+    flex: 1;
+    padding: 0.625rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #E5E7EB;
+}
+
+.cwm-btn--cancel {
+    background: #fff;
+    color: #374151;
+}
+
+.cwm-btn--start {
+    background: #4C1D95;
+    color: #fff;
+    border-color: #4C1D95;
+}

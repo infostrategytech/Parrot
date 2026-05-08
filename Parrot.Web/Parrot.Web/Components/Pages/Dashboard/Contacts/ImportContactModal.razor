@@ -1,0 +1,66 @@
+@using Parrot.Web.Components.Pages.Dashboard.Contacts
+
+<ModalShell Visible="Visible" Title="Import contact" Subtitle="Upload a CSV file to add multiple customers to your CRM."
+            Size="contact" OnClose="OnCancel">
+    <BodyContent>
+        <button class="ic-download-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download Template
+        </button>
+        <p class="ic-template-hint">Template columns: Name, Phone, Email, Stage</p>
+        <label class="ic-dropzone">
+            <input type="file" accept=".csv" style="display:none" @onchange="HandleFile" />
+            @if (string.IsNullOrEmpty(_fileName))
+            {
+                <div class="ic-drop-icon-wrap">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.75"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                </div>
+                <span class="ic-drop-label">Click to upload CSV file</span>
+                <span class="ic-drop-sub">or drag and drop</span>
+            }
+            else
+            {
+                <div class="ic-drop-icon-wrap ic-drop-icon-wrap--done">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                </div>
+                <span class="ic-drop-label">@_fileName</span>
+            }
+        </label>
+    </BodyContent>
+    <FooterContent>
+        <button class="modal-btn modal-btn--cancel" @onclick="OnCancel">Cancel</button>
+        <button class="modal-btn modal-btn--save" @onclick="OnCancel">Import contact</button>
+    </FooterContent>
+</ModalShell>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private string _fileName = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if (Visible) _fileName = string.Empty;
+    }
+
+    private void HandleFile(ChangeEventArgs e)
+    {
+        _fileName = e.Value?.ToString() ?? string.Empty;
+        if (!string.IsNullOrEmpty(_fileName))
+            _fileName = System.IO.Path.GetFileName(_fileName);
+    }
+}

@@ -1,0 +1,76 @@
+.ic-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border: 1.5px solid #7C3AED;
+    border-radius: 0.5rem;
+    background: #fff;
+    font-size: 0.875rem;
+    font-weight: 400;
+    width: fit-content;
+    color: #1d1d1d;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ic-download-btn:hover {
+    background: #F5F3FF;
+}
+
+.ic-template-hint {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    font-style: italic;
+    margin: 0;
+}
+
+.ic-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    width: 100%;
+    min-height: 8rem;
+    border: 1.5px dashed #D1D5DB;
+    border-radius: 0.625rem;
+    background: #fff;
+    cursor: pointer;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.ic-dropzone:hover {
+    border-color: #7C3AED;
+    background: #F5F3FF;
+}
+
+.ic-drop-icon-wrap {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: #F3F4F6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+}
+
+.ic-drop-icon-wrap--done {
+    background: #EDE9FE;
+}
+
+.ic-drop-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    text-align: center;
+}
+
+.ic-drop-sub {
+    font-size: 0.8125rem;
+    color: #6B7280;
+    text-align: center;
+}

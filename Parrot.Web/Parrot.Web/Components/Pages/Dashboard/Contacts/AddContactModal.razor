@@ -1,0 +1,88 @@
+@using Parrot.Web.Components.Pages.Dashboard.Contacts
+
+<ModalShell Visible="Visible" Title="Add contact"
+            Subtitle="Create a new contact for a customer you want to track or message." Size="contact" OnClose="OnCancel">
+    <BodyContent>
+        <div class="modal-field">
+            <label class="modal-label">Full name</label>
+            <input class="modal-input" placeholder="Jon doe" @bind="_contact.Name" />
+        </div>
+        <div class="modal-row">
+            <div class="modal-field modal-field--half">
+                <label class="modal-label">Email address <span class="modal-optional">(Optional)</span></label>
+                <input class="modal-input" type="email" placeholder="jondoe@gmail.com" @bind="_contact.Email" />
+            </div>
+            <div class="modal-field modal-field--half">
+                <label class="modal-label">Phone number <span class="modal-optional">(Optional)</span></label>
+                <input class="modal-input" type="tel" placeholder="08108023456" @bind="_contact.Phone" />
+            </div>
+        </div>
+        <div class="modal-field">
+            <label class="modal-label">Channel identifier</label>
+            <input class="modal-input" placeholder="e.g 081000333456 or @@jon_doe" @bind="_contact.ChannelIdentifier" />
+        </div>
+        <div class="modal-row">
+            <div class="modal-field modal-field--half">
+                <label class="modal-label">Stage</label>
+                <div class="modal-select-wrap">
+                    <select class="modal-select" @bind="_contact.Stage">
+                        <option value="">-- Select --</option>
+                        <option value="New Lead">New Lead</option>
+                        <option value="Interested">Interested</option>
+                        <option value="Customer">Customer</option>
+                        <option value="Vip">VIP</option>
+                    </select>
+                    <svg class="modal-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </div>
+            </div>
+            <div class="modal-field modal-field--half">
+                <label class="modal-label">Tag</label>
+                <div class="modal-select-wrap">
+                    <select class="modal-select" @bind="_tag">
+                        <option value="">-- Select --</option>
+                        <option value="VIP">VIP</option>
+                        <option value="Frequent buyer">Frequent buyer</option>
+                    </select>
+                    <svg class="modal-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </BodyContent>
+    <FooterContent>
+        <button class="modal-btn modal-btn--cancel" @onclick="OnCancel">Cancel</button>
+        <button class="modal-btn modal-btn--save" @onclick="HandleSave"
+                disabled="@string.IsNullOrWhiteSpace(_contact.Name)">Save contact</button>
+    </FooterContent>
+</ModalShell>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback<Contact> OnSave { get; set; }
+
+    private Contact _contact = new();
+    private string _tag = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if (Visible)
+        {
+            _contact = new Contact { HasWhatsApp = true, HasInstagram = true };
+            _tag = string.Empty;
+        }
+    }
+
+    private async Task HandleSave()
+    {
+        if (string.IsNullOrWhiteSpace(_contact.Name)) return;
+        if (!string.IsNullOrWhiteSpace(_tag))
+            _contact.Tags.Add(_tag);
+        await OnSave.InvokeAsync(_contact);
+    }
+}
