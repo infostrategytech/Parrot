@@ -10,7 +10,16 @@
 
     <div class="dashboard-main">
         <header class="dashboard-topbar">
-            <span class="dashboard-topbar-title">@GetPageTitle()</span>
+            @if (IsBreadcrumb())
+            {
+                <span class="dashboard-topbar-title">
+                    Channels <span class="topbar-breadcrumb-sep">/</span> Connect whatsapp business
+                </span>
+            }
+            else
+            {
+                <span class="dashboard-topbar-title">@GetPageTitle()</span>
+            }
             <NotificationDropdown />
         </header>
 
@@ -42,6 +51,15 @@
         Nav.LocationChanged -= OnLocationChanged;
     }
 
+    private bool IsBreadcrumb()
+    {
+        var uri = new Uri(Nav.Uri);
+        var segment = uri.AbsolutePath
+            .Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .LastOrDefault() ?? string.Empty;
+        return segment == "connect-whatsapp";
+    }
+
     private string GetPageTitle()
     {
         var uri = new Uri(Nav.Uri);
@@ -57,6 +75,7 @@
             "contacts" => "Contacts",
             "task-requests" => "Task Requests",
             "channels" => "Channels",
+            "connect-whatsapp" => "Channels",
             "conversations" => "Conversations",
             "team" => "Team",
             "qa-insights" => "QA & Conversation Insight",

@@ -1,5 +1,13 @@
 using Parrot.Web.Components;
 using Parrot.Web.Features.Auth.ForgotPassword.Services;
+using Parrot.Web.Features.Dashboard.AiAgents.State;
+using Parrot.Web.Features.Dashboard.Catalog.State;
+using Parrot.Web.Features.Dashboard.Channels.State;
+using Parrot.Web.Features.Dashboard.Contacts.State;
+using Parrot.Web.Features.Dashboard.Conversations.State;
+using Parrot.Web.Features.Dashboard.QaInsights.State;
+using Parrot.Web.Features.Dashboard.TaskRequests.State;
+using Parrot.Web.Features.Dashboard.Team.State;
 using Parrot.Web.Features.Auth.ForgotPassword.State;
 using Parrot.Web.Features.Auth.Login.Services;
 using Parrot.Web.Features.Auth.Login.State;
@@ -34,6 +42,15 @@ builder.Services.AddScoped<ForgotPasswordState>();
 builder.Services.AddScoped<ResetPasswordState>();
 builder.Services.AddScoped<VerifyEmailState>();
 builder.Services.AddScoped<AppState>();
+
+builder.Services.AddScoped<AiAgentsState>();
+builder.Services.AddScoped<CatalogState>();
+builder.Services.AddScoped<ChannelsState>();
+builder.Services.AddScoped<ContactsState>();
+builder.Services.AddScoped<ConversationsState>();
+builder.Services.AddScoped<QaInsightsState>();
+builder.Services.AddScoped<TaskRequestsState>();
+builder.Services.AddScoped<TeamState>();
 
 var app = builder.Build();
 
