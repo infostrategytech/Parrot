@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
-using Parrot.Api.Services.Auth;
-using Parrot.Api.Utils;
+using Parrot.Application.Auth;
+using Parrot.Application.Utils;
 
 namespace Test.Parrot.Api.Tests.Utils;
 

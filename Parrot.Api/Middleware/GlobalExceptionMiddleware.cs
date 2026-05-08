@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using Parrot.Api.Logging;
+using Parrot.Application.Logging;
 using Parrot.Domain.Exceptions;
 
 namespace Parrot.Api.Middleware;

@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Parrot.Api.Logging;
+using Parrot.Application.Logging;
 
 namespace Parrot.Api.Middleware;
 

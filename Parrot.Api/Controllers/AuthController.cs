@@ -2,9 +2,9 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Parrot.Api.DTOs.Auth;
+using Parrot.Application.Auth;
+using Parrot.Application.DTOs.Auth;
 using Parrot.Api.Middleware;
-using Parrot.Api.Services.Auth;
 using Parrot.Api.Utils;
 
 namespace Parrot.Api.Controllers;
@@ -22,14 +22,14 @@ public class AuthController : ControllerBase
 
     [HttpPost("register")]
     [EnableRateLimiting(RateLimitPolicies.Register)]
-    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-    public async Task<ActionResult<AuthResponse>> RegisterAsync([FromBody] RegisterRequest request)
+    public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequest request)
     {
-        AuthResponse response = await _authService.RegisterAsync(request);
-        return Ok(response);
+        await _authService.RegisterAsync(request);
+        return StatusCode(StatusCodes.Status201Created);
     }
 
     [HttpPost("login")]

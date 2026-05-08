@@ -5,12 +5,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Parrot.Api.Data;
-using Parrot.Api.Logging;
+using Parrot.Application.Auth;
+using Parrot.Application.Email;
+using Parrot.Application.Logging;
+using Parrot.Application.Models;
+using Parrot.Application.Utils;
+using Parrot.Infrastructure.Data;
+using Parrot.Infrastructure.Email;
 using Parrot.Api.Middleware;
-using Parrot.Api.Models;
-using Parrot.Api.Services.Auth;
-using Parrot.Api.Services.Email;
 using Parrot.Api.Utils;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -19,6 +21,13 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 JwtSettings jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
     ?? throw new InvalidOperationException("JwtSettings configuration is missing.");
+
+if (!builder.Environment.IsDevelopment() &&
+    jwtSettings.Secret is "YourSuperSecretKeyThatIsAtLeast32CharactersLong!")
+{
+    throw new InvalidOperationException(
+        "JwtSettings:Secret must be changed from the default placeholder before running in a non-development environment.");
+}
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
 
@@ -59,6 +68,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSettings.Issuer,
         ValidAudience = jwtSettings.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
+        ClockSkew = TimeSpan.Zero,
     };
 });
 

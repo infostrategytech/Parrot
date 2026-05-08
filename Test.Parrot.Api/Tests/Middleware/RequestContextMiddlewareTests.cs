@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
-using Parrot.Api.Logging;
 using Parrot.Api.Middleware;
+using Parrot.Application.Logging;
 
 namespace Test.Parrot.Api.Tests.Middleware;
 

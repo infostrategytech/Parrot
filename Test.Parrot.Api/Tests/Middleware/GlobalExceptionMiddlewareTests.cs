@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Parrot.Api.Logging;
 using Parrot.Api.Middleware;
+using Parrot.Application.Logging;
 using Parrot.Domain.Exceptions;
 
 namespace Test.Parrot.Api.Tests.Middleware;

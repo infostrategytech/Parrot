@@ -2,12 +2,12 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
-using Parrot.Api.DTOs.Auth;
-using Parrot.Api.Logging;
-using Parrot.Api.Models;
-using Parrot.Api.Services.Auth;
-using Parrot.Api.Services.Email;
-using Parrot.Api.Utils;
+using Parrot.Application.Auth;
+using Parrot.Application.DTOs.Auth;
+using Parrot.Application.Email;
+using Parrot.Application.Logging;
+using Parrot.Application.Models;
+using Parrot.Application.Utils;
 using Parrot.Domain.Exceptions;
 
 namespace Test.Parrot.Api.Tests.Services.Auth;
@@ -150,6 +150,35 @@ public class AuthServiceTests
         _userManagerMock.Verify(m => m.ResetAccessFailedCountAsync(user), Times.Once);
     }
 
+    [Fact]
+    public async Task LoginAsync_WhenLockedOut_DoesNotCheckPassword()
+    {
+        ApplicationUser user = CreateUser(emailConfirmed: true);
+        _userManagerMock.Setup(m => m.FindByEmailAsync(user.Email!)).ReturnsAsync(user);
+        _userManagerMock.Setup(m => m.IsLockedOutAsync(user)).ReturnsAsync(true);
+
+        await Assert.ThrowsAsync<UnauthorizedException>(() =>
+            _sut.LoginAsync(new LoginRequest { Email = user.Email!, Password = "any" }));
+
+        _userManagerMock.Verify(m => m.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()), Times.Never);
+        _userManagerMock.Verify(m => m.AccessFailedAsync(It.IsAny<ApplicationUser>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task LoginAsync_WhenEmailNotConfirmed_DoesNotIncrementOrResetAccessFailed()
+    {
+        ApplicationUser user = CreateUser(emailConfirmed: false);
+        _userManagerMock.Setup(m => m.FindByEmailAsync(user.Email!)).ReturnsAsync(user);
+        _userManagerMock.Setup(m => m.IsLockedOutAsync(user)).ReturnsAsync(false);
+        _userManagerMock.Setup(m => m.CheckPasswordAsync(user, "correct")).ReturnsAsync(true);
+
+        await Assert.ThrowsAsync<UnauthorizedException>(() =>
+            _sut.LoginAsync(new LoginRequest { Email = user.Email!, Password = "correct" }));
+
+        _userManagerMock.Verify(m => m.AccessFailedAsync(It.IsAny<ApplicationUser>()), Times.Never);
+        _userManagerMock.Verify(m => m.ResetAccessFailedCountAsync(It.IsAny<ApplicationUser>()), Times.Never);
+    }
+
     // ---------------------------------------------------------------------------
     // RegisterAsync
     // ---------------------------------------------------------------------------
@@ -215,7 +244,7 @@ public class AuthServiceTests
     }
 
     [Fact]
-    public async Task RegisterAsync_WhenSuccessful_SendsVerificationEmail_AndReturnsResponse()
+    public async Task RegisterAsync_WhenSuccessful_SendsVerificationEmail_AndReturnsNoToken()
     {
         _userManagerMock
             .Setup(m => m.FindByEmailAsync("new@test.com"))
@@ -230,7 +259,7 @@ public class AuthServiceTests
             .Setup(e => e.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        AuthResponse response = await _sut.RegisterAsync(new RegisterRequest
+        await _sut.RegisterAsync(new RegisterRequest
         {
             Email = "new@test.com",
             Password = "Pass123!",
@@ -238,16 +267,16 @@ public class AuthServiceTests
             BusinessName = "My Biz",
         });
 
-        Assert.Equal("test-jwt-token", response.Token);
-        Assert.Equal("new@test.com", response.Email);
-        Assert.Equal("My Biz", response.BusinessName);
-
         _emailServiceMock.Verify(
             e => e.SendEmailAsync(
                 "new@test.com",
                 It.IsAny<string>(),
                 It.Is<string>(body => body.Contains("http://localhost:3000"))),
             Times.Once);
+
+        _jwtHelperMock.Verify(
+            j => j.GenerateToken(It.IsAny<IEnumerable<Claim>>(), It.IsAny<DateTime?>()),
+            Times.Never);
     }
 
     // ---------------------------------------------------------------------------
