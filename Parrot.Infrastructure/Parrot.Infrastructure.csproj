@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Parrot.Domain\Parrot.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SocialMediaIntegrations/" />
+  </ItemGroup>
+
 </Project>
