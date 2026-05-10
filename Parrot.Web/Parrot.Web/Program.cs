@@ -1,7 +1,9 @@
+using Parrot.Grpc.Contracts.Messaging.V1;
 using Parrot.Web.Components;
 using Parrot.Web.Features.Auth.ForgotPassword.Services;
 using Parrot.Web.Features.Dashboard.AiAgents.State;
 using Parrot.Web.Features.Dashboard.Catalog.State;
+using Parrot.Web.Features.Dashboard.Channels.Services;
 using Parrot.Web.Features.Dashboard.Channels.State;
 using Parrot.Web.Features.Dashboard.Contacts.State;
 using Parrot.Web.Features.Dashboard.Conversations.State;
@@ -28,12 +30,20 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 string apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"]!;
+string grpcBaseUrl = builder.Configuration["GrpcSettings:BaseUrl"]!;
 
 builder.Services.AddHttpClient<ILoginService, LoginService>(c => c.BaseAddress = new Uri(apiBaseUrl));
 builder.Services.AddHttpClient<IRegisterService, RegisterService>(c => c.BaseAddress = new Uri(apiBaseUrl));
 builder.Services.AddHttpClient<IForgotPasswordService, ForgotPasswordService>(c => c.BaseAddress = new Uri(apiBaseUrl));
 builder.Services.AddHttpClient<IResetPasswordService, ResetPasswordService>(c => c.BaseAddress = new Uri(apiBaseUrl));
 builder.Services.AddHttpClient<IVerifyEmailService, VerifyEmailService>(c => c.BaseAddress = new Uri(apiBaseUrl));
+builder.Services.AddHttpClient<IIntegrationsService, IntegrationsService>(c => c.BaseAddress = new Uri(apiBaseUrl));
+
+builder.Services.AddGrpcClient<MessageVerificationService.MessageVerificationServiceClient>(o =>
+{
+    o.Address = new Uri(grpcBaseUrl);
+});
+builder.Services.AddScoped<IMessageVerificationGrpcClient, MessageVerificationGrpcClient>();
 
 builder.Services.AddScoped<AuthState>();
 builder.Services.AddScoped<LoginState>();

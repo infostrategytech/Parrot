@@ -9,20 +9,20 @@ namespace WhatsAppMessageIngestor;
 public sealed class KafkaConsumerWorker : BackgroundService
 {
     private readonly IConsumer<string, string> _consumer;
-    private readonly IMessageRepository _repository;
+    private readonly IPlatformMessageService _messageService;
     private readonly int _batchSize;
     private readonly string _topic;
     private readonly ILogger<KafkaConsumerWorker> _logger;
 
     public KafkaConsumerWorker(
         IOptions<KafkaSettings> kafkaSettings,
-        IMessageRepository repository,
+        IPlatformMessageService messageService,
         ILogger<KafkaConsumerWorker> logger)
     {
         KafkaSettings s = kafkaSettings.Value;
         _topic = s.Topic;
         _batchSize = s.ConsumerBatchSize;
-        _repository = repository;
+        _messageService = messageService;
         _logger = logger;
 
         _consumer = new ConsumerBuilder<string, string>(new ConsumerConfig
@@ -86,7 +86,7 @@ public sealed class KafkaConsumerWorker : BackgroundService
                                 return;
                             }
 
-                            await _repository.InsertAsync(message, ct);
+                            await _messageService.ProcessAsync(message, ct);
                         }
                         catch (Exception ex)
                         {

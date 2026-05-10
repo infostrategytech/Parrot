@@ -1,0 +1,8 @@
+@* Swap ImagePath and AltText here when the parrot asset is ready. *@
+
+<img src="@ImagePath" alt="@AltText" class="mascot-img" />
+
+@code {
+    [Parameter] public string ImagePath { get; set; } = "assets/images/gifs/owl-animation.gif";
+    [Parameter] public string AltText  { get; set; } = "Mascot";
+}
