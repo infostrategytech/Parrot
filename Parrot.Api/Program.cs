@@ -13,6 +13,7 @@ using Parrot.Application.Models;
 using Parrot.Application.Utils;
 using Parrot.Infrastructure.Data;
 using Parrot.Infrastructure.Email;
+using Parrot.Infrastructure.SocialMediaIntegrations;
 using Parrot.Api.Middleware;
 using Parrot.Api.Utils;
 
@@ -32,6 +33,7 @@ if (!builder.Environment.IsDevelopment() &&
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
 builder.Services.Configure<WhatsAppSettings>(builder.Configuration.GetSection(WhatsAppSettings.SectionName));
+builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(KafkaSettings.SectionName));
 
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -147,6 +149,9 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddSingleton<KafkaMessagePublisher>();
+builder.Services.AddSingleton<IMessagePublisher>(sp => sp.GetRequiredService<KafkaMessagePublisher>());
+builder.Services.AddHostedService(sp => sp.GetRequiredService<KafkaMessagePublisher>());
 builder.Services.AddScoped<IWhatsAppWebhookService, WhatsAppWebhookService>();
 builder.Services.AddScoped<RequestContext>();
 builder.Services.AddScoped<IRequestContext>(sp => sp.GetRequiredService<RequestContext>());
