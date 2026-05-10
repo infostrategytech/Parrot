@@ -1,6 +1,6 @@
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace WhatsAppMessageIngestor;
+namespace Parrot.Domain.Entities.Messages;
 
 [BsonDiscriminator("whatsapp")]
 public sealed class WhatsAppMessageDocument : MessageDocument

@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Parrot.Application.Integrations;
+using Parrot.Infrastructure.Messaging;
 using WhatsAppMessageIngestor;
 
-var builder = Host.CreateApplicationBuilder(args);
+HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.Configure<KafkaSettings>(
     builder.Configuration.GetSection(KafkaSettings.SectionName));
@@ -21,5 +22,5 @@ builder.Services.AddSingleton<IMessageRepository, MongoMessageRepository>();
 
 builder.Services.AddHostedService<KafkaConsumerWorker>();
 
-var host = builder.Build();
+IHost host = builder.Build();
 host.Run();

@@ -9,12 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.64.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore" Version="2.64.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+    <ProjectReference Include="..\Parrot.Application\Parrot.Application.csproj" />
+    <ProjectReference Include="..\Parrot.Grpc.Contracts\Parrot.Grpc.Contracts.csproj" />
+    <ProjectReference Include="..\Parrot.Infrastructure\Parrot.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

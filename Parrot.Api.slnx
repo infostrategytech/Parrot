@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Parrot.APi.Grpc/Parrot.APi.Grpc.csproj" Id="04c01dcd-d060-41a4-bef5-89c7bc01e9df" />
+  <Project Path="Parrot.Grpc.Contracts/Parrot.Grpc.Contracts.csproj" />
   <Project Path="Parrot.Api/Parrot.Api.Rest.csproj" />
   <Project Path="Parrot.Application/Parrot.Application.csproj" />
   <Project Path="Parrot.Domain/Parrot.Domain.csproj" />

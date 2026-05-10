@@ -1,8 +1,11 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Parrot.Application.DTOs.Integrations;
+using Parrot.Application.Integrations;
+using Parrot.Domain.Entities.Messages;
+using Parrot.Domain.Enums;
 
-namespace WhatsAppMessageIngestor;
+namespace Parrot.Infrastructure.Messaging;
 
 public sealed class MongoMessageRepository : IMessageRepository
 {
@@ -31,6 +34,23 @@ public sealed class MongoMessageRepository : IMessageRepository
         {
             // Already stored — safe to skip on Kafka redelivery.
         }
+    }
+
+    public async Task<ReceivedMessageSummary?> FindFirstAsync(
+        string channelId,
+        DateTime since,
+        CancellationToken cancellationToken = default)
+    {
+        FilterDefinition<MessageDocument> filter = Builders<MessageDocument>.Filter.And(
+            Builders<MessageDocument>.Filter.Eq("ChannelId", channelId),
+            Builders<MessageDocument>.Filter.Gte(x => x.ReceivedAt, since));
+
+        MessageDocument? doc = await _collection
+            .Find(filter)
+            .SortBy(x => x.ReceivedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return doc is null ? null : new ReceivedMessageSummary(doc.MessageId, doc.From, doc.ReceivedAt);
     }
 
     private static MessageDocument ToDocument(IncomingMessage message) => message.Platform switch

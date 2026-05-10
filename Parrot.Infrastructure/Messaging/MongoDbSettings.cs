@@ -1,4 +1,4 @@
-namespace WhatsAppMessageIngestor;
+namespace Parrot.Infrastructure.Messaging;
 
 public sealed class MongoDbSettings
 {
@@ -6,5 +6,5 @@ public sealed class MongoDbSettings
 
     public string ConnectionString { get; set; } = "mongodb://localhost:27017";
     public string Database { get; set; } = "parrot";
-    public string Collection { get; set; } = "whatsapp_messages";
+    public string Collection { get; set; } = "messages";
 }

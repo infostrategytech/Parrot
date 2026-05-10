@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "Parrot.Grpc.Contracts.Messaging.V1";
+
+package parrot.messaging.v1;
+
+// MessageVerificationService is used during channel onboarding to confirm
+// that the platform is receiving inbound messages from the connected number.
+service MessageVerificationService {
+  rpc CheckForMessage (CheckForMessageRequest) returns (CheckForMessageResponse);
+}
+
+message CheckForMessageRequest {
+  // The platform's channel identifier (e.g. WhatsApp phone number ID).
+  string channel_id = 1;
+  // Only consider messages received at or after this Unix timestamp (seconds).
+  int64 since_unix_seconds = 2;
+  // Messaging platform discriminator: "whatsapp", etc.
+  string platform = 3;
+}
+
+message CheckForMessageResponse {
+  bool message_received = 1;
+  // Populated only when message_received is true.
+  string message_id = 2;
+  string from_number = 3;
+  int64 received_at_unix_seconds = 4;
+}

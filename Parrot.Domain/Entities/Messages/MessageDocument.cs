@@ -1,8 +1,8 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Parrot.Application.DTOs.Integrations;
+using Parrot.Domain.Enums;
 
-namespace WhatsAppMessageIngestor;
+namespace Parrot.Domain.Entities.Messages;
 
 [BsonDiscriminator(Required = true)]
 [BsonKnownTypes(typeof(WhatsAppMessageDocument))]

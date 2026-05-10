@@ -1,9 +1,6 @@
-namespace Parrot.Application.DTOs.Integrations;
+using Parrot.Domain.Enums;
 
-public enum MessagingPlatform
-{
-    WhatsApp = 1,
-}
+namespace Parrot.Application.DTOs.Integrations;
 
 public record IncomingMessage
 {

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using Parrot.Application.DTOs.Integrations;
 using Parrot.Application.Logging;
+using Parrot.Domain.Enums;
 
 namespace Parrot.Application.Integrations;
 

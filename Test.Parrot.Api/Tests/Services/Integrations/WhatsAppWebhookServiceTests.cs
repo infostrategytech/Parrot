@@ -3,6 +3,7 @@ using Moq;
 using Parrot.Application.DTOs.Integrations;
 using Parrot.Application.Integrations;
 using Parrot.Application.Logging;
+using Parrot.Domain.Enums;
 
 namespace Test.Parrot.Api.Tests.Services.Integrations;
 

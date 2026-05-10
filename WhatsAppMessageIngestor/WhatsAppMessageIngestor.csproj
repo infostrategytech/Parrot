@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Parrot.Application\Parrot.Application.csproj" />
+    <ProjectReference Include="..\Parrot.Infrastructure\Parrot.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
