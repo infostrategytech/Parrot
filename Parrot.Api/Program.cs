@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Parrot.Application.Auth;
 using Parrot.Application.Email;
+using Parrot.Application.Integrations;
 using Parrot.Application.Logging;
 using Parrot.Application.Models;
 using Parrot.Application.Utils;
@@ -30,6 +31,7 @@ if (!builder.Environment.IsDevelopment() &&
 }
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
+builder.Services.Configure<WhatsAppSettings>(builder.Configuration.GetSection(WhatsAppSettings.SectionName));
 
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -127,12 +129,25 @@ builder.Services.AddRateLimiter(options =>
         RateLimitPartition.GetFixedWindowLimiter(
             ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             _ => PerIp(5, 15)));
+
+    // 1000 WhatsApp webhook deliveries per IP per minute (Meta sends bursts)
+    options.AddPolicy(RateLimitPolicies.WhatsAppWebhook, ctx =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 1000,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }));
 });
 
 // Services
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IWhatsAppWebhookService, WhatsAppWebhookService>();
 builder.Services.AddScoped<RequestContext>();
 builder.Services.AddScoped<IRequestContext>(sp => sp.GetRequiredService<RequestContext>());
 builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
