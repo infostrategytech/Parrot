@@ -20,6 +20,7 @@ using Parrot.Web.Features.Auth.ResetPassword.State;
 using Parrot.Web.Features.Auth.State;
 using Parrot.Web.Features.Auth.VerifyEmail.Services;
 using Parrot.Web.Features.Auth.VerifyEmail.State;
+using Parrot.Web.Services;
 using Parrot.Web.State;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,6 +46,7 @@ builder.Services.AddGrpcClient<MessageVerificationService.MessageVerificationSer
 });
 builder.Services.AddScoped<IMessageVerificationGrpcClient, MessageVerificationGrpcClient>();
 
+builder.Services.AddScoped<TokenStorageService>();
 builder.Services.AddScoped<AuthState>();
 builder.Services.AddScoped<LoginState>();
 builder.Services.AddScoped<RegisterState>();

@@ -1,4 +1,8 @@
-﻿<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }" NotFoundPage="typeof(Pages.NotFound)">
+@inject NavigationManager Nav
+@inject AuthState AuthState
+@inject TokenStorageService TokenStorage
+
+<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }" NotFoundPage="typeof(Pages.NotFound)">
     <Found Context="routeData">
         <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Dashboard.DashboardLayout)" />
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
@@ -6,14 +10,39 @@
 </Router>
 
 @code {
-    [Inject] NavigationManager Nav { get; set; } = default!;
+    private static readonly HashSet<string> PublicPaths =
+    [
+        "/", "/login", "/register", "/forgot-password", "/reset-password",
+        "/verify-email", "/sso-callback",
+    ];
 
     protected override void OnInitialized()
     {
-        var uri = new Uri(Nav.Uri);
+        Uri uri = new Uri(Nav.Uri);
         if (uri.AbsolutePath == "/" || uri.AbsolutePath == string.Empty)
         {
             Nav.NavigateTo("/login", replace: true);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        if (AuthState.IsAuthenticated)
+            return;
+
+        AuthResponse? stored = await TokenStorage.LoadAsync();
+        if (stored is null)
+            return;
+
+        AuthState.SetUser(stored);
+
+        Uri uri = new Uri(Nav.Uri);
+        if (PublicPaths.Contains(uri.AbsolutePath.ToLowerInvariant()))
+        {
+            Nav.NavigateTo("/dashboard");
         }
     }
 }

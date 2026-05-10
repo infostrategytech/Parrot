@@ -248,6 +248,47 @@ public class AuthService : IAuthService
         }
     }
 
+    public async Task<AuthResponse> ExternalLoginAsync(string email, string displayName, string provider, string providerKey)
+    {
+        ApplicationUser? user = await _userManager.FindByEmailAsync(email);
+
+        if (user is null)
+        {
+            user = new ApplicationUser
+            {
+                UserName = email,
+                Email = email,
+                BusinessName = displayName,
+                EmailConfirmed = true,
+            };
+
+            IdentityResult createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                _logger.LogError("External provider user creation failed for {Email} via {Provider}", email, provider);
+                throw new ValidationException("An error occurred while creating the user.");
+            }
+
+            await _userManager.AddLoginAsync(user, new UserLoginInfo(provider, providerKey, provider));
+
+            using (_logger.BeginEntityScope("User", user.Id))
+            {
+                _logger.LogInformation("User created via {Provider}. Email: {Email}", provider, email);
+            }
+        }
+        else if (await _userManager.IsLockedOutAsync(user))
+        {
+            throw new UnauthorizedException("Account is temporarily locked due to too many failed login attempts. Please try again later.");
+        }
+
+        using (_logger.BeginEntityScope("User", user.Id))
+        {
+            _logger.LogInformation("User signed in via {Provider}. Email: {Email}", provider, email);
+        }
+
+        return BuildAuthResponse(user);
+    }
+
     private async Task SendVerificationEmailAsync(ApplicationUser user)
     {
         string rawToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
