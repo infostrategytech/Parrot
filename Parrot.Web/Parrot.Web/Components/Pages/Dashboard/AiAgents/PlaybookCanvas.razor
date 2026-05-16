@@ -1,0 +1,196 @@
+<div class="pb-canvas" @onclick:stopPropagation>
+    <div class="pb-flow">
+        <div class="pb-node pb-node--trigger @(IsTriggerSelected ? "pb-node--selected" : "")" @onclick:stopPropagation
+             @onclick="() => OnTriggerSelected.InvokeAsync()">
+            <div class="pb-node-body">
+                <div class="pb-node-row">
+                    <span class="pb-node-label">
+                        How customers start this flow
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="16" x2="12" y2="12" />
+                            <line x1="12" y1="8" x2="12.01" y2="8" />
+                        </svg>
+                    </span>
+                    <span class="pb-trigger-badge">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        @TriggerPhrases phrases added
+                    </span>
+                </div>
+                <span class="pb-node-type">Trigger</span>
+            </div>
+        </div>
+
+        @foreach (var step in Playbook.Steps)
+        {
+            var stepId = step.Id;
+            var nodeTypeClass = GetNodeClass(step.Type);
+            var nodeLabel = GetNodeLabel(step.Type);
+            var nodeSubtype = GetNodeSubtype(step.Type);
+            <div class="pb-connector"></div>
+            <div class="pb-node pb-node--step @nodeTypeClass @(SelectedStepId == stepId ? "pb-node--selected" : "")"
+                 @onclick:stopPropagation @onclick="() => OnStepSelected.InvokeAsync(stepId)">
+                <div class="pb-node-body">
+                    <div class="pb-node-row">
+                        <span class="pb-node-label">
+                            @nodeLabel
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="16" x2="12" y2="12" />
+                                <line x1="12" y1="8" x2="12.01" y2="8" />
+                            </svg>
+                        </span>
+                        <button class="pb-step-del" @onclick:stopPropagation
+                                @onclick="() => OnStepRemoved.InvokeAsync(stepId)">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                <path d="M10 11v6" />
+                                <path d="M14 11v6" />
+                            </svg>
+                        </button>
+                    </div>
+                    <span class="pb-node-type">@nodeSubtype</span>
+                </div>
+            </div>
+        }
+
+        <div class="pb-connector"></div>
+        <div class="pb-add-step-wrap">
+            <button class="pb-add-step" @onclick:stopPropagation @onclick="() => OnToggleStepPicker.InvokeAsync()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="16" />
+                    <line x1="8" y1="12" x2="16" y2="12" />
+                </svg>
+                Add step
+            </button>
+            @if (ShowStepPicker)
+            {
+                <div class="pb-step-picker" @onclick:stopPropagation>
+                    <button class="pb-step-picker-item" @onclick='() => OnAddStepOfType.InvokeAsync("AskQuestion")'>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        </svg>
+                        Ask question
+                    </button>
+                    <button class="pb-step-picker-item" @onclick='() => OnAddStepOfType.InvokeAsync("SelectFromCatalog")'>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                        Select from catalog
+                    </button>
+                    <button class="pb-step-picker-item" @onclick='() => OnAddStepOfType.InvokeAsync("SendNotification")'>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                        Send notification
+                    </button>
+                    <button class="pb-step-picker-item" @onclick='() => OnAddStepOfType.InvokeAsync("CollectPayment")'>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                            <line x1="1" y1="10" x2="23" y2="10" />
+                        </svg>
+                        Collect payment
+                    </button>
+                    <button class="pb-step-picker-item" @onclick='() => OnAddStepOfType.InvokeAsync("UpdateContact")'>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EAB308" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        Update contact
+                    </button>
+                    <button class="pb-step-picker-item" @onclick='() => OnAddStepOfType.InvokeAsync("Wait")'>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        Wait
+                    </button>
+                    <button class="pb-step-picker-item" @onclick='() => OnAddStepOfType.InvokeAsync("CheckCondition")'>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                        </svg>
+                        Check a condition
+                    </button>
+                    <button class="pb-step-picker-item" @onclick='() => OnAddStepOfType.InvokeAsync("EndProcess")'>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="15" y1="9" x2="9" y2="15" />
+                            <line x1="9" y1="9" x2="15" y2="15" />
+                        </svg>
+                        End process
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Playbook Playbook { get; set; } = default!;
+    [Parameter] public string SelectedStepId { get; set; } = string.Empty;
+    [Parameter] public bool ShowStepPicker { get; set; }
+    [Parameter] public int TriggerPhrases { get; set; } = 10;
+    [Parameter] public bool IsTriggerSelected { get; set; }
+    [Parameter] public EventCallback OnTriggerSelected { get; set; }
+    [Parameter] public EventCallback<string> OnStepSelected { get; set; }
+    [Parameter] public EventCallback<string> OnStepRemoved { get; set; }
+    [Parameter] public EventCallback<string> OnAddStepOfType { get; set; }
+    [Parameter] public EventCallback OnToggleStepPicker { get; set; }
+
+    private static string GetNodeClass(string type) => type switch
+    {
+        "SelectFromCatalog" => "pb-node--catalog",
+        "SendNotification" => "pb-node--notification",
+        "CollectPayment" => "pb-node--payment",
+        "UpdateContact" => "pb-node--update-contact",
+        "Wait" => "pb-node--wait",
+        "CheckCondition" => "pb-node--condition",
+        "EndProcess" => "pb-node--end",
+        _ => ""
+    };
+
+    private static string GetNodeLabel(string type) => type switch
+    {
+        "SelectFromCatalog" => "Select from catalog",
+        "SendNotification" => "Send notification",
+        "CollectPayment" => "Collect payment",
+        "UpdateContact" => "Update contact",
+        "Wait" => "Wait",
+        "CheckCondition" => "Check a condition",
+        "EndProcess" => "End process",
+        _ => "Ask question"
+    };
+
+    private static string GetNodeSubtype(string type) => type switch
+    {
+        "SelectFromCatalog" => "Let customer choose item",
+        "SendNotification" => "Send a message to customer",
+        "CollectPayment" => "Request payment",
+        "UpdateContact" => "Update the contact record",
+        "Wait" => "Pause the process",
+        "CheckCondition" => "Branch based on data",
+        "EndProcess" => "Complete the playbook",
+        _ => "Ask customer for data"
+    };
+}

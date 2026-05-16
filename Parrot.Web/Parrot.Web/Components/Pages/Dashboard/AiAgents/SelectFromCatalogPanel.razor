@@ -1,0 +1,142 @@
+<div class="pb-field">
+    <div class="pb-catalog-header">
+        <label class="pb-field-label">SELECT CATALOG ITEMS</label>
+        <button class="pb-catalog-select-all" @onclick="SelectAll">Select all</button>
+    </div>
+    <div class="pb-catalog-search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input class="pb-catalog-search" placeholder="Search items..." value="@_catalogSearch"
+               @oninput="e => _catalogSearch = e.Value?.ToString() ?? string.Empty" />
+    </div>
+    <div class="pb-catalog-list">
+        @foreach (var item in GetFilteredItems())
+        {
+            var itemName = item;
+            var isChecked = Step.SelectedCatalogItems.Contains(itemName);
+            <label class="pb-catalog-item">
+                <input type="checkbox" checked="@isChecked"
+                       @onchange="async e => { ToggleItem(itemName, (bool)(e.Value ?? false)); await OnChanged.InvokeAsync(); }" />
+                <span>@itemName</span>
+            </label>
+        }
+    </div>
+</div>
+
+@if (Step.SelectedCatalogItems.Count > 0)
+{
+    <div class="pb-catalog-tags">
+        @foreach (var tag in Step.SelectedCatalogItems.ToList())
+        {
+            var tagName = tag;
+            <span class="pb-catalog-tag">
+                @tagName
+                <button @onclick="async () => { Step.SelectedCatalogItems.Remove(tagName); await OnChanged.InvokeAsync(); }">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </span>
+        }
+    </div>
+}
+
+<div class="pb-panel-divider"></div>
+
+<div class="pb-toggle-row">
+    <div class="pb-toggle-info">
+        <span class="pb-toggle-label">Allow Multiple</span>
+        <span class="pb-toggle-sub">Customer can select more than one item</span>
+    </div>
+    <button type="button" class="cam-toggle @(Step.AllowMultiple ? "cam-toggle--on" : "")"
+            @onclick="() => Step.AllowMultiple = !Step.AllowMultiple">
+        <span class="cam-toggle-thumb"></span>
+    </button>
+</div>
+
+<div class="pb-toggle-row">
+    <div class="pb-toggle-info">
+        <span class="pb-toggle-label">Quantity Selector</span>
+        <span class="pb-toggle-sub">Show quantity input for each item</span>
+    </div>
+    <button type="button" class="cam-toggle @(Step.QuantitySelector ? "cam-toggle--on" : "")"
+            @onclick="() => Step.QuantitySelector = !Step.QuantitySelector">
+        <span class="cam-toggle-thumb"></span>
+    </button>
+</div>
+
+@if (Step.QuantitySelector)
+{
+    <div class="pb-two-col">
+        <div class="pb-field">
+            <label class="pb-field-label">Min quantity</label>
+            <div class="pb-select-wrap">
+                <select class="pb-select" value="@Step.MinQuantity"
+                        @onchange="e => Step.MinQuantity = int.TryParse(e.Value?.ToString(), out var v) ? v : 1">
+                    @foreach (var v in new[] { 1, 2, 3, 5, 10 })
+                    {
+                        <option value="@v">@v</option>
+                    }
+                </select>
+                <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6" />
+                </svg>
+            </div>
+        </div>
+        <div class="pb-field">
+            <label class="pb-field-label">Max quantity</label>
+            <div class="pb-select-wrap">
+                <select class="pb-select" value="@Step.MaxQuantity"
+                        @onchange="e => Step.MaxQuantity = int.TryParse(e.Value?.ToString(), out var v) ? v : 10">
+                    @foreach (var v in new[] { 5, 10, 20, 50, 100 })
+                    {
+                        <option value="@v">@v</option>
+                    }
+                </select>
+                <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6" />
+                </svg>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public PlaybookStep Step { get; set; } = default!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private string _catalogSearch = string.Empty;
+
+    private static readonly List<string> CatalogItems = new()
+    {
+        "Rice", "Chicken", "Plantain", "Fried Yam", "Spaghetti", "Coca Cola"
+    };
+
+    private List<string> GetFilteredItems()
+    {
+        if (string.IsNullOrEmpty(_catalogSearch)) return CatalogItems;
+        return CatalogItems.Where(i => i.Contains(_catalogSearch, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private void ToggleItem(string item, bool add)
+    {
+        if (add && !Step.SelectedCatalogItems.Contains(item))
+            Step.SelectedCatalogItems.Add(item);
+        else if (!add)
+            Step.SelectedCatalogItems.Remove(item);
+    }
+
+    private async Task SelectAll()
+    {
+        foreach (var item in CatalogItems.Where(i => !Step.SelectedCatalogItems.Contains(i)))
+            Step.SelectedCatalogItems.Add(item);
+        await OnChanged.InvokeAsync();
+    }
+}

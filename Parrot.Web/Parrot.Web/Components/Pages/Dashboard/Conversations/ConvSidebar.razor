@@ -1,0 +1,176 @@
+﻿@using Parrot.Web.Components.Pages.Dashboard.Conversations
+
+<div class="cv-sidebar">
+    <div class="cv-search-wrap">
+        <svg class="cv-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input class="cv-search" placeholder="search customers..." value="@_search"
+               @oninput="e => _search = e.Value?.ToString() ?? string.Empty" />
+    </div>
+
+    <div class="cv-filters">
+        <div class="cv-filter-row">
+            <div class="cv-dropdown-wrap" @onclick:stopPropagation>
+                <button class="cv-filter-btn" @onclick="ToggleChannelDrop">
+                    <span class="cv-filter-label">Channel:</span>
+                    <span class="cv-filter-value">@(_channelFilter == "" ? "All channels" : _channelFilter)</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         class="cv-chevron @(_openDrop == "channel" ? "cv-chevron--open" : "")">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </button>
+                @if (_openDrop == "channel")
+                {
+                    <div class="cv-dropdown-menu">
+                        @foreach (var opt in _channelOpts)
+                        {
+                            var v = opt.Value;
+                            <button class="cv-dropdown-item @(_channelFilter == v ? "cv-dropdown-item--active" : "")"
+                                    @onclick="() => PickChannel(v)">@opt.Label</button>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="cv-dropdown-wrap" @onclick:stopPropagation>
+                <button class="cv-filter-btn" @onclick="ToggleStatusDrop">
+                    <span class="cv-filter-label">Status:</span>
+                    <span class="cv-filter-value">@(_statusFilter == "" ? "All status" : _statusFilter)</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         class="cv-chevron @(_openDrop == "status" ? "cv-chevron--open" : "")">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </button>
+                @if (_openDrop == "status")
+                {
+                    <div class="cv-dropdown-menu">
+                        @foreach (var opt in _statusOpts)
+                        {
+                            var v = opt.Value;
+                            <button class="cv-dropdown-item @(_statusFilter == v ? "cv-dropdown-item--active" : "")"
+                                    @onclick="() => PickStatus(v)">@opt.Label</button>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="cv-filter-row">
+            <div class="cv-dropdown-wrap" @onclick:stopPropagation>
+                <button class="cv-filter-btn cv-filter-btn--wide" @onclick="ToggleAgentDrop">
+                    <span class="cv-filter-label">Agents:</span>
+                    <span class="cv-filter-value">@(_agentFilter == "" ? "All agents" : _agentFilter)</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         class="cv-chevron @(_openDrop == "agent" ? "cv-chevron--open" : "")">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </button>
+                @if (_openDrop == "agent")
+                {
+                    <div class="cv-dropdown-menu">
+                        @foreach (var opt in _agentOpts)
+                        {
+                            var v = opt.Value;
+                            <button class="cv-dropdown-item @(_agentFilter == v ? "cv-dropdown-item--active" : "")"
+                                    @onclick="() => PickAgent(v)">@opt.Label</button>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="cv-list">
+        @foreach (var conv in GetFiltered())
+        {
+            var convId = conv.Id;
+            <div class="cv-item @(SelectedId == convId ? "cv-item--active" : "")"
+                 @onclick="() => OnSelect.InvokeAsync(convId)">
+                <div class="cv-item-top">
+                    <div class="cv-item-left">
+                        <div class="cv-item-avatar-wrap">
+                            <div class="cv-item-avatar">
+                                <img src="@conv.CustomerAvatar" alt="@conv.CustomerName" />
+                            </div>
+                            <span class="cv-item-channel-badge">
+                                <img src="assets/images/icons/@(conv.PrimaryChannel).png" alt="@conv.PrimaryChannel" />
+                            </span>
+                        </div>
+                        <div class="cv-item-info">
+                            <span class="cv-item-name">@conv.CustomerName</span>
+                            <span class="cv-item-preview">@conv.LastMessage</span>
+                        </div>
+                    </div>
+                    <span class="cv-item-time">@conv.TimeAgo</span>
+                </div>
+                <div class="cv-item-footer">
+                    <div class="cv-item-status">
+                        <span class="cv-status-dot cv-status-dot--@conv.Status.ToLower()"></span>
+                        <span class="cv-status-text">@conv.Status</span>
+                    </div>
+                    <div class="cv-agent-badge">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                            <path d="M4.93 4.93a10 10 0 0 0 0 14.14" />
+                        </svg>
+                        <span>@conv.AgentName</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<ConversationItem> Conversations { get; set; } = new();
+    [Parameter] public string SelectedId { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> OnSelect { get; set; }
+
+    private string _search = string.Empty;
+    private string _channelFilter = string.Empty;
+    private string _statusFilter = string.Empty;
+    private string _agentFilter = string.Empty;
+    private string _openDrop = string.Empty;
+
+    private readonly List<(string Value, string Label)> _channelOpts = new()
+    {
+        ("", "All channels"), ("whatsapp", "WhatsApp"), ("instagram", "Instagram"), ("facebook", "Facebook")
+    };
+    private readonly List<(string Value, string Label)> _statusOpts = new()
+    {
+        ("", "All status"), ("Open", "Open"), ("Closed", "Closed")
+    };
+    private readonly List<(string Value, string Label)> _agentOpts = new()
+    {
+        ("", "All agents"), ("Bakerbot", "Bakerbot")
+    };
+
+    private void ToggleChannelDrop() => _openDrop = _openDrop == "channel" ? string.Empty : "channel";
+    private void ToggleStatusDrop() => _openDrop = _openDrop == "status" ? string.Empty : "status";
+    private void ToggleAgentDrop() => _openDrop = _openDrop == "agent" ? string.Empty : "agent";
+
+    private void PickChannel(string val) { _channelFilter = val; _openDrop = string.Empty; }
+    private void PickStatus(string val) { _statusFilter = val; _openDrop = string.Empty; }
+    private void PickAgent(string val) { _agentFilter = val; _openDrop = string.Empty; }
+
+    private IEnumerable<ConversationItem> GetFiltered()
+    {
+        var list = Conversations.AsEnumerable();
+        if (!string.IsNullOrEmpty(_search))
+            list = list.Where(c => c.CustomerName.Contains(_search, StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrEmpty(_channelFilter))
+            list = list.Where(c => c.PrimaryChannel == _channelFilter);
+        if (!string.IsNullOrEmpty(_statusFilter))
+            list = list.Where(c => c.Status == _statusFilter);
+        if (!string.IsNullOrEmpty(_agentFilter))
+            list = list.Where(c => c.AgentName == _agentFilter);
+        return list;
+    }
+
+}

@@ -1,0 +1,99 @@
+@using Parrot.Web.Components.Pages.Dashboard.Team
+
+<div class="tm-modal-overlay">
+    <div class="tm-modal">
+        <h2 class="tm-modal-title">Invite team member</h2>
+        <p class="tm-modal-sub">They will receive an email invitation to join your workspace.</p>
+        <hr class="tm-modal-divider" />
+
+        <div class="tm-field">
+            <label class="tm-label">Full name</label>
+            <input class="tm-input" type="text" placeholder="jon doe" @bind="_fullName" @bind:event="oninput" />
+        </div>
+
+        <div class="tm-field">
+            <label class="tm-label">Email address</label>
+            <input class="tm-input" type="email" placeholder="you@example.com" @bind="_email" @bind:event="oninput" />
+        </div>
+
+        <div class="tm-field">
+            <label class="tm-label">Workspace role</label>
+            <div class="tm-select-wrap">
+                <select class="tm-select" value="@_selectedRole" @onchange="OnRoleChanged">
+                    <option value="">--Select role--</option>
+                    @foreach (var role in WorkspaceRoles.All)
+                    {
+                        <option value="@role">@role</option>
+                    }
+                </select>
+                <svg class="tm-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="tm-permissions-section">
+            <span class="tm-permissions-label">Role Permissions</span>
+            <div class="tm-permissions-box">
+                @if (string.IsNullOrEmpty(_selectedRole))
+                {
+                    <p class="tm-permissions-placeholder">Select a role to define permissions</p>
+                }
+                else
+                {
+                    @foreach (var perm in _permissions)
+                    {
+                        <label class="tm-perm-item">
+                            <input type="checkbox" class="tm-checkbox" @bind="perm.Enabled" />
+                            <span class="tm-perm-label">@perm.Label</span>
+                        </label>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="tm-modal-actions">
+            <button class="tm-btn--cancel" @onclick="OnCancel">Cancel</button>
+            <button class="tm-btn--primary @(_canSend ? "" : "tm-btn--disabled")" @onclick="HandleSend"
+                    disabled="@(!_canSend)">
+                Send invitation
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback<TeamMember> OnSend { get; set; }
+
+    string _fullName = string.Empty;
+    string _email = string.Empty;
+    string _selectedRole = string.Empty;
+    List<RolePermission> _permissions = [];
+
+    bool _canSend => !string.IsNullOrWhiteSpace(_fullName)
+        && !string.IsNullOrWhiteSpace(_email)
+        && !string.IsNullOrEmpty(_selectedRole);
+
+    void OnRoleChanged(ChangeEventArgs e)
+    {
+        _selectedRole = e.Value?.ToString() ?? string.Empty;
+        _permissions = WorkspaceRoles.GetPermissions(_selectedRole);
+    }
+
+    protected override void OnParametersSet() { }
+
+    async Task HandleSend()
+    {
+        if (!_canSend) return;
+        var member = new TeamMember
+        {
+            Id = Guid.NewGuid().ToString(),
+            FullName = _fullName,
+            Email = _email,
+            Role = _selectedRole
+        };
+        await OnSend.InvokeAsync(member);
+    }
+}

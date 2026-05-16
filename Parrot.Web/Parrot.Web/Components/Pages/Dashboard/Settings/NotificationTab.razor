@@ -1,0 +1,71 @@
+<div class="st-notifications">
+    <div class="st-card">
+        <h2 class="st-card-title">Email Notifications</h2>
+        <p class="st-card-sub">Choose which updates should be sent to your email.</p>
+        <div class="st-notif-list">
+            @foreach (var item in _emailNotifs)
+            {
+                <div class="st-notif-row">
+                    <div>
+                        <div class="st-notif-label">@item.Label</div>
+                        <div class="st-notif-sub">@item.Sub</div>
+                    </div>
+                    <button class="st-toggle @(item.Enabled ? "st-toggle--on" : "")"
+                            @onclick="() => item.Enabled = !item.Enabled"></button>
+                </div>
+            }
+        </div>
+        <div class="st-card-footer">
+            <button class="st-save-btn">Save preference</button>
+        </div>
+    </div>
+
+    <div class="st-card">
+        <h2 class="st-card-title">In-App Alerts</h2>
+        <p class="st-card-sub">Control alerts that appear inside your dashboard.</p>
+        <div class="st-notif-list">
+            @foreach (var item in _inAppNotifs)
+            {
+                <div class="st-notif-row">
+                    <div>
+                        <div class="st-notif-label">@item.Label</div>
+                        <div class="st-notif-sub">@item.Sub</div>
+                    </div>
+                    <button class="st-toggle @(item.Enabled ? "st-toggle--on" : "")"
+                            @onclick="() => item.Enabled = !item.Enabled"></button>
+                </div>
+            }
+        </div>
+        <div class="st-card-footer">
+            <button class="st-save-btn">Save preference</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    class NotifItem
+    {
+        public string Label { get; set; } = ""; public string Sub { get; set; } = ""; public bool Enabled
+        {
+            get; set;
+        }
+    }
+
+    List<NotifItem> _emailNotifs =
+    [
+        new() { Label = "Weekly performance summary", Sub = "A digest of your AI agents performance and conversion metrics.",
+Enabled = true },
+        new() { Label = "Task request updates", Sub = "Alerts when new task requests are created by your AI.", Enabled = true },
+        new() { Label = "Channel connection alerts", Sub = "Instant warnings if any of your connected channels disconnect.",Enabled = false },
+        new() { Label = "Usage limit approaching", Sub = "Get notified when you are close to your conversation limit.", Enabled
+= true },
+        new() { Label = "Payment & billing updates", Sub = "Receive important billing and subscription notifications.", Enabled
+= true },
+    ];
+
+    List<NotifItem> _inAppNotifs =
+    [
+        new() { Label = "Enable real-time alerts", Sub = "Show alerts inside the platform when important events occur.", Enabled
+= true },
+    ];
+}

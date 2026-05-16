@@ -1,0 +1,35 @@
+<div class="cv-modal-overlay" @onclick="() => OnCancel.InvokeAsync()">
+    <div class="cv-modal cv-modal--takectrl" @onclick:stopPropagation>
+        <h2 class="cv-modal-title">Take control of this conversation</h2>
+        <p class="cv-modal-sub">You'll temporarily respond to the customer while the AI pauses.</p>
+        <hr class="cv-modal-divider" />
+        <div class="cv-duration-section">
+            <p class="cv-duration-label">Control Duration</p>
+            <div class="cv-duration-row">
+                @foreach (var opt in _opts)
+                {
+                    var o = opt;
+                    <button class="cv-duration-btn @(_selected == o ? "cv-duration-btn--active" : "")" @onclick="() => _selected = o">@o</button>
+                }
+            </div>
+        </div>
+        <div class="cv-takectrl-notice">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px">
+                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span>When the time expires, your Ai Agent will automatically resume control of the conversation.</span>
+        </div>
+        <div class="cv-modal-actions">
+            <button class="cv-modal-btn--cancel" @onclick="() => OnCancel.InvokeAsync()">Cancel</button>
+            <button class="cv-modal-btn--primary" @onclick="() => OnConfirm.InvokeAsync(_selected)">Take control</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback<string> OnConfirm { get; set; }
+
+    private readonly List<string> _opts = new() { "15 minutes", "30 minutes", "1 hour" };
+    private string _selected = "15 minutes";
+}

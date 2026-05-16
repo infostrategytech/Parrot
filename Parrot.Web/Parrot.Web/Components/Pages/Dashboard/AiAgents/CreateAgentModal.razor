@@ -1,0 +1,86 @@
+@namespace Parrot.Web.Components.Pages.Dashboard.AiAgents
+@using Parrot.Web.Components.Shared
+
+<ModalShell Visible="true" Title="Create AI agent"
+            Subtitle="Set up an AI agent to handle customer conversations for your business." Size="md" ShowCloseButton="false"
+            ShowDivider="true" OnClose="OnCancel">
+    <BodyContent>
+        <div class="cam-form">
+            <div class="cam-field">
+                <label class="cam-label">Agent name</label>
+                <input class="cam-input" placeholder="e.g support bot, sales assistant" @bind="_name" />
+            </div>
+            <div class="cam-field">
+                <label class="cam-label">Description <span class="cam-optional">(Optional)</span></label>
+                <textarea class="cam-textarea" rows="4"
+                          placeholder="Brief description of what this agent helps customers with"
+                          @bind="_description"></textarea>
+            </div>
+            <div class="cam-field">
+                <label class="cam-label">Choose mascot</label>
+                <p class="cam-label-sub">Select an avatar to represent your agent</p>
+                <div class="cam-mascot-grid">
+                    @foreach (var m in _mascots)
+                    {
+                        var mascot = m;
+                        <button type="button"
+                                class="cam-mascot-item @(_selectedMascot == mascot.Name ? "cam-mascot-item--selected" : "")"
+                                @onclick="() => _selectedMascot = mascot.Name">
+                            <img src="@mascot.Gif" alt="@mascot.Name" class="cam-mascot-gif" />
+                            <span class="cam-mascot-name">@mascot.Name</span>
+                        </button>
+                    }
+                </div>
+            </div>
+            <div class="cam-toggle-row">
+                <div class="cam-toggle-info">
+                    <span class="cam-toggle-label">Human takeover</span>
+                    <span class="cam-toggle-sub">Allow a team member to step in and continue the conversation.</span>
+                </div>
+                <button type="button" class="cam-toggle @(_humanTakeover ? "cam-toggle--on" : "")"
+                        @onclick="() => _humanTakeover = !_humanTakeover">
+                    <span class="cam-toggle-thumb"></span>
+                </button>
+            </div>
+        </div>
+    </BodyContent>
+    <FooterContent>
+        <button class="cam-btn cam-btn--cancel" @onclick="OnCancel">Cancel</button>
+        <button class="cam-btn cam-btn--create" @onclick="HandleCreate">Create agent</button>
+    </FooterContent>
+</ModalShell>
+
+@code {
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback<AiAgent> OnCreate { get; set; }
+
+    private string _name = string.Empty;
+    private string _description = string.Empty;
+    private string _selectedMascot = "Nova";
+    private bool _humanTakeover;
+
+    private record MascotOption(string Name, string Gif);
+
+    private readonly List<MascotOption> _mascots = new()
+    {
+        new("Nova", "/assets/images/gifs/nova-mascott.gif"),
+        new("Atlas", "/assets/images/gifs/owl-animation.gif"),
+        new("Bolt", "/assets/images/gifs/bolt-mascott.gif"),
+        new("Aegis", "/assets/images/gifs/aegis-mascott.gif"),
+        new("Buzz", "/assets/images/gifs/buzz-mascott.gif"),
+        new("Luna", "/assets/images/gifs/luna-mascott.gif"),
+    };
+
+    private async Task HandleCreate()
+    {
+        var agent = new AiAgent
+        {
+            Name = _name,
+            Description = _description,
+            Mascot = _selectedMascot,
+            HumanTakeover = _humanTakeover,
+            IsActive = true
+        };
+        await OnCreate.InvokeAsync(agent);
+    }
+}

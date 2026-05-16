@@ -1,0 +1,97 @@
+@page "/dashboard/settings"
+@page "/dashboard/settings/{Tab}"
+@layout DashboardLayout
+@using Parrot.Web.Components.Pages.Dashboard.Settings
+
+<div class="st-page">
+    <nav class="st-tabs">
+        <button class="st-tab @(ActiveTab == "profile" ? "st-tab--active" : "")" @onclick='() => SetTab("profile")'>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg>
+            Profile
+        </button>
+        <button class="st-tab @(ActiveTab == "workspace" ? "st-tab--active" : "")" @onclick='() => SetTab("workspace")'>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+            </svg>
+            Workspace
+        </button>
+        <button class="st-tab @(ActiveTab == "automation" ? "st-tab--active" : "")"
+                @onclick='() => SetTab("automation")'>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            Automation
+        </button>
+        <button class="st-tab @(ActiveTab == "security" ? "st-tab--active" : "")" @onclick='() => SetTab("security")'>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            Security
+        </button>
+        <button class="st-tab @(ActiveTab == "notification" ? "st-tab--active" : "")"
+                @onclick='() => SetTab("notification")'>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            Notification
+        </button>
+        <button class="st-tab @(ActiveTab == "billing" ? "st-tab--active" : "")" @onclick='() => SetTab("billing")'>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+            Billing &amp; Usage
+        </button>
+    </nav>
+
+    <div class="st-body">
+        @if (ActiveTab == "profile")
+        {
+            <ProfileTab />
+        }
+        @if (ActiveTab == "workspace")
+        {
+            <WorkspaceTab />
+        }
+        @if (ActiveTab == "automation")
+        {
+            <AutomationTab />
+        }
+        @if (ActiveTab == "security")
+        {
+            <SecurityTab />
+        }
+        @if (ActiveTab == "notification")
+        {
+            <NotificationTab />
+        }
+        @if (ActiveTab == "billing")
+        {
+            <BillingTab />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Tab { get; set; }
+
+    string ActiveTab = "profile";
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrEmpty(Tab)) ActiveTab = Tab.ToLower();
+    }
+
+    void SetTab(string tab) => ActiveTab = tab;
+}

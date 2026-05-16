@@ -1,0 +1,155 @@
+/* Styles scoped to ConnectFacebookSetup */
+
+.cfb-signin-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.5rem;
+    background: #4C1D95;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    width: fit-content;
+    transition: background 0.15s;
+}
+
+.cfb-signin-btn:hover {
+    background: #3b1678;
+}
+
+.cfb-account-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.625rem;
+    background: #F9FAFB;
+}
+
+.cfb-account-icon {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.cfb-account-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cfb-account-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.cfb-account-type {
+    font-size: 0.8125rem;
+    color: #6B7280;
+}
+
+.cfb-perms-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.625rem;
+    overflow: hidden;
+}
+
+.cfb-perm-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid #F3F4F6;
+    background: #fff;
+}
+
+.cfb-perm-item:last-child {
+    border-bottom: none;
+}
+
+.cfb-perm-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #F5F3FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.cfb-perm-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cfb-perm-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.cfb-perm-sub {
+    font-size: 0.8125rem;
+    color: #6B7280;
+}
+
+/* Redirect overlay */
+.cfb-redirect-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cfb-redirect-card {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 2.5rem 2rem;
+    max-width: 380px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+}
+
+.cfb-redirect-spinner {
+    width: 28px;
+    height: 28px;
+    border-width: 3px;
+    border-color: rgba(76, 29, 149, 0.2);
+    border-top-color: #4C1D95;
+}
+
+.cfb-redirect-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.cfb-redirect-sub {
+    font-size: 0.875rem;
+    color: #6B7280;
+    margin: 0;
+    line-height: 1.5;
+}
