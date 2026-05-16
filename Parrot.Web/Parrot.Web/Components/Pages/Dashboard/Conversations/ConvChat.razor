@@ -1,0 +1,189 @@
+@using Parrot.Web.Components.Pages.Dashboard.Conversations
+
+<div class="cv-chat">
+    <div class="cv-chat-header">
+        <div class="cv-chat-header-inner">
+            <div class="cv-chat-header-top">
+                <span class="cv-chat-name">@Conv.CustomerName</span>
+                @if (InControlMode)
+                {
+                    <span class="cv-timer">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        @ControlTimeLeft
+                    </span>
+                }
+            </div>
+            <div class="cv-chat-meta">
+                <div class="cv-channel-tag">
+                    <img src="assets/images/icons/@(Conv.PrimaryChannel).png" alt="@Conv.PrimaryChannel"
+                         class="cv-channel-tag-icon" />
+                    <span>@GetChannelName(Conv.PrimaryChannel)</span>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </div>
+                <span class="cv-meta-sep">·</span>
+                <div class="cv-agent-tag">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                        <path d="M4.93 4.93a10 10 0 0 0 0 14.14" />
+                    </svg>
+                    <span>@Conv.AgentName</span>
+                </div>
+                <span class="cv-meta-sep">·</span>
+                <div class="cv-status-badge">
+                    <span class="cv-status-dot cv-status-dot--@Conv.Status.ToLower()"></span>
+                    <span>@Conv.Status</span>
+                </div>
+            </div>
+        </div>
+        @if (!InControlMode)
+        {
+            <button class="cv-take-control-btn" @onclick="() => OnTakeControl.InvokeAsync()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                    <line x1="6" y1="1" x2="6" y2="4" />
+                    <line x1="10" y1="1" x2="10" y2="4" />
+                    <line x1="14" y1="1" x2="14" y2="4" />
+                </svg>
+                Take control
+            </button>
+        }
+    </div>
+
+    @if (Conv.HasDuplicate)
+    {
+        <div class="cv-dup-banner">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="cv-dup-text">
+                Possible duplicate customer found: <strong>@Conv.DuplicateName</strong>
+                @GetDupChannelEmoji(Conv.DuplicateChannel)
+            </span>
+            <button class="cv-link-accounts-btn" @onclick="() => OnLinkAccounts.InvokeAsync()">
+                Link accounts
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+            </button>
+        </div>
+    }
+
+    <div class="cv-messages">
+        @foreach (var msg in Conv.Messages)
+        {
+            @if (msg.IsAi)
+            {
+                <div class="cv-msg cv-msg--ai">
+                    <div class="cv-msg-bubble cv-msg-bubble--ai">@msg.Text</div>
+                </div>
+            }
+            else
+            {
+                <div class="cv-msg cv-msg--customer">
+                    <div class="cv-msg-avatar"><img src="@Conv.CustomerAvatar" alt="@Conv.CustomerName" /></div>
+                    <div>
+                        <div class="cv-msg-bubble cv-msg-bubble--customer">@msg.Text</div>
+                        @if (msg.HasTask)
+                        {
+                            <div class="cv-task-link">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="16" />
+                                    <line x1="8" y1="12" x2="16" y2="12" />
+                                </svg>
+                                Task created from this message
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    @if (InControlMode)
+    {
+        <div class="cv-input-bar">
+            <input class="cv-input" placeholder="Enter message here..." value="@_message"
+                   @oninput="e => _message = e.Value?.ToString() ?? string.Empty" @onkeydown="OnKeyDown" />
+            <button class="cv-send-btn" @onclick="Send">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="cv-readonly-bar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            This conversation is being handled by your AI agent. Responses are read-only.
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public ConversationItem Conv { get; set; } = default!;
+    [Parameter] public bool InControlMode { get; set; }
+    [Parameter] public string ControlTimeLeft { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnTakeControl { get; set; }
+    [Parameter] public EventCallback OnLinkAccounts { get; set; }
+
+    private string _message = string.Empty;
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") Send();
+    }
+
+    private void Send()
+    {
+        if (string.IsNullOrWhiteSpace(_message)) return;
+        Conv.Messages.Add(new ConvMessage { Text = _message, IsAi = false });
+        _message = string.Empty;
+    }
+
+    private static string GetChannelIcon(string channel) => channel switch
+    {
+        "instagram" => "📸",
+        "facebook" => "👥",
+        _ => "💬"
+    };
+
+    private static string GetChannelName(string channel) => channel switch
+    {
+        "instagram" => "Instagram",
+        "facebook" => "Facebook",
+        _ => "WhatsApp"
+    };
+
+    private static string GetDupChannelEmoji(string channel) => channel switch
+    {
+        "instagram" => "📸",
+        "facebook" => "👥",
+        _ => "💬"
+    };
+}

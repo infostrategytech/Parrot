@@ -93,7 +93,22 @@
 
 @if (_showConnectModal)
 {
-    <ConnectWhatsappModal OnCancel="CloseConnect" OnStartSetup="StartSetup" />
+    @if (_activeChannelKey == "whatsapp")
+    {
+        <ConnectWhatsappModal OnCancel="CloseConnect" OnStartSetup="StartSetup" />
+    }
+    else if (_activeChannelKey == "facebook")
+    {
+        <ConnectFacebookModal OnCancel="CloseConnect" OnStartSetup="StartSetup" />
+    }
+    else if (_activeChannelKey == "instagram")
+    {
+        <ConnectInstagramModal OnCancel="CloseConnect" OnStartSetup="StartSetup" />
+    }
+    else if (_activeChannelKey == "twitter")
+    {
+        <ConnectTwitterModal OnCancel="CloseConnect" OnStartSetup="StartSetup" />
+    }
 }
 
 @if (_showDisconnectModal)
@@ -108,7 +123,7 @@
 
     private void OpenConnect(string key)
     {
-        if (key == "whatsapp")
+        if (key is "whatsapp" or "facebook" or "instagram" or "twitter")
         {
             _activeChannelKey = key;
             _showConnectModal = true;
@@ -120,7 +135,14 @@
     private void StartSetup()
     {
         _showConnectModal = false;
-        Nav.NavigateTo("/dashboard/channels/connect-whatsapp");
+        if (_activeChannelKey == "facebook")
+            Nav.NavigateTo("/dashboard/channels/connect-facebook-marketplace");
+        else if (_activeChannelKey == "instagram")
+            Nav.NavigateTo("/dashboard/channels/connect-instagram");
+        else if (_activeChannelKey == "twitter")
+            Nav.NavigateTo("/dashboard/channels/connect-x");
+        else
+            Nav.NavigateTo("/dashboard/channels/connect-whatsapp");
     }
 
     private void OpenDisconnect(string key)

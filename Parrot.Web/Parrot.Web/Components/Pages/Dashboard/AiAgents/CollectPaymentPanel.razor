@@ -1,0 +1,65 @@
+@{
+    var fixedSrc = "Fixed";
+    var collectedSrc = "FromCollected";
+}
+
+<div class="pb-field">
+    <label class="pb-field-label">Amount source</label>
+    <div class="pb-source-toggle">
+        <button class="pb-source-btn @(Step.AmountSource == fixedSrc ? "pb-source-btn--active" : "")"
+                @onclick="() => Step.AmountSource = fixedSrc">
+            Fixed amount
+        </button>
+        <button class="pb-source-btn @(Step.AmountSource == collectedSrc ? "pb-source-btn--active" : "")"
+                @onclick="() => Step.AmountSource = collectedSrc">
+            From collected data
+        </button>
+    </div>
+</div>
+
+@if (Step.AmountSource != "FromCollected")
+{
+    <div class="pb-field">
+        <label class="pb-field-label">Amount</label>
+        <div class="pb-amount-wrap">
+            <span class="pb-amount-prefix">₦</span>
+            <input class="pb-input pb-input--amount" type="number" placeholder="0.00" value="@Step.PaymentAmount"
+                   @oninput="e => Step.PaymentAmount = decimal.TryParse(e.Value?.ToString(), out var v) ? v : 0" />
+        </div>
+    </div>
+}
+
+<div class="pb-field">
+    <label class="pb-field-label">Payment provider</label>
+    <div class="pb-select-wrap">
+        <select class="pb-select" value="@Step.PaymentProvider"
+                @onchange="async e => { Step.PaymentProvider = e.Value?.ToString() ?? string.Empty; await OnChanged.InvokeAsync(); }">
+            <option value="">-- Select --</option>
+            <option value="Paystack">Paystack</option>
+            <option value="Flutterwave">Flutterwave</option>
+            <option value="Stripe">Stripe</option>
+        </select>
+        <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6" />
+        </svg>
+    </div>
+</div>
+
+<div class="pb-field">
+    <label class="pb-field-label">Success message</label>
+    <textarea class="pb-textarea" rows="3" placeholder="Message shown after successful payment"
+              value="@Step.SuccessMessage"
+              @oninput="e => Step.SuccessMessage = e.Value?.ToString() ?? string.Empty"></textarea>
+</div>
+
+<div class="pb-field">
+    <label class="pb-field-label">Failure message</label>
+    <textarea class="pb-textarea" rows="3" placeholder="Message shown after failed payment" value="@Step.FailureMessage"
+              @oninput="e => Step.FailureMessage = e.Value?.ToString() ?? string.Empty"></textarea>
+</div>
+
+@code {
+    [Parameter] public PlaybookStep Step { get; set; } = default!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+}

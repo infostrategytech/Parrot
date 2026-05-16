@@ -1,0 +1,37 @@
+<div class="pb-field">
+    <label class="pb-field-label">Wait duration</label>
+    <div class="pb-wait-row">
+        <div class="pb-select-wrap pb-wait-num">
+            <select class="pb-select" value="@Step.WaitDuration"
+                    @onchange="async e => { Step.WaitDuration = e.Value?.ToString() ?? string.Empty; await OnChanged.InvokeAsync(); }">
+                <option value="">-- Select --</option>
+                @foreach (var n in new[] { "1", "2", "3", "5", "10", "15", "30", "60" })
+                {
+                    <option value="@n">@n</option>
+                }
+            </select>
+            <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+            </svg>
+        </div>
+        <div class="pb-select-wrap pb-wait-unit">
+            <select class="pb-select" value="@Step.WaitUnit"
+                    @onchange="e => Step.WaitUnit = e.Value?.ToString() ?? string.Empty">
+                <option value="Minutes">Minutes</option>
+                <option value="Hours">Hours</option>
+                <option value="Days">Days</option>
+            </select>
+            <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+            </svg>
+        </div>
+    </div>
+    <span class="pb-field-hint">The process will pause for this duration before continuing</span>
+</div>
+
+@code {
+    [Parameter] public PlaybookStep Step { get; set; } = default!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+}

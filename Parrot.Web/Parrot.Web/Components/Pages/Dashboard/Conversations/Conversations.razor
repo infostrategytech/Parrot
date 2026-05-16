@@ -1,9 +1,104 @@
-@page "/dashboard/conversations"
+﻿@page "/dashboard/conversations"
 @layout DashboardLayout
+@inject ConversationsState ConversationsState
+@using Parrot.Web.Components.Pages.Dashboard.Conversations
 
-<div class="dashboard-placeholder-page">
-    <h2>Conversations</h2>
-    <p>View and manage customer conversations here.</p>
+<div class="cv-page" @onclick="CloseDropdowns">
+    <ConvSidebar
+        Conversations="ConversationsState.Conversations"
+        SelectedId="@_selectedId"
+        OnSelect="SelectConversation" />
+
+    @if (_selected is not null)
+    {
+        <ConvChat
+            Conv="_selected"
+            InControlMode="_inControl"
+            ControlTimeLeft="@_controlTimeLeft"
+            OnTakeControl="OpenTakeControl"
+            OnLinkAccounts="OpenLinkAccounts" />
+
+        <ConvDetails Conv="_selected" />
+    }
+    else
+    {
+        <div class="cv-empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <p>Select a conversation to view</p>
+        </div>
+    }
 </div>
 
-@code { }
+@if (_showLinkModal)
+{
+    <LinkAccountsModal OnCancel="CloseLinkModal" OnSelect="ShowMergeConfirm" />
+}
+
+@if (_showMergeModal)
+{
+    <MergeConfirmModal OnCancel="CloseMergeModal" OnConfirm="ConfirmMerge" />
+}
+
+@if (_showTakeControlModal)
+{
+    <TakeControlModal OnCancel="CloseTakeControl" OnConfirm="ConfirmTakeControl" />
+}
+
+@code {
+    private string _selectedId = string.Empty;
+    private ConversationItem? _selected;
+    private bool _showLinkModal;
+    private bool _showMergeModal;
+    private bool _showTakeControlModal;
+    private bool _inControl;
+    private string _controlTimeLeft = "14:32";
+
+    protected override void OnInitialized()
+    {
+        _selected = ConversationsState.Conversations.FirstOrDefault();
+        _selectedId = _selected?.Id ?? string.Empty;
+    }
+
+    private void SelectConversation(string id)
+    {
+        _selectedId = id;
+        _selected = ConversationsState.GetConversation(id);
+        _inControl = false;
+    }
+
+    private void CloseDropdowns() { }
+
+    private void OpenLinkAccounts() => _showLinkModal = true;
+    private void CloseLinkModal() => _showLinkModal = false;
+
+    private void ShowMergeConfirm(ConvSearchResult _)
+    {
+        _showLinkModal = false;
+        _showMergeModal = true;
+    }
+
+    private void CloseMergeModal() => _showMergeModal = false;
+
+    private void ConfirmMerge()
+    {
+        if (_selected is not null) _selected.HasDuplicate = false;
+        _showMergeModal = false;
+    }
+
+    private void OpenTakeControl() => _showTakeControlModal = true;
+    private void CloseTakeControl() => _showTakeControlModal = false;
+
+    private void ConfirmTakeControl(string duration)
+    {
+        _inControl = true;
+        _controlTimeLeft = duration switch
+        {
+            "30 minutes" => "29:59",
+            "1 hour" => "59:59",
+            _ => "14:59"
+        };
+        _showTakeControlModal = false;
+    }
+}

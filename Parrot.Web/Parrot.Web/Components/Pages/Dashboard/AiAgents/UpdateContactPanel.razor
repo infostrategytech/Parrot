@@ -1,0 +1,39 @@
+<div class="pb-field">
+    <label class="pb-field-label">Stage</label>
+    <div class="pb-select-wrap">
+        <select class="pb-select" value="@Step.ContactStage"
+                @onchange="async e => { Step.ContactStage = e.Value?.ToString() ?? string.Empty; await OnChanged.InvokeAsync(); }">
+            <option value="">-- Select --</option>
+            <option value="NewLead">New Lead</option>
+            <option value="Interested">Interested</option>
+            <option value="Customer">Customer</option>
+            <option value="VIP">VIP</option>
+        </select>
+        <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6" />
+        </svg>
+    </div>
+</div>
+
+<div class="pb-field">
+    <label class="pb-field-label">Tags</label>
+    <div class="pb-select-wrap">
+        <select class="pb-select" value="@Step.ContactTags"
+                @onchange="e => Step.ContactTags = e.Value?.ToString() ?? string.Empty">
+            <option value="">-- Select --</option>
+            <option value="VIP">VIP</option>
+            <option value="Returning">Returning</option>
+            <option value="FrequentBuyer">Frequent buyer</option>
+        </select>
+        <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6" />
+        </svg>
+    </div>
+</div>
+
+@code {
+    [Parameter] public PlaybookStep Step { get; set; } = default!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+}

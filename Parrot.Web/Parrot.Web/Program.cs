@@ -4,7 +4,7 @@ using Parrot.Web.Features.Dashboard.AiAgents.State;
 using Parrot.Web.Features.Dashboard.Catalog.State;
 using Parrot.Web.Features.Dashboard.Channels.State;
 using Parrot.Web.Features.Dashboard.Contacts.State;
-using Parrot.Web.Features.Dashboard.Conversations.State;
+using Parrot.Web.Components.Pages.Dashboard.Conversations;
 using Parrot.Web.Features.Dashboard.QaInsights.State;
 using Parrot.Web.Features.Dashboard.TaskRequests.State;
 using Parrot.Web.Features.Dashboard.Team.State;
@@ -52,7 +52,7 @@ builder.Services.AddScoped<QaInsightsState>();
 builder.Services.AddScoped<TaskRequestsState>();
 builder.Services.AddScoped<TeamState>();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

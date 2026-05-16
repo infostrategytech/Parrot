@@ -1,9 +1,179 @@
 @page "/dashboard/qa-insights"
 @layout DashboardLayout
+@using Parrot.Web.Components.Pages.Dashboard.QaInsights
 
-<div class="dashboard-placeholder-page">
-    <h2>QA & Conversation Insight</h2>
-    <p>Analyse conversation quality and insights here.</p>
-</div>
+<div class="qi-page">
+    <div class="qi-topbar">
+        <button class="qi-date-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            Date range
+        </button>
+    </div>
 
-@code { }
+    <div class="qi-stat-grid">
+        @foreach (var card in _statCards)
+        {
+            <div class="qi-stat-card">
+                <div class="qi-stat-header">
+                    <span class="qi-stat-title">@card.Title</span>
+                    <span class="qi-stat-change @(card.ChangePositive ? "qi-change--up" : "qi-change--down")">
+                        @if (card.ChangePositive)
+                        {
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>
+                        }
+                        else
+                        {
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        }
+                        @card.Change
+                    </span>
+                </div>
+                <div class="qi-stat-value">@card.Value</div>
+                <div class="qi-stat-sub">@card.Sub</div>
+            </div>
+        }
+    </div>
+
+    <div class="qi-bottom">
+        <div class="qi-performance-panel">
+            <h3 class="qi-panel-title">AI vs Human Performance</h3>
+            <p class="qi-panel-sub">Key metrics at a glance</p>
+            <hr class="qi-panel-divider" />
+            <div class="qi-perf-cards">
+                <div class="qi-perf-card">
+                    <div class="qi-perf-card-header">
+                        <div class="qi-perf-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                                <path d="M4.93 4.93a10 10 0 0 0 0 14.14" />
+                            </svg>
+                        </div>
+                        <span class="qi-perf-card-title">AI Agent Performance</span>
+                    </div>
+                    @foreach (var row in _aiRows)
+                    {
+                        <div class="qi-perf-row">
+                            <span class="qi-perf-label">@row.Label</span>
+                            <span class="qi-perf-value">@row.Value</span>
+                        </div>
+                    }
+                </div>
+                <div class="qi-perf-card">
+                    <div class="qi-perf-card-header">
+                        <div class="qi-perf-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </div>
+                        <span class="qi-perf-card-title">Human Performance</span>
+                    </div>
+                    @foreach (var row in _humanRows)
+                    {
+                        <div class="qi-perf-row">
+                            <span class="qi-perf-label">@row.Label</span>
+                            <span class="qi-perf-value">@row.Value</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="qi-insight-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+                <p class="qi-insight-text">Human intervention improves resolution rates by 12.3% for complex custom
+                    requests, while AI maintains high efficiency for standardized flows.</p>
+                </div>
+            </div>
+
+            <div class="qi-sentiment-panel">
+                <div class="qi-sentiment-header">
+                    <span class="qi-sentiment-title">Customer Sentiment</span>
+                    <div class="qi-sentiment-pct-wrap">
+                        <span class="qi-sentiment-pct">78%</span>
+                        <span class="qi-sentiment-pct-label">Positive</span>
+                    </div>
+                </div>
+                <hr class="qi-sentiment-divider" />
+                <div class="qi-donut-wrap">
+                    <svg viewBox="0 0 120 120" class="qi-donut">
+                        <circle cx="60" cy="60" r="46" fill="none" stroke="#E5E7EB" stroke-width="20" />
+                        @{
+                            double circumference = 2 * Math.PI * 46;
+                            double neutralOffset = circumference * (1 - 0.16);
+                            double negOffset = circumference * (1 - 0.06);
+                            double posOffset = circumference * (1 - 0.78);
+                        }
+                        <circle cx="60" cy="60" r="46" fill="none" stroke="#22C55E" stroke-width="20"
+                                stroke-dasharray="@circumference" stroke-dashoffset="@posOffset"
+                                transform="rotate(-90 60 60)" />
+                        <circle cx="60" cy="60" r="46" fill="none" stroke="#D1D5DB" stroke-width="20"
+                                stroke-dasharray="@(circumference * 0.16) @circumference"
+                                stroke-dashoffset="@(-(circumference * 0.78))" transform="rotate(-90 60 60)" />
+                        <circle cx="60" cy="60" r="46" fill="none" stroke="#EF4444" stroke-width="20"
+                                stroke-dasharray="@(circumference * 0.06) @circumference"
+                                stroke-dashoffset="@(-(circumference * 0.94))" transform="rotate(-90 60 60)" />
+                    </svg>
+                </div>
+                <div class="qi-legend">
+                    @foreach (var s in _sentimentSlices)
+                    {
+                        <div class="qi-legend-row">
+                            <span class="qi-legend-dot" style="background:@s.Color"></span>
+                            <span class="qi-legend-label">@s.Label</span>
+                            <span class="qi-legend-val">@s.Percent%</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+@code {
+    private readonly List<StatCard> _statCards =
+    [
+        new("Total Conversations", "4,281", "All handled across channels.", "+12.5%", true),
+        new("AI Resolution Rate", "84.2%", "Resolved without human intervention.","+ 4.1%", true),
+        new("Human Takeover Rate", "11.8%", "Escalated to manual control.", "-2.4%", false),
+        new("Tasks Created", "1,592", "Requests generated from flows.", "+18.7%", true),
+        new("Goal achieved", "3,912", "Customers completed intended action.","+ 12.5%",true),
+        new("Unresolved", "172", "Closed without achieving goal.", "+4s", false),
+    ];
+
+    private readonly List<PerformanceRow> _aiRows =
+    [
+        new("Resolution Rate:", "84.2%"),
+        new("Avg Sentiment Score", "4.4/5"),
+        new("Goal Completion", "91.8%"),
+    ];
+
+    private readonly List<PerformanceRow> _humanRows =
+    [
+        new("Resolution Rate:", "84.2%"),
+        new("Avg Sentiment Score", "4.4/5"),
+        new("Goal Completion", "91.8%"),
+    ];
+
+    private readonly List<SentimentSlice> _sentimentSlices =
+    [
+        new("Positive Sentiment", "#22C55E", 78),
+        new("Neutral Sentiment", "#D1D5DB", 16),
+        new("Negativee Sentiment", "#EF4444", 6),
+    ];
+}

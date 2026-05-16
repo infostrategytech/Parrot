@@ -1,0 +1,39 @@
+<div class="pb-modal-overlay" @onclick="() => OnCancel.InvokeAsync()">
+    <div class="pb-modal" @onclick:stopPropagation>
+        <h2 class="pb-modal-title">Name your playbook</h2>
+        <p class="pb-modal-sub">Give this playbook a name and description so you can easily identify what this
+            automation does.</p>
+            <div class="pb-field" style="margin-top:20px;">
+                <label class="pb-field-label">Playbook name</label>
+                <input class="pb-input" placeholder="e.g. Order food, Book appointment" value="@_name"
+                       @oninput="e => _name = e.Value?.ToString() ?? string.Empty" />
+            </div>
+            <div class="pb-field">
+                <label class="pb-field-label">Description <span class="pb-field-label--sub">(Optional)</span></label>
+                <textarea class="pb-textarea" rows="4"
+                          placeholder="Handles customer food orders by collecting item selection, quantity, delivery details, and sending an order confirmation."
+                          value="@_desc" @oninput="e => _desc = e.Value?.ToString() ?? string.Empty"></textarea>
+            </div>
+            <div class="pb-modal-actions">
+                <button class="pb-btn pb-btn--ghost" @onclick="() => OnCancel.InvokeAsync()">Cancel</button>
+                <button class="pb-btn pb-btn--primary" @onclick="Confirm">Save playbook</button>
+            </div>
+        </div>
+    </div>
+
+@code {
+    [Parameter] public string InitialName { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback<PlaybookSaveArgs> OnSave { get; set; }
+
+    private string _name = string.Empty;
+    private string _desc = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(InitialName))
+            _name = InitialName;
+    }
+
+    private async Task Confirm() => await OnSave.InvokeAsync(new PlaybookSaveArgs(_name, _desc));
+}
