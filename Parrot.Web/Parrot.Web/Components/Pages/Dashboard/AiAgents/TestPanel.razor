@@ -1,0 +1,72 @@
+<div class="pb-panel pb-panel--test" @onclick:stopPropagation>
+    <div class="pb-panel-header">
+        <div class="pb-panel-title-row">
+            <span class="pb-panel-title">Test</span>
+        </div>
+        <button class="pb-panel-close" @onclick="() => OnClose.InvokeAsync()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </button>
+    </div>
+    <div class="pb-panel-divider"></div>
+    <div class="pb-test-messages">
+        @foreach (var msg in _testMessages)
+        {
+            @if (msg.IsUser)
+            {
+                <div class="pb-test-msg pb-test-msg--user">
+                    <div class="pb-test-avatar pb-test-avatar--user">👤</div>
+                    <div class="pb-test-bubble pb-test-bubble--user">@msg.Text</div>
+                </div>
+            }
+            else
+            {
+                <div class="pb-test-msg pb-test-msg--bot">
+                    <div class="pb-test-bubble pb-test-bubble--bot">@msg.Text</div>
+                    <div class="pb-test-avatar pb-test-avatar--bot">🤖</div>
+                </div>
+            }
+        }
+    </div>
+    <div class="pb-test-input-row">
+        <input class="pb-test-input" placeholder="Type a message..." value="@_testInput"
+               @oninput="e => _testInput = e.Value?.ToString() ?? string.Empty" @onkeydown="OnKeyDown" />
+        <button class="pb-test-send" @onclick="SendMessage">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private string _testInput = string.Empty;
+    private readonly List<TestMessage> _testMessages = new()
+    {
+        new TestMessage { Text = "2 plates of Jollof Rice with chicken and a Pepsi", IsUser = true },
+        new TestMessage { Text = "Got it! So that's:\n• Jollof Rice x2\n• Chicken x1\n• Pepsi x1\nWould you like anything else?", IsUser = false },
+        new TestMessage { Text = "No, that's all. Make the jollof extra spicy please", IsUser = true },
+        new TestMessage { Text = "Noted — extra spicy Jollof Rice. Your total comes to ₦7,000. Should I go ahead and place this order?", IsUser = false },
+    };
+
+    private record TestMessage { public string Text { get; init; } = string.Empty; public bool IsUser { get; init; } }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") SendMessage();
+    }
+
+    private void SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(_testInput)) return;
+        _testMessages.Add(new TestMessage { Text = _testInput, IsUser = true });
+        _testInput = string.Empty;
+    }
+}

@@ -1,0 +1,567 @@
+@page "/dashboard/ai-agents/{AgentId}"
+@layout DashboardLayout
+@inject AiAgentsState AiAgentsState
+@inject NavigationManager Nav
+@using Parrot.Web.Components.Pages.Dashboard.AiAgents
+@implements IDisposable
+
+@{
+    var agent = AiAgentsState.GetAgent(AgentId);
+}
+
+@if (agent is null)
+{
+    <div class="dashboard-placeholder-page">
+        <h2>Agent not found</h2>
+        <p>This agent does not exist or has been deleted.</p>
+    </div>
+}
+else
+{
+    <div class="agd-page" @onclick="CloseMenus">
+        <div class="agd-header-card">
+            <div class="agd-header-left">
+                <div class="agd-mascot-lg-wrap">
+                    <img src="@GetMascotGif(agent.Mascot)" alt="@agent.Mascot" class="agd-mascot-lg-img" />
+                </div>
+                <div class="agd-header-info">
+                    <div class="agd-header-name-row">
+                        <span class="agd-agent-name">@agent.Name</span>
+                        <span class="agd-active-badge">
+                            <span class="agd-active-dot"></span>
+                            Active
+                        </span>
+                    </div>
+                    <p class="agd-agent-desc">@agent.Description</p>
+                </div>
+            </div>
+            <button class="agd-menu-btn" @onclick:stopPropagation @onclick="() => _showHeaderMenu = !_showHeaderMenu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="1.5" />
+                    <circle cx="12" cy="12" r="1.5" />
+                    <circle cx="12" cy="19" r="1.5" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="agd-tabs">
+            <button class="agd-tab @(_activeTab == "overview" ? "agd-tab--active" : "")"
+                    @onclick='() => _activeTab = "overview"'>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                Overview
+            </button>
+            <button class="agd-tab @(_activeTab == "playbooks" ? "agd-tab--active" : "")"
+                    @onclick='() => _activeTab = "playbooks"'>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+                Playbooks
+            </button>
+            <button class="agd-tab @(_activeTab == "channels" ? "agd-tab--active" : "")"
+                    @onclick='() => _activeTab = "channels"'>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+                Channels
+            </button>
+            <button class="agd-tab @(_activeTab == "analytics" ? "agd-tab--active" : "")"
+                    @onclick='() => _activeTab = "analytics"'>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                    <polyline points="17 6 23 6 23 12" />
+                </svg>
+                Analytics
+            </button>
+        </div>
+
+        @if (_activeTab == "overview")
+        {
+            <div class="agd-tab-content">
+                <div class="agd-stats-grid">
+                    <div class="agd-stat-card">
+                        <div class="agd-stat-header">
+                            <span class="agd-stat-label">Conversations Handled</span>
+                            <span class="agd-stat-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                </svg>
+                            </span>
+                        </div>
+                        <span class="agd-stat-value">1,247</span>
+                    </div>
+                    <div class="agd-stat-card">
+                        <div class="agd-stat-header">
+                            <span class="agd-stat-label">Tasks Created</span>
+                            <span class="agd-stat-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="9" y1="9" x2="15" y2="9" />
+                                    <line x1="9" y1="12" x2="15" y2="12" />
+                                    <line x1="9" y1="15" x2="11" y2="15" />
+                                </svg>
+                            </span>
+                        </div>
+                        <span class="agd-stat-value">389</span>
+                    </div>
+                    <div class="agd-stat-card">
+                        <div class="agd-stat-header">
+                            <span class="agd-stat-label">Avg Response Time</span>
+                            <span class="agd-stat-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                            </span>
+                        </div>
+                        <span class="agd-stat-value">1.2s</span>
+                    </div>
+                    <div class="agd-stat-card">
+                        <div class="agd-stat-header">
+                            <span class="agd-stat-label">Satisfaction Score</span>
+                            <span class="agd-stat-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                </svg>
+                            </span>
+                        </div>
+                        <span class="agd-stat-value">4.6 / 5</span>
+                    </div>
+                </div>
+
+                <div class="agd-behavior-card">
+                    <h3 class="agd-behavior-title">Default Behavior</h3>
+                    <p class="agd-behavior-sub">Control how this agent handles conversations and automation.</p>
+                    <div class="agd-behavior-row">
+                        <div class="agd-behavior-info">
+                            <span class="agd-behavior-name">Human Takeover</span>
+                            <span class="agd-behavior-desc">Allow a team member to step in and continue the conversation.</span>
+                        </div>
+                        <span
+                            class="agd-behavior-badge @(agent.HumanTakeover ? "agd-behavior-badge--active" : "agd-behavior-badge--inactive")">
+                            <span class="agd-behavior-dot"></span>
+                            @(agent.HumanTakeover ? "Active" : "Inactive")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (_activeTab == "playbooks")
+        {
+            <div class="agd-tab-content">
+                @if (!agent.Playbooks.Any())
+                {
+                    <div class="agd-pb-empty">
+                        <div class="agd-pb-empty-icon">
+                            <img src="/assets/images/icons/playbook-icon.png" alt="Playbooks" class="agd-pb-empty-img" />
+                        </div>
+                        <h3 class="agd-pb-empty-title">Create your first playbook</h3>
+                        <p class="agd-pb-empty-sub">Playbooks define how this agent handles specific customer requests.<br />Create
+                            structured workflows to guide conversations, collect<br />information, and automate actions like orders,
+                            bookings, or<br />notifications.</p>
+                            <button class="aia-btn-primary" @onclick="CreateNewPlaybook">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="16" />
+                                    <line x1="8" y1="12" x2="16" y2="12" />
+                                </svg>
+                                Create playbook
+                            </button>
+                            <div class="agd-pb-whatcan">
+                                <p class="agd-pb-whatcan-title">What can a playbook do?</p>
+                                @foreach (var item in _playbookCapabilities)
+                                {
+                                    <div class="agd-pb-capability">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5"
+                                             stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                        <span>@item</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                else
+                    {
+                        <div class="agd-pb-list">
+                            <div class="agd-pb-list-header">
+                                <div>
+                                    <h3 class="agd-pb-list-title">Automation Playbooks</h3>
+                                    <p class="agd-pb-list-sub">Playbooks define how this agent handles specific customer requests.</p>
+                                </div>
+                                <button class="aia-btn-primary" @onclick="CreateNewPlaybook">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                         stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="12" y1="8" x2="12" y2="16" />
+                                        <line x1="8" y1="12" x2="16" y2="12" />
+                                    </svg>
+                                    Create playbook
+                                </button>
+                            </div>
+                            <div class="agd-pb-table-wrap">
+                                <table class="agd-pb-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th>Steps</th>
+                                            <th>Execution</th>
+                                            <th>Status</th>
+                                            <th>Date Created</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var pb in agent.Playbooks)
+                                        {
+                                            var pbId = pb.Id;
+                                            <tr class="agd-pb-row" @onclick="() => OpenPlaybook(pbId)">
+                                                <td class="agd-pb-cell-title">@pb.Title</td>
+                                                <td class="agd-pb-cell-desc">@TruncateText(pb.Description, 55)</td>
+                                                <td>@pb.StepCount</td>
+                                                <td>@pb.Execution</td>
+                                                <td><span class="agd-pb-status agd-pb-status--@pb.Status.ToLower()">@pb.Status</span></td>
+                                                <td>@pb.DateCreated.ToString("dd MMM, yyyy • hh:mm tt")</td>
+                                                <td @onclick:stopPropagation>
+                                                    <div class="agd-pb-menu-wrap">
+                                                        <button class="agd-pb-menu-btn" @onclick="() => TogglePbMenu(pbId)">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                                                <circle cx="12" cy="5" r="1.5" />
+                                                                <circle cx="12" cy="12" r="1.5" />
+                                                                <circle cx="12" cy="19" r="1.5" />
+                                                            </svg>
+                                                        </button>
+                                                        @if (_openPbMenu == pbId)
+                                                        {
+                                                            <div class="agd-pb-dropdown">
+                                                                <button class="agd-pb-dropdown-item" @onclick="() => OpenPlaybook(pbId)">
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                                         stroke-linejoin="round">
+                                                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                                                    </svg>
+                                                                    Edit details
+                                                                </button>
+                                                                <button class="agd-pb-dropdown-item">
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                                         stroke-linejoin="round">
+                                                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                                                    </svg>
+                                                                    Duplicate
+                                                                </button>
+                                                                <button class="agd-pb-dropdown-item agd-pb-dropdown-item--danger">
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                                         stroke-linejoin="round">
+                                                                        <circle cx="12" cy="12" r="10" />
+                                                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                                                                    </svg>
+                                                                    Deactivate
+                                                                </button>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="agd-pb-footer">
+                                <span>Showing 1-@agent.Playbooks.Count items</span>
+                                <button class="agd-pb-page-btn agd-pb-page-btn--active">1</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (_activeTab == "channels")
+            {
+                <div class="agd-tab-content">
+                    <h3 class="agd-channels-title">Connected Channels</h3>
+                    <p class="agd-channels-sub">Assign messaging channels to this agent.</p>
+                    <div class="agd-channels-list">
+                        @foreach (var ch in agent.Channels)
+                        {
+                            var channel = ch;
+                            <div class="agd-channel-row">
+                                <div class="agd-channel-icon-wrap">
+                                    @GetChannelIcon(channel.Key)
+                                </div>
+                                <div class="agd-channel-info">
+                                    <span class="agd-channel-name">@channel.Name</span>
+                                    <span class="agd-channel-desc">@channel.Description</span>
+                                </div>
+                                <button type="button" class="cam-toggle @(channel.IsEnabled ? "cam-toggle--on" : "")"
+                                        @onclick="() => channel.IsEnabled = !channel.IsEnabled">
+                                    <span class="cam-toggle-thumb"></span>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (_activeTab == "analytics")
+            {
+                <div class="agd-tab-content">
+                    <div class="agd-analytics">
+                        <h3 class="agd-analytics-title">Agent Performance</h3>
+                        <p class="agd-analytics-sub">Track how this AI agent is performing across conversations, tasks, and customer
+                            interaction</p>
+                            <div class="agd-stats-grid">
+                                <div class="agd-stat-card">
+                                    <div class="agd-stat-header">
+                                        <span class="agd-stat-label">Conversations Handled</span>
+                                        <span class="agd-stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                                                         stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                        </svg></span>
+                                    </div>
+                                    <span class="agd-stat-value">1,247</span>
+                                </div>
+                                <div class="agd-stat-card">
+                                    <div class="agd-stat-header">
+                                        <span class="agd-stat-label">Tasks Created</span>
+                                        <span class="agd-stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                                                         stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                            <line x1="9" y1="9" x2="15" y2="9" />
+                                            <line x1="9" y1="12" x2="15" y2="12" />
+                                            <line x1="9" y1="15" x2="11" y2="15" />
+                                        </svg></span>
+                                    </div>
+                                    <span class="agd-stat-value">389</span>
+                                </div>
+                                <div class="agd-stat-card">
+                                    <div class="agd-stat-header">
+                                        <span class="agd-stat-label">Avg Response Time</span>
+                                        <span class="agd-stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                                                         stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <polyline points="12 6 12 12 16 14" />
+                                        </svg></span>
+                                    </div>
+                                    <span class="agd-stat-value">1.2s</span>
+                                </div>
+                                <div class="agd-stat-card">
+                                    <div class="agd-stat-header">
+                                        <span class="agd-stat-label">Completion Rate</span>
+                                        <span class="agd-stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                                                         stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                                            <polyline points="17 6 23 6 23 12" />
+                                        </svg></span>
+                                    </div>
+                                    <span class="agd-stat-value">94%</span>
+                                </div>
+                            </div>
+
+                            <div class="agd-charts-row">
+                                <div class="agd-chart-card">
+                                    <h4 class="agd-chart-title">Conversation over time</h4>
+                                    <div class="agd-hbar-chart">
+                                        @foreach (var day in _convByDay)
+                                        {
+                                            <div class="agd-hbar-row">
+                                                <span class="agd-hbar-label">@day.Day</span>
+                                                <div class="agd-hbar-track">
+                                                    <div class="agd-hbar-fill" style="width: @(Math.Round(day.Count * 100.0 / 200))%"></div>
+                                                </div>
+                                                <span class="agd-hbar-val">@day.Count</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="agd-chart-card">
+                                    <h4 class="agd-chart-title">Most triggered playbook</h4>
+                                    <div class="agd-vbar-chart">
+                                        <div class="agd-vbar-yaxis">
+                                            <span>700</span>
+                                            <span>600</span>
+                                            <span>500</span>
+                                            <span>400</span>
+                                            <span>300</span>
+                                            <span>200</span>
+                                            <span>100</span>
+                                            <span>0</span>
+                                        </div>
+                                        <div class="agd-vbar-area">
+                                            <div class="agd-vbar-bars-wrap">
+                                                <div class="agd-vbar-grid">
+                                                    @for (int i = 0; i < 8; i++)
+                                                    {
+                                                        <div class="agd-vbar-gridline"></div>
+                                                    }
+                                                </div>
+                                                <div class="agd-vbar-bars">
+                                                    @foreach (var pb in _triggeredPlaybooks)
+                                                    {
+                                                        <div class="agd-vbar-col">
+                                                            <div class="agd-vbar-fill"
+                                                                 style="height: @(Math.Round(pb.Count * 100.0 / 700))%"></div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="agd-vbar-xlabels">
+                                                @foreach (var pb in _triggeredPlaybooks)
+                                                {
+                                                    <span class="agd-vbar-label">@pb.Name</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="agd-donut-row">
+                                <div class="agd-donut-card">
+                                    <div class="agd-donut" style="background: conic-gradient(#10B981 0% 62%, #E5E7EB 62% 100%);">
+                                        <div class="agd-donut-hole"><span>62%</span></div>
+                                    </div>
+                                    <span class="agd-donut-label">WhatsApp Business</span>
+                                </div>
+                                <div class="agd-donut-card">
+                                    <div class="agd-donut" style="background: conic-gradient(#EC4899 0% 62%, #E5E7EB 62% 100%);">
+                                        <div class="agd-donut-hole"><span>62%</span></div>
+                                    </div>
+                                    <span class="agd-donut-label">Instagram</span>
+                                </div>
+                                <div class="agd-donut-card">
+                                    <div class="agd-donut" style="background: conic-gradient(#3B82F6 0% 62%, #E5E7EB 62% 100%);">
+                                        <div class="agd-donut-hole"><span>62%</span></div>
+                                    </div>
+                                    <span class="agd-donut-label">facebook Marketplace</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+@code {
+    [Parameter] public string AgentId { get; set; } = string.Empty;
+
+    private string _activeTab = "overview";
+    private bool _showHeaderMenu;
+    private string _openPbMenu = string.Empty;
+
+    private readonly string[] _playbookCapabilities = new[]
+    {
+        "Trigger when customers send specific messages",
+        "Ask questions and collect information",
+        "Select items from your catalog",
+        "Send confirmations and notifications",
+        "Request payment or complete tasks"
+    };
+
+    private record DayCount(string Day, int Count);
+    private readonly List<DayCount> _convByDay = new()
+    {
+        new("Mon", 163), new("Tue", 100), new("Wed", 120),
+        new("Thu", 120), new("Fri", 120), new("Sat", 120), new("Sun", 45)
+    };
+
+    private record PbCount(string Name, int Count);
+    private readonly List<PbCount> _triggeredPlaybooks = new()
+    {
+        new("Place food order", 350),
+        new("Delivery tracking", 590),
+        new("Refund request", 640),
+        new("Book table", 640)
+    };
+
+    private void CloseMenus()
+    {
+        _showHeaderMenu = false;
+        _openPbMenu = string.Empty;
+    }
+
+    private void TogglePbMenu(string id)
+    {
+        _openPbMenu = _openPbMenu == id ? string.Empty : id;
+    }
+
+    private void OpenPlaybook(string pbId)
+    {
+        Nav.NavigateTo($"/dashboard/ai-agents/{AgentId}/playbooks/{pbId}");
+    }
+
+    private void CreateNewPlaybook()
+    {
+        var agent = AiAgentsState.GetAgent(AgentId);
+        if (agent is null) return;
+        var pb = new Playbook { Id = Guid.NewGuid().ToString(), Title = "New Playbook", Status = "Draft" };
+        agent.Playbooks.Add(pb);
+        Nav.NavigateTo($"/dashboard/ai-agents/{AgentId}/playbooks/{pb.Id}");
+    }
+
+    private static string GetMascotGif(string mascot) => mascot switch
+    {
+        "Bolt" => "/assets/images/gifs/bolt-mascott.gif",
+        "Aegis" => "/assets/images/gifs/aegis-mascott.gif",
+        "Buzz" => "/assets/images/gifs/buzz-mascott.gif",
+        "Luna" => "/assets/images/gifs/luna-mascott.gif",
+        _ => "/assets/images/gifs/nova-mascott.gif"
+    };
+
+    private static string TruncateText(string text, int max) =>
+        text.Length <= max ? text : text[..max] + "...";
+
+    private RenderFragment GetChannelIcon(string key) => key switch
+    {
+        "whatsapp" => @<svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366">
+            <path
+            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>,
+        "facebook" => @<svg width="24" height="24" viewBox="0 0 24 24" fill="#1877F2">
+            <path
+            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+        </svg>,
+        _ => @<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <defs>
+                <radialGradient id="ig1" cx="30%" cy="107%" r="150%">
+                    <stop offset="0%" stop-color="#fdf497" />
+                    <stop offset="5%" stop-color="#fdf497" />
+                    <stop offset="45%" stop-color="#fd5949" />
+                    <stop offset="60%" stop-color="#d6249f" />
+                    <stop offset="90%" stop-color="#285AEB" />
+                </radialGradient>
+            </defs>
+            <rect width="24" height="24" rx="5" fill="url(#ig1)" />
+            <rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="white" stroke-width="1.5" />
+            <circle cx="12" cy="12" r="4.5" fill="none" stroke="white" stroke-width="1.5" />
+            <circle cx="17.5" cy="6.5" r="1" fill="white" />
+        </svg>
+    };
+
+    public void Dispose() { }
+}

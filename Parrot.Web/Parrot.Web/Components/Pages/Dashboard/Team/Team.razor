@@ -1,9 +1,44 @@
 @page "/dashboard/team"
 @layout DashboardLayout
+@using Parrot.Web.Components.Pages.Dashboard.Team
 
-<div class="dashboard-placeholder-page">
-    <h2>Team</h2>
-    <p>Manage your team members and roles here.</p>
+<div class="tm-page">
+    @if (_members.Count == 0)
+    {
+        <div class="aia-empty">
+            <div class="aia-empty-bg-img"></div>
+            <div class="aia-empty-content">
+                <img src="/assets/images/gifs/owl-animation.gif" alt="Owl mascot" class="aia-empty-owl-img" />
+                <h2 class="aia-empty-title">No team members yet</h2>
+                <p class="aia-empty-sub">Invite your team to help manage conversations<br />and monitor activity.</p>
+                <button class="aia-btn-primary" @onclick="OpenInvite">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                    Add team member
+                </button>
+            </div>
+        </div>
+    }
 </div>
 
-@code { }
+@if (_showInvite)
+{
+    <InviteModal OnCancel="CloseInvite" OnSend="HandleInviteSent" />
+}
+
+@code {
+    List<TeamMember> _members = [];
+    bool _showInvite;
+
+    void OpenInvite() => _showInvite = true;
+    void CloseInvite() => _showInvite = false;
+
+    void HandleInviteSent(TeamMember member)
+    {
+        _members.Add(member);
+        _showInvite = false;
+    }
+}

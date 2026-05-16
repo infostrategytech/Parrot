@@ -1,0 +1,99 @@
+<div class="pb-two-col">
+    <div class="pb-field">
+        <label class="pb-field-label">Field to check</label>
+        <div class="pb-select-wrap">
+            <select class="pb-select" value="@Step.ConditionField"
+                    @onchange="async e => { Step.ConditionField = e.Value?.ToString() ?? string.Empty; await OnChanged.InvokeAsync(); }">
+                <option value="">-- Select --</option>
+                <option value="CustomerName">Customer Name</option>
+                <option value="CustomerOrder">Customer Order</option>
+                <option value="SelectedItems">Selected Items</option>
+                <option value="OrderTotal">Order total</option>
+            </select>
+            <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+            </svg>
+        </div>
+    </div>
+    <div class="pb-field">
+        <label class="pb-field-label">Operator</label>
+        <div class="pb-select-wrap">
+            <select class="pb-select" value="@Step.ConditionOperator"
+                    @onchange="async e => { Step.ConditionOperator = e.Value?.ToString() ?? string.Empty; await OnChanged.InvokeAsync(); }">
+                <option value="">-- Select operator --</option>
+                <option value="equals">Equals</option>
+                <option value="notequals">Does not equals</option>
+                <option value="contains">Contains</option>
+                <option value="gt">Greater than</option>
+                <option value="lt">Less than</option>
+                <option value="isempty">Is empty</option>
+                <option value="isnotempty">Is not empty</option>
+            </select>
+            <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+            </svg>
+        </div>
+    </div>
+</div>
+
+<div class="pb-field">
+    <label class="pb-field-label">Value</label>
+    <input class="pb-input" placeholder="Comparison value" value="@Step.ConditionValue"
+           @oninput="e => Step.ConditionValue = e.Value?.ToString() ?? string.Empty" />
+</div>
+
+<div class="pb-field">
+    <label class="pb-field-label">Path</label>
+    <div class="pb-condition-path pb-condition-path--yes">
+        <div class="pb-condition-path-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span class="pb-condition-path-label pb-condition-path-label--yes">Yes Path</span>
+        </div>
+        <p class="pb-condition-path-sub">When condition is true</p>
+        <div class="pb-select-wrap">
+            <select class="pb-select" value="@Step.YesAction"
+                    @onchange="e => Step.YesAction = e.Value?.ToString() ?? string.Empty">
+                <option value="">-- Select action --</option>
+                <option value="continue">Continue to next step</option>
+                <option value="end">End flow</option>
+            </select>
+            <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+            </svg>
+        </div>
+    </div>
+    <div class="pb-condition-path pb-condition-path--no">
+        <div class="pb-condition-path-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+            <span class="pb-condition-path-label pb-condition-path-label--no">No Path</span>
+        </div>
+        <p class="pb-condition-path-sub">When condition is false</p>
+        <div class="pb-select-wrap">
+            <select class="pb-select" value="@Step.NoAction"
+                    @onchange="e => Step.NoAction = e.Value?.ToString() ?? string.Empty">
+                <option value="">-- Select action --</option>
+                <option value="continue">Continue to next step</option>
+                <option value="end">End flow</option>
+            </select>
+            <svg class="pb-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+            </svg>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public PlaybookStep Step { get; set; } = default!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+}

@@ -1,11 +1,14 @@
 .dashboard-layout {
     display: flex;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .dashboard-sidebar {
     width: 225px;
     flex-shrink: 0;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 .dashboard-main {
@@ -14,6 +17,8 @@
     flex-direction: column;
     min-width: 0;
     background-color: #fff;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .dashboard-topbar {
@@ -47,4 +52,5 @@
     flex: 1;
     padding: 1.5rem;
     overflow-y: auto;
+    background: #F9FAFB;
 }

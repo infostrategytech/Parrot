@@ -1,0 +1,334 @@
+@page "/dashboard/channels/connect-facebook-marketplace"
+@layout DashboardLayout
+@inject ChannelsState ChannelsState
+@inject NavigationManager Nav
+
+<div class="cws-page">
+    <a class="cws-cancel-link" @onclick="Cancel" @onclick:preventDefault="true" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+        </svg>
+        Cancel
+    </a>
+
+    <div class="cws-stepper">
+        @for (int i = 0; i < _steps.Length; i++)
+        {
+            var idx = i;
+            var stepNum = i + 1;
+            <div class="cws-step @GetStepClass(idx)">
+                <span class="cws-step-indicator">
+                    @if (_completedSteps.Contains(idx))
+                    {
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                    }
+                    else
+                    {
+                        @stepNum
+                    }
+                </span>
+                <span class="cws-step-label">@_steps[idx]</span>
+            </div>
+            @if (idx < _steps.Length - 1)
+            {
+                <div class="cws-step-divider"></div>
+            }
+        }
+    </div>
+
+    <div class="cws-body">
+        @if (_currentStep == 0)
+        {
+            <div class="cws-panel">
+                <h2 class="cws-panel-title">Sign in to Facebook</h2>
+                <p class="cws-panel-sub">Connect your Facebook account to authorize access.</p>
+
+                @if (_fbConnected)
+                {
+                    <div class="cfb-account-row">
+                        <img src="assets/images/icons/facebook.png" alt="Facebook" class="cfb-account-icon" />
+                        <div class="cfb-account-info">
+                            <span class="cfb-account-name">Chioma J. Udeze</span>
+                            <span class="cfb-account-type">Facebook Business Account</span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p class="cws-panel-sub">Click the button below to sign in with your Facebook account.</p>
+                    <button class="cfb-signin-btn" @onclick="SignInWithFacebook">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                        Continue with facebook
+                    </button>
+                }
+
+                <div class="cws-info-box">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <ul class="cws-info-list">
+                        <li>Make sure you're logged into the correct Facebook account</li>
+                        <li>You need admin access to the Facebook Page</li>
+                        <li>Business Manager accounts are recommended</li>
+                    </ul>
+                </div>
+
+                @if (_fbConnected)
+                {
+                    <div class="cws-actions">
+                        <button class="cws-primary-btn" @onclick="Step1Next">
+                            Next
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                            </svg>
+                        </button>
+                    </div>
+                }
+            </div>
+
+            <div class="cws-guide-panel">
+                <h3 class="cws-guide-title">How to sign in to Facebook</h3>
+                <p class="cws-guide-sub">Follow along with the video for a guided walkthrough of each step.</p>
+                <div class="cws-video-embed">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="#FF0000">
+                        <path
+                        d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.8 12 21.8 12 21.8s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7z" />
+                        <polygon points="9.7,15.5 9.7,8.5 16.3,12" fill="white" />
+                    </svg>
+                </div>
+            </div>
+        }
+
+        @if (_currentStep == 1)
+        {
+            <div class="cws-panel">
+                <h2 class="cws-panel-title">Grant Permissions</h2>
+                <p class="cws-panel-sub">The following permissions are required for your AI to manage Marketplace
+                    conversations.</p>
+
+                    <ul class="cfb-perms-list">
+                        <li class="cfb-perm-item">
+                            <span class="cfb-perm-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B21A8" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                </svg>
+                            </span>
+                            <div class="cfb-perm-text">
+                                <span class="cfb-perm-name">Read messages</span>
+                                <span class="cfb-perm-sub">View incoming customer messages</span>
+                            </div>
+                        </li>
+                        <li class="cfb-perm-item">
+                            <span class="cfb-perm-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B21A8" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13" />
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                </svg>
+                            </span>
+                            <div class="cfb-perm-text">
+                                <span class="cfb-perm-name">Send messages</span>
+                                <span class="cfb-perm-sub">Reply to customers on your behalf</span>
+                            </div>
+                        </li>
+                        <li class="cfb-perm-item">
+                            <span class="cfb-perm-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B21A8" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="2" y1="12" x2="22" y2="12" />
+                                    <path
+                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                                </svg>
+                            </span>
+                            <div class="cfb-perm-text">
+                                <span class="cfb-perm-name">Access page metadata</span>
+                                <span class="cfb-perm-sub">Read page info and settings</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="cws-info-box">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <ul class="cws-info-list">
+                            <li>All permissions are required for full functionality</li>
+                            <li>You can revoke access later from Meta settings</li>
+                            <li>Permissions apply only to the selected page</li>
+                        </ul>
+                    </div>
+
+                    <div class="cws-actions">
+                        @if (_step2Loading)
+                        {
+                            <button class="cws-primary-btn cws-primary-btn--loading" disabled>
+                                <span class="cws-spinner"></span>
+                                Authorizing
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="cws-primary-btn" @onclick="AuthorizeAndConnect">
+                                Authorize &amp; connect
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12" />
+                                    <polyline points="12 5 19 12 12 19" />
+                                </svg>
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="cws-guide-panel">
+                    <h3 class="cws-guide-title">Granting messaging permissions</h3>
+                    <p class="cws-guide-sub">Follow along with the video for a guided walkthrough of each step.</p>
+                    <div class="cws-video-embed">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="#FF0000">
+                            <path
+                            d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.8 12 21.8 12 21.8s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7z" />
+                            <polygon points="9.7,15.5 9.7,8.5 16.3,12" fill="white" />
+                        </svg>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (_showRedirectOverlay)
+    {
+        <div class="cfb-redirect-overlay">
+            <div class="cfb-redirect-card">
+                <span class="cws-spinner cfb-redirect-spinner"></span>
+                <h3 class="cfb-redirect-title">Redirecting to facebook...</h3>
+                <p class="cfb-redirect-sub">Complete the required steps in facebook. You will be redirected back automatically.
+                </p>
+            </div>
+        </div>
+    }
+
+    @if (_showToast)
+    {
+        <div class="cws-toast cws-toast--success">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#16A34A" />
+                <polyline points="9 12 11 14 15 10" stroke="#fff" stroke-width="2.5" stroke-linecap="round"
+                          stroke-linejoin="round" />
+            </svg>
+            <span>@_toastMessage</span>
+            <button class="cws-toast-close" @onclick="() => _showToast = false">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+    }
+
+    @if (_showSuccessModal)
+    {
+        <ModalShell Visible="true" ShowDivider="false" ShowCloseButton="false" ExtraClass="cws-success-modal"
+                    OnClose="GoToChannels">
+            <BodyContent>
+                <div class="cws-success-owl">
+                    <img src="assets/images/gifs/welcome-owl.gif" alt="Success" class="cws-success-gif" />
+                </div>
+                <h2 class="cws-success-title">facebook Marketplace Connected Successfully</h2>
+                <p class="cws-success-sub">Your channel is now active and ready to receive customer messages.</p>
+                <button class="cws-primary-btn cws-primary-btn--full" @onclick="GoToChannels">Go to channels</button>
+            </BodyContent>
+        </ModalShell>
+    }
+
+@code {
+    private readonly string[] _steps = { "Sign in to Facebook", "Grant Permissions" };
+    private readonly HashSet<int> _completedSteps = new();
+    private int _currentStep = 0;
+
+    private bool _fbConnected;
+    private bool _showRedirectOverlay;
+    private bool _step2Loading;
+
+    private bool _showToast;
+    private string _toastMessage = string.Empty;
+    private bool _showSuccessModal;
+
+    private string GetStepClass(int idx)
+    {
+        if (_completedSteps.Contains(idx)) return "cws-step--done";
+        if (idx == _currentStep) return "cws-step--active";
+        return "";
+    }
+
+    private async Task SignInWithFacebook()
+    {
+        _showRedirectOverlay = true;
+        StateHasChanged();
+        await Task.Delay(2500);
+        _showRedirectOverlay = false;
+        _fbConnected = true;
+        ShowToast("Facebook account connected");
+        StateHasChanged();
+    }
+
+    private void Step1Next()
+    {
+        _completedSteps.Add(0);
+        _currentStep = 1;
+    }
+
+    private async Task AuthorizeAndConnect()
+    {
+        _step2Loading = true;
+        StateHasChanged();
+        await Task.Delay(2000);
+        _step2Loading = false;
+        _completedSteps.Add(1);
+        ChannelsState.ConnectChannel("facebook", "Facebook Marketplace", "15th May 2026");
+        _showSuccessModal = true;
+        StateHasChanged();
+    }
+
+    private void GoToChannels()
+    {
+        _showSuccessModal = false;
+        Nav.NavigateTo("/dashboard/channels");
+    }
+
+    private void Cancel() => Nav.NavigateTo("/dashboard/channels");
+
+    private void ShowToast(string message)
+    {
+        _toastMessage = message;
+        _showToast = true;
+        _ = HideToastAfterDelay();
+    }
+
+    private async Task HideToastAfterDelay()
+    {
+        await Task.Delay(4000);
+        _showToast = false;
+        await InvokeAsync(StateHasChanged);
+    }
+}

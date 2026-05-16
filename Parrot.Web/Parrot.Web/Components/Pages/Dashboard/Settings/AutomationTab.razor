@@ -1,0 +1,70 @@
+<div class="st-automation">
+    <div class="st-card">
+        <h2 class="st-card-title">Automation</h2>
+        <p class="st-card-sub">Control system-wide automation behavior.</p>
+
+        <div class="st-auto-sections">
+            <div class="st-card st-card--gray">
+                <h3 class="st-section-title">Conversation Limits</h3>
+                <p class="st-section-sub">Prevent excessive usage from a single customer.</p>
+                <div class="st-field" style="margin-top:16px">
+                    <label class="st-label">Max messages per customer per day</label>
+                    <div class="st-select-wrap">
+                        <select class="st-select">
+                            <option>51</option>
+                            <option>25</option>
+                            <option>100</option>
+                        </select>
+                        <svg class="st-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </div>
+                    <span class="st-field-hint">Prevents a single customer from consuming excessive conversations.</span>
+                </div>
+            </div>
+
+            <div class="st-card st-card--gray">
+                <h3 class="st-section-title">Conversation Timeout</h3>
+                <p class="st-section-sub">Automatically close idle conversations.</p>
+                <div class="st-field" style="margin-top:16px">
+                    <label class="st-label">Close conversation after inactivity <span class="st-label-note">(Minutes)</span></label>
+                    <div class="st-select-wrap">
+                        <select class="st-select">
+                            <option>30</option>
+                            <option>15</option>
+                            <option>60</option>
+                        </select>
+                        <svg class="st-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="st-card st-card--gray">
+                <h3 class="st-section-title">Usage Protection</h3>
+                <p class="st-section-sub">Pause AI responses when approaching limits.</p>
+                <div class="st-field" style="margin-top:16px">
+                    <label class="st-label">Pause AI responses when workspace reaches <span class="st-label-note">(% of conversation limit)</span></label>
+                    <div class="st-select-wrap">
+                        <select class="st-select">
+                            <option>80</option>
+                            <option>70</option>
+                            <option>90</option>
+                        </select>
+                        <svg class="st-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="st-card-footer">
+            <button class="st-save-btn">Save changes</button>
+        </div>
+    </div>
+</div>

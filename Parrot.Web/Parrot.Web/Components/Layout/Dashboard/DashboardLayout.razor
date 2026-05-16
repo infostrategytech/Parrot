@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager Nav
+@inject AiAgentsState AiAgentsState
 @implements IDisposable
 @using Parrot.Web.Components.Pages.Dashboard.Notification
 
@@ -12,9 +13,33 @@
         <header class="dashboard-topbar">
             @if (IsBreadcrumb())
             {
-                <span class="dashboard-topbar-title">
-                    Channels <span class="topbar-breadcrumb-sep">/</span> Connect whatsapp business
-                </span>
+                @if (IsAiAgentRoute())
+                {
+                    <span class="dashboard-topbar-title">
+                        AI Agents <span class="topbar-breadcrumb-sep">/</span> @GetAiAgentBreadcrumb()
+                    </span>
+                }
+                else
+                {
+                    <span class="dashboard-topbar-title">
+                        @if (GetPathSegments().LastOrDefault() == "connect-facebook-marketplace")
+                        {
+                            @:Channels <span class="topbar-breadcrumb-sep">/</span> Connect facebook marketplace
+                        }
+                        else if (GetPathSegments().LastOrDefault() == "connect-instagram")
+                        {
+                            @:Channels <span class="topbar-breadcrumb-sep">/</span> Connect instagram
+                        }
+                        else if (GetPathSegments().LastOrDefault() == "connect-x")
+                        {
+                            @:Channels <span class="topbar-breadcrumb-sep">/</span> Connect X (formerly Twitter)
+                        }
+                        else
+                        {
+                            @:Channels <span class="topbar-breadcrumb-sep">/</span> Connect whatsapp business
+                        }
+                    </span>
+                }
             }
             else
             {
@@ -55,19 +80,50 @@
 
     private bool IsBreadcrumb()
     {
+        var segs = GetPathSegments();
+        return (segs.Length == 1 && segs[0] == "connect-whatsapp") ||
+               (segs.Length == 1 && segs[0] == "connect-facebook-marketplace") ||
+               (segs.Length == 1 && segs[0] == "connect-instagram") ||
+               (segs.Length == 1 && segs[0] == "connect-x") ||
+               (segs.Length >= 3 && segs[1] == "ai-agents");
+    }
+
+    private bool IsAiAgentRoute()
+    {
+        var segs = GetPathSegments();
+        return segs.Length >= 3 && segs[1] == "ai-agents";
+    }
+
+    private string GetAiAgentBreadcrumb()
+    {
+        var segs = GetPathSegments();
+        var agentName = "Agent";
+        if (segs.Length >= 3)
+        {
+            var agent = AiAgentsState.GetAgent(segs[2]);
+            agentName = agent?.Name ?? "Agent";
+        }
+        if (segs.Length >= 5 && segs[3] == "playbooks")
+        {
+            var agent = AiAgentsState.GetAgent(segs[2]);
+            var pb = agent?.Playbooks.FirstOrDefault(p => p.Id == segs[4]);
+            var pbName = pb?.Title ?? "New Playbook";
+            return $"{agentName} / {pbName}";
+        }
+        return agentName;
+    }
+
+    private string[] GetPathSegments()
+    {
         var uri = new Uri(Nav.Uri);
-        var segment = uri.AbsolutePath
-            .Split('/', StringSplitOptions.RemoveEmptyEntries)
-            .LastOrDefault() ?? string.Empty;
-        return segment == "connect-whatsapp";
+        return uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
     }
 
     private string GetPageTitle()
     {
         var uri = new Uri(Nav.Uri);
-        var segment = uri.AbsolutePath
-            .Split('/', StringSplitOptions.RemoveEmptyEntries)
-            .LastOrDefault() ?? string.Empty;
+        var segs = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var segment = segs.LastOrDefault() ?? string.Empty;
 
         return segment switch
         {
@@ -81,6 +137,7 @@
             "conversations" => "Conversations",
             "team" => "Team",
             "qa-insights" => "QA & Conversation Insight",
+            "settings" => "Settings",
             _ => System.Globalization.CultureInfo.CurrentCulture.TextInfo
                     .ToTitleCase(segment.Replace("-", " "))
         };

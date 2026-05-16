@@ -1,0 +1,99 @@
+<div class="pb-panel" @onclick:stopPropagation>
+    <div class="pb-panel-header">
+        <div class="pb-panel-title-row">
+            <span class="pb-panel-title">@GetPanelTitle(Step.Type)</span>
+            @if (IsStepConfigured(Step))
+            {
+                <span class="pb-badge pb-badge--configured">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Configured
+                </span>
+            }
+            else
+            {
+                <span class="pb-badge pb-badge--incomplete">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    Incomplete
+                </span>
+            }
+        </div>
+        <button class="pb-panel-close" @onclick="() => OnClose.InvokeAsync()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </button>
+    </div>
+    <div class="pb-panel-divider"></div>
+    <div class="pb-panel-body">
+        @switch (Step.Type)
+        {
+            case "AskQuestion":
+                <AskQuestionPanel Step="Step" Playbook="Playbook" SelectedStepId="SelectedStepId" OnChanged="OnChanged" />
+                break;
+            case "SelectFromCatalog":
+                <SelectFromCatalogPanel Step="Step" OnChanged="OnChanged" />
+                break;
+            case "SendNotification":
+                <SendNotificationPanel Step="Step" OnChanged="OnChanged" />
+                break;
+            case "CollectPayment":
+                <CollectPaymentPanel Step="Step" OnChanged="OnChanged" />
+                break;
+            case "UpdateContact":
+                <UpdateContactPanel Step="Step" OnChanged="OnChanged" />
+                break;
+            case "Wait":
+                <WaitPanel Step="Step" OnChanged="OnChanged" />
+                break;
+            case "CheckCondition":
+                <CheckConditionPanel Step="Step" OnChanged="OnChanged" />
+                break;
+            case "EndProcess":
+                <EndProcessPanel />
+                break;
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public PlaybookStep Step { get; set; } = default!;
+    [Parameter] public Playbook Playbook { get; set; } = default!;
+    [Parameter] public string SelectedStepId { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private static string GetPanelTitle(string type) => type switch
+    {
+        "SelectFromCatalog" => "Select from Catalog",
+        "SendNotification" => "Send Notification",
+        "CollectPayment" => "Collect Payment",
+        "UpdateContact" => "Update Contact",
+        "Wait" => "Wait",
+        "CheckCondition" => "Check a condition",
+        "EndProcess" => "End Process",
+        _ => "Ask Question"
+    };
+
+    private static bool IsStepConfigured(PlaybookStep step) => step.Type switch
+    {
+        "AskQuestion" => !string.IsNullOrEmpty(step.QuestionText) && !string.IsNullOrEmpty(step.ResponseType),
+        "SelectFromCatalog" => step.SelectedCatalogItems.Count > 0,
+        "SendNotification" => !string.IsNullOrEmpty(step.NotificationName) && !string.IsNullOrEmpty(step.MessageContent),
+        "CollectPayment" => !string.IsNullOrEmpty(step.PaymentProvider),
+        "UpdateContact" => !string.IsNullOrEmpty(step.ContactStage),
+        "Wait" => !string.IsNullOrEmpty(step.WaitDuration),
+        "CheckCondition" => !string.IsNullOrEmpty(step.ConditionField) && !string.IsNullOrEmpty(step.ConditionOperator),
+        "EndProcess" => true,
+        _ => false
+    };
+}

@@ -1,0 +1,126 @@
+@using Parrot.Web.Components.Pages.Dashboard.Conversations
+
+<div class="cv-details">
+    <div class="cv-det-panel-title">Conversation Details</div>
+    <div class="cv-det-divider"></div>
+
+    <div class="cv-det-header">
+        <div class="cv-det-avatar"><img src="@Conv.CustomerAvatar" alt="@Conv.CustomerName" /></div>
+        <p class="cv-det-name">@Conv.CustomerName</p>
+        @if (Conv.Tags.Count > 0)
+        {
+            <div class="cv-det-tags">
+                @foreach (var tag in Conv.Tags)
+                {
+                    <span class="cv-det-tag cv-det-tag--gray">@tag</span>
+                }
+            </div>
+        }
+        <div class="cv-det-stats">
+            <div class="cv-det-stat">
+                <div class="cv-det-stat-label">Orders</div>
+                <div class="cv-det-stat-num">@Conv.OrderCount</div>
+            </div>
+            <div class="cv-det-stat">
+                <div class="cv-det-stat-label">Channels</div>
+                <div class="cv-det-stat-num">@Conv.Channels.Count</div>
+            </div>
+        </div>
+        @if (Conv.OrderCount > 0)
+        {
+            <a href="#" class="cv-det-link">
+                Open contact profile
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
+                </svg>
+            </a>
+        }
+    </div>
+
+    <div class="cv-det-divider"></div>
+
+    <div class="cv-section">
+        <div class="cv-section-title">Channels</div>
+        @foreach (var ch in Conv.Channels)
+        {
+            <div class="cv-channel-item">
+                <div class="cv-channel-icon-wrap">
+                    <img src="assets/images/icons/@(ch.Key).png" alt="@ch.Name" />
+                </div>
+                <div>
+                    <div class="cv-channel-name">@ch.Name</div>
+                    <div class="cv-channel-handle">@ch.Handle</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="cv-section">
+        <div class="cv-section-title">AI Handling</div>
+        <div class="cv-ai-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                <path d="M4.93 4.93a10 10 0 0 0 0 14.14" />
+            </svg>
+            @Conv.AiHandling
+        </div>
+    </div>
+
+    <div class="cv-section">
+        <div class="cv-section-title">Detected Steps</div>
+        @if (Conv.DetectedSteps.Count == 0)
+        {
+            <p class="cv-empty-hint">No steps detected yet</p>
+        }
+        else
+        {
+            @foreach (var step in Conv.DetectedSteps)
+            {
+                <div class="cv-step-item">@step</div>
+            }
+        }
+    </div>
+
+    @if (Conv.Tasks.Count > 0)
+    {
+        <div class="cv-section">
+            <div class="cv-section-title">Tasks</div>
+            @foreach (var task in Conv.Tasks)
+            {
+                <div class="cv-task-item">
+                    <div class="cv-task-title">@task.Title</div>
+                    <div class="cv-task-meta">
+                        <span class="cv-task-status">@task.Status</span>
+                        <span class="cv-task-time">@task.TimeAgo</span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="cv-qa-notice">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <p class="cv-qa-text"><strong>QA Notice:</strong> Conversations are automatically logged for security and
+            quality assurance purpose.</p>
+        </div>
+    </div>
+
+@code {
+    [Parameter] public ConversationItem Conv { get; set; } = default!;
+
+    private static string GetChannelIcon(string key) => key switch
+    {
+        "instagram" => "📸",
+        "facebook" => "👥",
+        _ => "💬"
+    };
+}

@@ -1,0 +1,101 @@
+<div class="pb-panel" @onclick:stopPropagation>
+    <div class="pb-panel-header">
+        <div class="pb-panel-title-row">
+            <span class="pb-panel-title">Trigger</span>
+            @if (Playbook.TriggerPhrases.Count > 0)
+            {
+                <span class="pb-badge pb-badge--configured">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Configured
+                </span>
+            }
+            else
+            {
+                <span class="pb-badge pb-badge--incomplete">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    Incomplete
+                </span>
+            }
+        </div>
+        <button class="pb-panel-close" @onclick="() => OnClose.InvokeAsync()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </button>
+    </div>
+    <div class="pb-panel-divider"></div>
+    <div class="pb-panel-body">
+        <div class="pb-field">
+            <label class="pb-field-label">EXAMPLE PHRASES</label>
+            <p class="pb-field-hint">Type phrases your customers would say to trigger this flow</p>
+            <div class="pb-trigger-input-row">
+                <input class="pb-input" placeholder="e.g I want to buy food, can I order rice" @bind="_newPhrase"
+                       @bind:event="oninput" @onkeydown="HandleKeyDown" />
+                <button class="pb-btn pb-btn--primary pb-trigger-add-btn" @onclick="AddPhrase">Add</button>
+            </div>
+            @if (Playbook.TriggerPhrases.Count == 0)
+            {
+                <p class="pb-field-hint pb-trigger-hint-warn">Add at least 1 example phrase</p>
+            }
+        </div>
+        @if (Playbook.TriggerPhrases.Count > 0)
+        {
+            <div class="pb-trigger-phrases">
+                @foreach (var phrase in Playbook.TriggerPhrases)
+                {
+                    var p = phrase;
+                    <div class="pb-trigger-phrase-tag">
+                        <span>@p</span>
+                        <button class="pb-trigger-phrase-del" @onclick="() => RemovePhrase(p)">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public Playbook Playbook { get; set; } = default!;
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private string _newPhrase = string.Empty;
+
+    private async Task AddPhrase()
+    {
+        var trimmed = _newPhrase.Trim();
+        if (!string.IsNullOrEmpty(trimmed) && !Playbook.TriggerPhrases.Contains(trimmed))
+        {
+            Playbook.TriggerPhrases.Add(trimmed);
+            _newPhrase = string.Empty;
+            await OnChanged.InvokeAsync();
+        }
+    }
+
+    private async Task RemovePhrase(string phrase)
+    {
+        Playbook.TriggerPhrases.Remove(phrase);
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await AddPhrase();
+    }
+}

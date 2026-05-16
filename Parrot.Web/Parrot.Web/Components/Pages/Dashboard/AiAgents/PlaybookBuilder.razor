@@ -1,0 +1,158 @@
+﻿@page "/dashboard/ai-agents/{AgentId}/playbooks/{PlaybookId}"
+@layout DashboardLayout
+@inject AiAgentsState AiAgentsState
+@inject NavigationManager Nav
+@using Parrot.Web.Components.Pages.Dashboard.AiAgents
+
+@{
+    var agent = AiAgentsState.GetAgent(AgentId);
+    var playbook = agent?.Playbooks.FirstOrDefault(p => p.Id == PlaybookId);
+}
+@if (agent is null || playbook is null)
+{
+    <div class="dashboard-placeholder-page">
+        <h2>Playbook not found</h2>
+        <p>This playbook does not exist.</p>
+    </div>
+}
+else
+{
+    <div class="pb-page" @onclick="CloseAll">
+        <div class="pb-subheader">
+            <div class="pb-subheader-left">
+                <input class="pb-name-input" value="@playbook.Title"
+                       @onchange="e => playbook.Title = e.Value?.ToString() ?? playbook.Title" @onclick:stopPropagation />
+                <span class="pb-badge pb-badge--draft">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                    </svg>
+                    Draft
+                </span>
+            </div>
+            <div class="pb-subheader-right">
+                <button class="pb-btn pb-btn--ghost" @onclick:stopPropagation @onclick="ToggleTestPanel">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    Test
+                </button>
+                <button class="pb-btn pb-btn--primary" @onclick:stopPropagation @onclick="OpenSaveModal">Save</button>
+            </div>
+        </div>
+
+        <div class="pb-workspace">
+            <PlaybookCanvas Playbook="playbook" SelectedStepId="@_selectedStepId"
+                            ShowStepPicker="@(_showStepPicker && _stepPickerPlaybook?.Id == playbook.Id)"
+                            TriggerPhrases="@playbook.TriggerPhrases.Count" IsTriggerSelected="@_showTriggerPanel"
+                            OnTriggerSelected="ToggleTriggerPanel" OnStepSelected="SelectStep"
+                            OnStepRemoved="stepId => RemoveStep(playbook, stepId)"
+                            OnAddStepOfType="type => AddStepOfType(playbook, type)"
+                            OnToggleStepPicker="() => ToggleStepPicker(playbook)" />
+
+            @if (_showTriggerPanel)
+            {
+                <TriggerPanel Playbook="playbook" OnClose="() => _showTriggerPanel = false" OnChanged="StateHasChanged" />
+            }
+            else
+            {
+                var step = !string.IsNullOrEmpty(_selectedStepId)
+                    ? playbook.Steps.FirstOrDefault(s => s.Id == _selectedStepId)
+                    : null;
+                if (step is not null)
+                {
+                    <PlaybookStepPanel Step="step" Playbook="playbook" SelectedStepId="@_selectedStepId"
+                                       OnClose="() => _selectedStepId = string.Empty" OnChanged="StateHasChanged" />
+                }
+            }
+
+            @if (_showTestPanel)
+            {
+                <TestPanel OnClose="() => _showTestPanel = false" />
+            }
+        </div>
+    </div>
+
+    @if (_showSaveModal)
+    {
+        <SavePlaybookModal InitialName="@playbook.Title" OnCancel="CloseSaveModal"
+                           OnSave="args => ConfirmSave(playbook, args)" />
+    }
+}
+
+@code {
+    [Parameter] public string AgentId { get; set; } = string.Empty;
+    [Parameter] public string PlaybookId { get; set; } = string.Empty;
+
+    private string _selectedStepId = string.Empty;
+    private bool _showTriggerPanel;
+    private bool _showStepPicker;
+    private Playbook? _stepPickerPlaybook;
+    private bool _showTestPanel;
+    private bool _showSaveModal;
+
+    private void SelectStep(string id)
+    {
+        _selectedStepId = _selectedStepId == id ? string.Empty : id;
+        _showTriggerPanel = false;
+    }
+
+    private void ToggleTriggerPanel()
+    {
+        _showTriggerPanel = !_showTriggerPanel;
+        _selectedStepId = string.Empty;
+    }
+
+    private void ToggleStepPicker(Playbook pb)
+    {
+        if (_stepPickerPlaybook?.Id == pb.Id)
+            _showStepPicker = !_showStepPicker;
+        else
+        {
+            _stepPickerPlaybook = pb;
+            _showStepPicker = true;
+        }
+    }
+
+    private void AddStepOfType(Playbook pb, string type)
+    {
+        var step = new PlaybookStep { Type = type };
+        pb.Steps.Add(step);
+        _selectedStepId = step.Id;
+        pb.StepCount = pb.Steps.Count;
+        _showStepPicker = false;
+    }
+
+    private void RemoveStep(Playbook pb, string stepId)
+    {
+        pb.Steps.RemoveAll(s => s.Id == stepId);
+        if (_selectedStepId == stepId) _selectedStepId = string.Empty;
+        pb.StepCount = pb.Steps.Count;
+    }
+
+    private void CloseAll()
+    {
+        _selectedStepId = string.Empty;
+        _showStepPicker = false;
+    }
+
+    private void ToggleTestPanel()
+    {
+        _showTestPanel = !_showTestPanel;
+        if (_showTestPanel) _selectedStepId = string.Empty;
+    }
+
+    private void OpenSaveModal() => _showSaveModal = true;
+    private void CloseSaveModal() => _showSaveModal = false;
+
+    private void ConfirmSave(Playbook pb, PlaybookSaveArgs args)
+    {
+        if (!string.IsNullOrWhiteSpace(args.Name))
+            pb.Title = args.Name;
+        if (!string.IsNullOrWhiteSpace(args.Description))
+            pb.Description = args.Description;
+        pb.Status = "Active";
+        _showSaveModal = false;
+    }
+}

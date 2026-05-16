@@ -1,0 +1,55 @@
+@using Parrot.Web.Components.Pages.Dashboard.Conversations
+
+<div class="cv-modal-overlay" @onclick="() => OnCancel.InvokeAsync()">
+    <div class="cv-modal cv-modal--link" @onclick:stopPropagation>
+        <h2 class="cv-modal-title">Link Customer Accounts</h2>
+        <p class="cv-modal-sub">Connect another account that belongs to the same customer.</p>
+        <hr class="cv-modal-divider" />
+        <div class="cv-link-search-wrap">
+            <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%)" width="14" height="14"
+                 viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input class="cv-link-search" placeholder="Search by name or username..." value="@_query"
+                   @oninput="e => _query = e.Value?.ToString() ?? string.Empty" />
+        </div>
+        <div>
+            @foreach (var r in GetResults())
+            {
+                var result = r;
+                <div class="cv-link-result" @onclick="() => OnSelect.InvokeAsync(result)">
+                    <div class="cv-link-result-avatar"><img src="@r.Avatar" alt="@r.Name" /></div>
+                    <div class="cv-link-result-info">
+                        <div class="cv-link-result-name">@r.Name</div>
+                        <div>
+                            <span class="cv-link-result-channel">@r.Channel</span>
+                            <span class="cv-link-result-sep"> • </span>
+                            <span class="cv-link-result-username">@r.Username</span>
+                        </div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                    </svg>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback<ConvSearchResult> OnSelect { get; set; }
+
+    private string _query = string.Empty;
+
+    private IEnumerable<ConvSearchResult> GetResults()
+    {
+        if (string.IsNullOrEmpty(_query)) return ConversationsState.SearchResults;
+        return ConversationsState.SearchResults
+            .Where(r => r.Name.Contains(_query, StringComparison.OrdinalIgnoreCase)
+                     || r.Username.Contains(_query, StringComparison.OrdinalIgnoreCase));
+    }
+}
