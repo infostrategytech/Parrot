@@ -35,6 +35,7 @@ if (!builder.Environment.IsDevelopment() &&
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
 builder.Services.Configure<WhatsAppSettings>(builder.Configuration.GetSection(WhatsAppSettings.SectionName));
+builder.Services.Configure<FacebookSettings>(builder.Configuration.GetSection(FacebookSettings.SectionName));
 builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(KafkaSettings.SectionName));
 
 // Database
@@ -159,6 +160,18 @@ builder.Services.AddRateLimiter(options =>
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 QueueLimit = 0,
             }));
+
+    // 1000 Facebook webhook deliveries per IP per minute (Meta sends bursts)
+    options.AddPolicy(RateLimitPolicies.FacebookWebhook, ctx =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 1000,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }));
 });
 
 // Services
@@ -169,6 +182,8 @@ builder.Services.AddSingleton<KafkaMessagePublisher>();
 builder.Services.AddSingleton<IMessagePublisher>(sp => sp.GetRequiredService<KafkaMessagePublisher>());
 builder.Services.AddHostedService(sp => sp.GetRequiredService<KafkaMessagePublisher>());
 builder.Services.AddScoped<IWhatsAppWebhookService, WhatsAppWebhookService>();
+builder.Services.AddScoped<IFacebookWebhookService, FacebookWebhookService>();
+builder.Services.AddSingleton<IFacebookPageRegistry, InMemoryFacebookPageRegistry>();
 builder.Services.AddScoped<RequestContext>();
 builder.Services.AddScoped<IRequestContext>(sp => sp.GetRequiredService<RequestContext>());
 builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
@@ -184,6 +199,9 @@ app.UseGlobalExceptionHandler();
 
 // Request context: populates IRequestContext and opens the structured log scope
 app.UseRequestContext();
+
+// Capture raw body for webhook HMAC signature validation
+app.UseRawBodyCapture();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

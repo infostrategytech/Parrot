@@ -16,3 +16,4 @@ dotnet_diagnostic.SA1309.severity = none # private fields use _camelCase per nam
 dotnet_diagnostic.SA1101.severity = none # this. qualification is not required
 dotnet_diagnostic.SA1600.severity = none # XML documentation not required
 dotnet_diagnostic.SA1633.severity = none # file headers not required
+dotnet_diagnostic.IDE0290.severity = none # primary constructor conflicts with SA1009 on base class syntax

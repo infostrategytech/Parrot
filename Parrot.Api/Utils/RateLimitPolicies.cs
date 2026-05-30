@@ -10,4 +10,5 @@ public static class RateLimitPolicies
     public const string ResetPassword = "auth:reset-password";
     public const string ChangePassword = "auth:change-password";
     public const string WhatsAppWebhook = "webhooks:whatsapp";
+    public const string FacebookWebhook = "webhooks:facebook";
 }

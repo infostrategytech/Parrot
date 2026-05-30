@@ -11,4 +11,9 @@ public static class MiddlewareExtensions
     {
         return app.UseMiddleware<RequestContextMiddleware>();
     }
+
+    public static IApplicationBuilder UseRawBodyCapture(this IApplicationBuilder app)
+    {
+        return app.UseMiddleware<RawBodyMiddleware>();
+    }
 }
