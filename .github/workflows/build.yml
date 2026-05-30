@@ -27,13 +27,13 @@ jobs:
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props') }}
         restore-keys: ${{ runner.os }}-nuget-
 
-    - run: dotnet restore
+    - run: dotnet restore Backend.slnx
 
-    - run: dotnet build --configuration Release --no-restore --warnaserror
+    - run: dotnet build Backend.slnx --configuration Release --no-restore --warnaserror
 
     - name: Test with coverage
       run: |
-        dotnet test --configuration Release --no-build --verbosity normal \
+        dotnet test Backend.slnx --configuration Release --no-build --verbosity normal \
           --logger trx \
           --collect:"XPlat Code Coverage" \
           --results-directory ./test-results
@@ -71,7 +71,7 @@ jobs:
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props') }}
         restore-keys: ${{ runner.os }}-nuget-
 
-    - run: dotnet restore
+    - run: dotnet restore Backend.slnx
 
     - name: Check code formatting
-      run: dotnet format --verify-no-changes --verbosity diagnostic
+      run: dotnet format Backend.slnx --verify-no-changes --verbosity diagnostic
