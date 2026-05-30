@@ -16,4 +16,10 @@ public class KafkaSettings
 
     /// <summary>Max messages the consumer collects per round before parallel processing.</summary>
     public int ConsumerBatchSize { get; set; } = 50;
+
+    /// <summary>
+    /// Use Google Application Default Credentials (SASL_SSL + OAuthBearer).
+    /// Required for GCP Managed Service for Apache Kafka.
+    /// </summary>
+    public bool UseGcpAuth { get; set; } = false;
 }
