@@ -1,0 +1,66 @@
+@page "/sso-callback"
+@layout AuthLayout
+@inject AuthState AuthState
+@inject TokenStorageService TokenStorage
+@inject NavigationManager Navigation
+
+<div class="ve-wrapper">
+    <div class="ve-card">
+        <div class="ve-icon-wrap">
+            <span class="ve-spinner"></span>
+        </div>
+        <h1 class="ve-title">@(_error is null ? "Signing you in..." : "Sign-in failed")</h1>
+        @if (_error is not null)
+        {
+            <p class="ve-subtitle">@_error</p>
+            <a href="/login" class="ve-btn-primary">Back to Sign In</a>
+        }
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? token { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? expiresAt { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? userId { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? email { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? businessName { get; set; }
+
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(email))
+        {
+            _error = "Google sign-in did not return the expected data. Please try again.";
+            return;
+        }
+
+        if (!DateTime.TryParse(expiresAt, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime parsedExpiry))
+        {
+            _error = "Invalid session data received. Please try again.";
+            return;
+        }
+
+        AuthResponse authResponse = new AuthResponse
+        {
+            Token = token,
+            ExpiresAt = parsedExpiry,
+            UserId = userId,
+            Email = email,
+            BusinessName = businessName ?? string.Empty,
+        };
+
+        AuthState.SetUser(authResponse);
+        await TokenStorage.SaveAsync(authResponse);
+        Navigation.NavigateTo("/dashboard");
+    }
+}

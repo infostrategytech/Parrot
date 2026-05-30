@@ -2,6 +2,10 @@
 @layout AuthLayout
 @using Parrot.SharedComponents.Components.Forms
 @using Parrot.SharedComponents.Components.InputFields
+@inject IRegisterService RegisterService
+@inject RegisterState RegisterState
+@inject NavigationManager Navigation
+@implements IDisposable
 
 <div class="register-wrapper">
     <div class="register-card">
@@ -11,8 +15,13 @@
         <h1 class="register-title">Create your account</h1>
         <p class="register-subtitle">Set up your account to start handling customer messages with AI.</p>
 
+        @if (!string.IsNullOrEmpty(RegisterState.ErrorMessage))
+        {
+            <div class="form-error-banner">@RegisterState.ErrorMessage</div>
+        }
+
         <GenericForm Fields="@formFields"
-                     SubmitButtonText="Create account"
+                     SubmitButtonText="@(RegisterState.IsLoading ? "Creating account..." : "Create account")"
                      OnSubmit="HandleRegistration"
                      OnFieldChanged="HandleFieldChanged" />
     </div>
@@ -60,19 +69,21 @@
         }
     };
 
+    protected override void OnInitialized()
+    {
+        RegisterState.OnChange += StateHasChanged;
+    }
+
     private void HandleFieldChanged((string FieldId, string Value) change)
     {
         if (change.FieldId == "password" || change.FieldId == "confirmPassword")
         {
-            var passwordField = formFields.Find(f => f.Id == "password");
-            var confirmField = formFields.Find(f => f.Id == "confirmPassword");
+            FormInputModel? passwordField = formFields.Find(f => f.Id == "password");
+            FormInputModel? confirmField = formFields.Find(f => f.Id == "confirmPassword");
 
             if (passwordField != null && confirmField != null)
             {
-                var passwordValue = passwordField.Value;
-                var confirmValue = confirmField.Value;
-
-                confirmField.ErrorMessage = (!string.IsNullOrEmpty(confirmValue) && passwordValue != confirmValue)
+                confirmField.ErrorMessage = (!string.IsNullOrEmpty(confirmField.Value) && passwordField.Value != confirmField.Value)
                     ? "Password mismatch"
                     : string.Empty;
             }
@@ -81,6 +92,51 @@
 
     private async Task HandleRegistration(Dictionary<string, string> formData)
     {
-        await Task.CompletedTask;
+        RegisterState.Reset();
+
+        string password = formData.GetValueOrDefault("Password", string.Empty);
+        string confirmPassword = formData.GetValueOrDefault("Confirm password", string.Empty);
+
+        if (password != confirmPassword)
+        {
+            RegisterState.SetError("Passwords do not match.");
+            return;
+        }
+
+        RegisterState.SetLoading(true);
+
+        try
+        {
+            await RegisterService.RegisterAsync(new RegisterRequest
+            {
+                BusinessName = formData.GetValueOrDefault("Business name", string.Empty),
+                Email = formData.GetValueOrDefault("Email address", string.Empty),
+                Password = password,
+                ConfirmPassword = confirmPassword,
+            });
+
+            Navigation.NavigateTo("/verify-email");
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            RegisterState.SetError("An account with this email already exists.");
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            RegisterState.SetError("Too many attempts. Please wait and try again.");
+        }
+        catch
+        {
+            RegisterState.SetError("Something went wrong. Please try again.");
+        }
+        finally
+        {
+            RegisterState.SetLoading(false);
+        }
+    }
+
+    public void Dispose()
+    {
+        RegisterState.OnChange -= StateHasChanged;
     }
 }

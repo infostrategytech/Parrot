@@ -1,5 +1,6 @@
 using System.Text;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -20,6 +21,7 @@ using Parrot.Api.Utils;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Configuration
+builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection(FrontendSettings.SectionName));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 JwtSettings jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
     ?? throw new InvalidOperationException("JwtSettings configuration is missing.");
@@ -55,11 +57,12 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// JWT Authentication
+// JWT + Google OAuth Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = "ExternalCookies";
 })
 .AddJwtBearer(options =>
 {
@@ -74,6 +77,19 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
         ClockSkew = TimeSpan.Zero,
     };
+})
+.AddCookie("ExternalCookies", options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+})
+.AddGoogle(options =>
+{
+    options.SignInScheme = "ExternalCookies";
+    options.ClientId = builder.Configuration["GoogleOAuth:ClientId"] ?? throw new InvalidOperationException("GoogleOAuth:ClientId is not configured.");
+    options.ClientSecret = builder.Configuration["GoogleOAuth:ClientSecret"] ?? throw new InvalidOperationException("GoogleOAuth:ClientSecret is not configured.");
+    options.CallbackPath = "/signin-google";
+    options.Scope.Add("email");
+    options.Scope.Add("profile");
 });
 
 // Rate Limiting

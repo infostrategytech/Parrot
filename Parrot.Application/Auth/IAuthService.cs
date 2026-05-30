@@ -17,4 +17,6 @@ public interface IAuthService
     Task ResetPasswordAsync(ResetPasswordRequest request);
 
     Task ChangePasswordAsync(string userId, ChangePasswordRequest request);
+
+    Task<AuthResponse> ExternalLoginAsync(string email, string displayName, string provider, string providerKey);
 }

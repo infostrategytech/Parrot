@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/Parrot.Api/">
+    <Project Path="Parrot.Api/Parrot.Api.Rest.csproj" />
+  </Folder>
+  <Folder Name="/Parrot.SharedCompnents/">
+    <Project Path="Parrot.SharedCompnents/Parrot.SharedComponents.csproj" />
+  </Folder>
+  <Folder Name="/Parrot.Web/">
+    <Project Path="Parrot.Web/Parrot.Web.Client/Parrot.Web.Client.csproj" />
+    <Project Path="Parrot.Web/Parrot.Web/Parrot.Web.csproj" />
+  </Folder>
+  <Project Path="Parrot.APi.Grpc/Parrot.APi.Grpc.csproj" />
+  <Project Path="Parrot.Application/Parrot.Application.csproj" />
+  <Project Path="Parrot.Domain/Parrot.Domain.csproj" />
+  <Project Path="Parrot.Grpc.Contracts/Parrot.Grpc.Contracts.csproj" />
+  <Project Path="Parrot.Infrastructure/Parrot.Infrastructure.csproj" />
+  <Project Path="Test.Parrot.Api/Test.Parrot.Api.csproj" />
+  <Project Path="WhatsAppMessageIngestor/WhatsAppMessageIngestor.csproj" />
+</Solution>

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Threading.Channels;
 using Confluent.Kafka;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -35,11 +36,34 @@ public sealed class KafkaMessagePublisher : IMessagePublisher, IHostedService, I
             FullMode = BoundedChannelFullMode.Wait,
         });
 
-        _producer = new ProducerBuilder<string, string>(new ProducerConfig
+        ProducerConfig producerConfig = new ProducerConfig
         {
             BootstrapServers = s.BootstrapServers,
             Acks = Acks.Leader,
-        }).Build();
+        };
+
+        if (s.UseGcpAuth)
+        {
+            producerConfig.SecurityProtocol = SecurityProtocol.SaslSsl;
+            producerConfig.SaslMechanism = SaslMechanism.OAuthBearer;
+        }
+
+        ProducerBuilder<string, string> producerBuilder = new ProducerBuilder<string, string>(producerConfig);
+
+        if (s.UseGcpAuth)
+        {
+            producerBuilder.SetOAuthBearerTokenRefreshHandler((producer, _) =>
+            {
+                GoogleCredential credential = GoogleCredential
+                    .GetApplicationDefault()
+                    .CreateScoped("https://www.googleapis.com/auth/cloud-platform");
+                string token = credential.UnderlyingCredential
+                    .GetAccessTokenForRequestAsync().GetAwaiter().GetResult();
+                producer.OAuthBearerSetToken(token, DateTimeOffset.UtcNow.AddMinutes(55).ToUnixTimeMilliseconds(), string.Empty);
+            });
+        }
+
+        _producer = producerBuilder.Build();
     }
 
     public async Task PublishAsync(IncomingMessage message, CancellationToken cancellationToken = default)

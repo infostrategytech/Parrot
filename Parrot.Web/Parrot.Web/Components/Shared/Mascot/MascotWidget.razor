@@ -1,0 +1,152 @@
+@implements IAsyncDisposable
+
+<div class="mascot-widget">
+
+    @if (_bubbleVisible)
+    {
+        <div class="mascot-bubble @(_bubbleState)">
+            <p class="mascot-bubble-text">@_displayText@if (_typing){<span class="mascot-cursor"></span>}</p>
+        </div>
+    }
+
+    <button class="mascot-figure" @onclick="AdvanceOnClick" title="@(_bubbleVisible ? "Next tip" : "Show tip")" aria-label="Mascot">
+        <Mascot ImagePath="@MascotImagePath" AltText="@MascotAltText" />
+    </button>
+
+</div>
+
+@code {
+    [Parameter] public string MascotImagePath { get; set; } = "assets/images/gifs/owl-animation.gif";
+    [Parameter] public string MascotAltText   { get; set; } = "Mascot";
+    [Parameter] public string[] Messages      { get; set; } = DefaultMessages;
+
+    private static readonly string[] DefaultMessages =
+    {
+        "Hey! Your AI agents are ready to handle customer conversations.",
+        "Tip: Connect a channel to start receiving messages from customers.",
+        "You can create custom AI agents with unique personalities for each brand.",
+        "Have pending task requests? Review them from the sidebar.",
+        "WhatsApp Business integration takes just a few minutes to set up.",
+    };
+
+    private const int MaxDisplayChars  = 100;
+    private const int TypeIntervalMs   = 38;
+    private const int PauseMs          = 4200;
+    private const int LeaveAnimationMs = 350;
+    private const int BetweenMs        = 700;
+
+    private int    _messageIndex;
+    private string _displayText = string.Empty;
+    private string _fullText    = string.Empty;
+    private bool   _typing;
+    private bool   _bubbleVisible;
+    private string _bubbleState = string.Empty; // "mascot-bubble--enter" | "mascot-bubble--leave"
+
+    private Timer? _typeTimer;
+    private Timer? _pauseTimer;
+    private CancellationTokenSource _cts = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        try { await Task.Delay(900, _cts.Token); } catch (OperationCanceledException) { return; }
+        await InvokeAsync(StartNextMessage);
+    }
+
+    private async Task StartNextMessage()
+    {
+        if (_cts.IsCancellationRequested) return;
+
+        string raw   = Messages[_messageIndex % Messages.Length];
+        _fullText    = TruncateAtWord(raw, MaxDisplayChars);
+        _displayText = string.Empty;
+        _typing      = true;
+        _bubbleState  = "mascot-bubble--enter";
+        _bubbleVisible = true;
+        StateHasChanged();
+
+        // Let the enter animation finish before typing starts.
+        await Delay(280);
+        _bubbleState = string.Empty;
+        StateHasChanged();
+
+        int charIndex = 0;
+        _typeTimer?.Dispose();
+        _typeTimer = new Timer(_ =>
+        {
+            if (_cts.IsCancellationRequested) return;
+            if (charIndex < _fullText.Length)
+            {
+                _displayText = _fullText[..++charIndex];
+                InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                _typeTimer?.Dispose();
+                _typeTimer = null;
+                _typing = false;
+                InvokeAsync(StateHasChanged);
+                SchedulePause();
+            }
+        }, null, TypeIntervalMs, TypeIntervalMs);
+    }
+
+    private void SchedulePause()
+    {
+        _pauseTimer?.Dispose();
+        _pauseTimer = new Timer(_ =>
+        {
+            _pauseTimer?.Dispose();
+            _pauseTimer = null;
+            if (_cts.IsCancellationRequested) return;
+            _ = InvokeAsync(DismissAndAdvance);
+        }, null, PauseMs, Timeout.Infinite);
+    }
+
+    private async Task DismissAndAdvance()
+    {
+        _typeTimer?.Dispose();
+        _typeTimer = null;
+        _pauseTimer?.Dispose();
+        _pauseTimer = null;
+
+        _bubbleState = "mascot-bubble--leave";
+        StateHasChanged();
+
+        await Delay(LeaveAnimationMs);
+        _bubbleVisible = false;
+        _messageIndex++;
+        StateHasChanged();
+
+        await Delay(BetweenMs);
+        await StartNextMessage();
+    }
+
+    private void AdvanceOnClick()
+    {
+        // Clicking the mascot skips to next message immediately.
+        _ = InvokeAsync(DismissAndAdvance);
+    }
+
+    private Task Delay(int ms)
+    {
+        try { return Task.Delay(ms, _cts.Token); }
+        catch (OperationCanceledException) { return Task.CompletedTask; }
+    }
+
+    private static string TruncateAtWord(string text, int maxLength)
+    {
+        if (text.Length <= maxLength) return text;
+        int lastSpace = text.LastIndexOf(' ', maxLength);
+        int cut = lastSpace > maxLength / 2 ? lastSpace : maxLength;
+        return text[..cut].TrimEnd() + "…";
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _cts.CancelAsync();
+        _cts.Dispose();
+        _typeTimer?.Dispose();
+        _pauseTimer?.Dispose();
+    }
+}

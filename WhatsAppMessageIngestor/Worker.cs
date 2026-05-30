@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Confluent.Kafka;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.Extensions.Options;
 using Parrot.Application.DTOs.Integrations;
 using Parrot.Application.Integrations;
@@ -9,29 +10,52 @@ namespace WhatsAppMessageIngestor;
 public sealed class KafkaConsumerWorker : BackgroundService
 {
     private readonly IConsumer<string, string> _consumer;
-    private readonly IMessageRepository _repository;
+    private readonly IPlatformMessageService _messageService;
     private readonly int _batchSize;
     private readonly string _topic;
     private readonly ILogger<KafkaConsumerWorker> _logger;
 
     public KafkaConsumerWorker(
         IOptions<KafkaSettings> kafkaSettings,
-        IMessageRepository repository,
+        IPlatformMessageService messageService,
         ILogger<KafkaConsumerWorker> logger)
     {
         KafkaSettings s = kafkaSettings.Value;
         _topic = s.Topic;
         _batchSize = s.ConsumerBatchSize;
-        _repository = repository;
+        _messageService = messageService;
         _logger = logger;
 
-        _consumer = new ConsumerBuilder<string, string>(new ConsumerConfig
+        ConsumerConfig consumerConfig = new ConsumerConfig
         {
             BootstrapServers = s.BootstrapServers,
             GroupId = s.ConsumerGroupId,
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = false,
-        }).Build();
+        };
+
+        if (s.UseGcpAuth)
+        {
+            consumerConfig.SecurityProtocol = SecurityProtocol.SaslSsl;
+            consumerConfig.SaslMechanism = SaslMechanism.OAuthBearer;
+        }
+
+        ConsumerBuilder<string, string> consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
+
+        if (s.UseGcpAuth)
+        {
+            consumerBuilder.SetOAuthBearerTokenRefreshHandler((consumer, _) =>
+            {
+                GoogleCredential credential = GoogleCredential
+                    .GetApplicationDefault()
+                    .CreateScoped("https://www.googleapis.com/auth/cloud-platform");
+                string token = credential.UnderlyingCredential
+                    .GetAccessTokenForRequestAsync().GetAwaiter().GetResult();
+                consumer.OAuthBearerSetToken(token, DateTimeOffset.UtcNow.AddMinutes(55).ToUnixTimeMilliseconds(), string.Empty);
+            });
+        }
+
+        _consumer = consumerBuilder.Build();
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -86,7 +110,7 @@ public sealed class KafkaConsumerWorker : BackgroundService
                                 return;
                             }
 
-                            await _repository.InsertAsync(message, ct);
+                            await _messageService.ProcessAsync(message, ct);
                         }
                         catch (Exception ex)
                         {

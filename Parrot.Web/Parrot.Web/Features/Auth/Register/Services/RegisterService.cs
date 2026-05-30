@@ -17,6 +17,7 @@ public class RegisterService : IRegisterService
     {
         HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/auth/register", request);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<AuthResponse>();
+        // API returns 201 Created with no body — registration requires email verification before login
+        return null;
     }
 }

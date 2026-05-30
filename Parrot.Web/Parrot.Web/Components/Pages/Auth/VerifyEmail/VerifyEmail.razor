@@ -1,6 +1,11 @@
 @page "/verify-email"
 @layout AuthLayout
 @inject NavigationManager Navigation
+@inject IVerifyEmailService VerifyEmailService
+@inject VerifyEmailState VerifyEmailState
+@inject AuthState AuthState
+@inject TokenStorageService TokenStorage
+@implements IDisposable
 
 <div class="ve-wrapper">
     @if (_state == "pending")
@@ -19,6 +24,10 @@
             <button class="ve-btn-primary" @onclick="HandleResend" disabled="@_resending">
                 @(_resending ? "Sending..." : "Resend email")
             </button>
+            @if (!string.IsNullOrEmpty(VerifyEmailState.ErrorMessage))
+            {
+                <p class="form-error-banner">@VerifyEmailState.ErrorMessage</p>
+            }
         </div>
         <div class="ve-footer-pill">
             Already verified? <a href="/login">Sign in</a>
@@ -82,16 +91,67 @@
     private string _email = "your email address";
     private bool _resending = false;
 
+    protected override void OnInitialized()
+    {
+        VerifyEmailState.OnChange += StateHasChanged;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         if (!string.IsNullOrWhiteSpace(UserId) && !string.IsNullOrWhiteSpace(Token))
         {
             _state = "verifying";
+            await VerifyEmailAsync();
+        }
+    }
+
+    private async Task VerifyEmailAsync()
+    {
+        try
+        {
+            AuthResponse? response = await VerifyEmailService.VerifyEmailAsync(new VerifyEmailRequest
+            {
+                UserId = UserId!,
+                Token = Token!,
+            });
+
+            _state = "success";
+
+            if (response is not null)
+            {
+                AuthState.SetUser(response);
+                await TokenStorage.SaveAsync(response);
+            }
+        }
+        catch
+        {
+            _state = "error";
         }
     }
 
     private async Task HandleResend()
     {
         _resending = true;
+        VerifyEmailState.SetError(null);
+        StateHasChanged();
+
+        try
+        {
+            await VerifyEmailService.ResendVerificationEmailAsync(
+                new ResendVerificationEmailRequest { Email = _email });
+        }
+        catch
+        {
+            VerifyEmailState.SetError("Something went wrong. Please try again.");
+        }
+        finally
+        {
+            _resending = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        VerifyEmailState.OnChange -= StateHasChanged;
     }
 }

@@ -20,6 +20,10 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
 
 builder.Services.AddSingleton<IMessageRepository, MongoMessageRepository>();
 
+builder.Services.AddSingleton<IPlatformMessageHandler, WhatsAppMessageHandler>();
+builder.Services.AddSingleton<IPlatformMessageHandlerFactory, PlatformMessageHandlerFactory>();
+builder.Services.AddSingleton<IPlatformMessageService, PlatformMessageService>();
+
 builder.Services.AddHostedService<KafkaConsumerWorker>();
 
 IHost host = builder.Build();
