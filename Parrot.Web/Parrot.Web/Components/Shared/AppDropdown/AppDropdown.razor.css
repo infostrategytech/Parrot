@@ -8,7 +8,7 @@
     border: 1px solid #D1D5DB;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    color: #111827;
+    color: #1F2937;
     background: #fff;
     appearance: none;
     -webkit-appearance: none;
@@ -20,8 +20,8 @@
 }
 
 .appdrop-select:focus {
-    border-color: #7C3AED;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
+    border-color: #53279E;
+    box-shadow: 0 0 0 3px rgba(155,111,232,0.22);
 }
 
 .appdrop-arrow {

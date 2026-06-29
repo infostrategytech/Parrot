@@ -18,7 +18,7 @@
 
 .ob-modal {
     background: #ffffff;
-    border-radius: 1.25rem;
+    border-radius: 15px;
     padding: 2.5rem 2rem 2rem;
     width: 100%;
     max-width: 500px;
@@ -45,14 +45,14 @@
 .ob-title {
     font-size: 1.375rem;
     font-weight: 700;
-    color: #111827;
+    color: #1F2937;
     text-align: center;
     margin: 0 0 0.5rem;
 }
 
 .ob-subtitle {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: #6B7280;
     text-align: center;
     margin: 0 0 1.5rem;
     line-height: 1.55;
@@ -73,14 +73,14 @@
 }
 
 .ob-btn--primary {
-    background-color: #5B21B6;
+    background-color: #53279E;
     color: #ffffff;
     border: none;
     margin-bottom: 0.75rem;
 }
 
 .ob-btn--primary:hover {
-    background-color: #4C1D95;
+    background-color: #53279E;
     color: #ffffff;
 }
 
@@ -92,19 +92,19 @@
 }
 
 .ob-btn--secondary:hover {
-    border-color: #7C3AED;
-    color: #7C3AED;
+    border-color: #53279E;
+    color: #53279E;
 }
 
 .ob-skip {
     font-size: 0.8125rem;
-    color: #9ca3af;
+    color: #9CA3AF;
     text-align: center;
     margin: 0;
 }
 
 .ob-skip a {
-    color: #5B21B6;
+    color: #53279E;
     font-weight: 500;
     text-decoration: none;
 }

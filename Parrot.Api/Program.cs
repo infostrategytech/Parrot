@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Parrot.Application.Agents;
 using Parrot.Application.Auth;
 using Parrot.Application.Email;
 using Parrot.Application.Integrations;
 using Parrot.Application.Logging;
 using Parrot.Application.Models;
 using Parrot.Application.Utils;
+using Parrot.Infrastructure.Agents;
 using Parrot.Infrastructure.Data;
 using Parrot.Infrastructure.Email;
 using Parrot.Infrastructure.SocialMediaIntegrations;
@@ -176,6 +178,8 @@ builder.Services.AddRateLimiter(options =>
 
 // Services
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
+builder.Services.AddScoped<IAgentRepository, AgentRepository>();
+builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<KafkaMessagePublisher>();

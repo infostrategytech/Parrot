@@ -1,61 +1,111 @@
-﻿<div class="sidebar" @onclick="ClosePopup">
-    <a href="/dashboard" class="sidebar-logo"><img src="assets/images/logo.png" alt="Logo" /></a>
+<div class="sidebar" @onclick="ClosePopup">
+    <div class="sidebar-aurora sidebar-aurora--1" aria-hidden="true"></div>
+    <div class="sidebar-aurora sidebar-aurora--2" aria-hidden="true"></div>
+    <div class="sidebar-aurora sidebar-aurora--3" aria-hidden="true"></div>
+
+    <a href="/dashboard" class="sidebar-brand">
+        <div class="sidebar-brand-logo">iB</div>
+        <div class="sidebar-brand-info">
+            <span class="sidebar-brand-name">iBakers</span>
+            <span class="sidebar-brand-sub">AI Workspace</span>
+        </div>
+    </a>
 
     <div class="sidebar-body">
         <nav class="sidebar-nav">
+            <div class="sidebar-section-row">
+                <span class="sidebar-section-label">Main</span>
+                <span class="sidebar-section-line"></span>
+            </div>
             <NavLink href="/dashboard" class="sidebar-link" Match="NavLinkMatch.All" ActiveClass="sidebar-link--active">
-                <SidebarIcon Name="dashboard" />
-                <span>Dashboard</span>
+                <span class="nav-tile"><SidebarIcon Name="dashboard" /></span>
+                <span class="nav-label">Dashboard</span>
+                <span class="nav-dot"></span>
             </NavLink>
             <NavLink href="/dashboard/ai-agents" class="sidebar-link" ActiveClass="sidebar-link--active">
-                <SidebarIcon Name="ai-agents" />
-                <span>AI Agents</span>
+                <span class="nav-tile"><SidebarIcon Name="ai-agents" /></span>
+                <span class="nav-label">AI Agents</span>
+                <span class="nav-dot"></span>
             </NavLink>
             <NavLink href="/dashboard/catalog" class="sidebar-link" ActiveClass="sidebar-link--active">
-                <SidebarIcon Name="catalog" />
-                <span>Catalog</span>
+                <span class="nav-tile"><SidebarIcon Name="catalog" /></span>
+                <span class="nav-label">Catalog</span>
+                <span class="nav-dot"></span>
             </NavLink>
             <NavLink href="/dashboard/contacts" class="sidebar-link" ActiveClass="sidebar-link--active">
-                <SidebarIcon Name="contacts" />
-                <span>Contacts</span>
+                <span class="nav-tile"><SidebarIcon Name="contacts" /></span>
+                <span class="nav-label">Contacts</span>
+                <span class="nav-dot"></span>
             </NavLink>
             <NavLink href="/dashboard/task-requests" class="sidebar-link" ActiveClass="sidebar-link--active">
-                <SidebarIcon Name="task-requests" />
-                <span>Task Requests</span>
+                <span class="nav-tile"><SidebarIcon Name="task-requests" /></span>
+                <span class="nav-label">Task Requests</span>
+                <span class="nav-dot"></span>
             </NavLink>
             <NavLink href="/dashboard/channels" class="sidebar-link" ActiveClass="sidebar-link--active">
-                <SidebarIcon Name="channels" />
-                <span>Channels</span>
+                <span class="nav-tile"><SidebarIcon Name="channels" /></span>
+                <span class="nav-label">Channels</span>
+                <span class="nav-dot"></span>
             </NavLink>
             <NavLink href="/dashboard/conversations" class="sidebar-link" ActiveClass="sidebar-link--active">
-                <SidebarIcon Name="conversations" />
-                <span>Conversations</span>
+                <span class="nav-tile"><SidebarIcon Name="conversations" /></span>
+                <span class="nav-label">Conversations</span>
+                <span class="nav-dot"></span>
             </NavLink>
         </nav>
 
-        <nav class="sidebar-nav sidebar-nav--footer">
+        <div class="sidebar-spacer"></div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-row">
+                <span class="sidebar-section-label">Manage</span>
+                <span class="sidebar-section-line"></span>
+            </div>
             <NavLink href="/dashboard/team" class="sidebar-link" ActiveClass="sidebar-link--active">
-                <SidebarIcon Name="team" />
-                <span>Team</span>
+                <span class="nav-tile"><SidebarIcon Name="team" /></span>
+                <span class="nav-label">Team</span>
+                <span class="nav-dot"></span>
             </NavLink>
             <NavLink href="/dashboard/qa-insights" class="sidebar-link" ActiveClass="sidebar-link--active">
-                <SidebarIcon Name="qa-insights" />
-                <span>QA &amp; Conversation Insight</span>
+                <span class="nav-tile"><SidebarIcon Name="qa-insights" /></span>
+                <span class="nav-label">QA &amp; Conversation Insight</span>
+                <span class="nav-dot"></span>
             </NavLink>
         </nav>
+
+        <div class="sidebar-agents-card">
+            <div class="sidebar-agents-inner">
+                <div class="sidebar-agents-header">
+                    <span class="sidebar-agents-pulse"></span>
+                    <span class="sidebar-agents-title">Agents online</span>
+                    <span class="sidebar-agents-count">8</span>
+                </div>
+                <p class="sidebar-agents-sub">Handling live conversations right now.</p>
+                <div class="sidebar-agents-bars">
+                    @foreach (var (height, index) in _barHeights.Select((h, i) => (h, i)))
+                    {
+                        <span class="sidebar-agents-bar @(index % 3 == 0 ? "sidebar-agents-bar--accent" : "")"
+                              style="height: @(height)%"></span>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="sidebar-profile-wrap @(_showPopup ? "sidebar-profile-wrap--open" : "")" @onclick:stopPropagation="true">
         <div class="sidebar-profile" @onclick="TogglePopup">
             <div class="sidebar-avatar">
-                <img src="assets/images/avatar.svg" alt="Avatar" class="sidebar-avatar-img" />
+                <div class="sidebar-avatar-inner">JD</div>
+                <span class="sidebar-avatar-status"></span>
             </div>
             <div class="sidebar-profile-text">
                 <span class="sidebar-profile-name">Hello, Jon</span>
                 <span class="sidebar-profile-email">jondoe@gmail.com</span>
             </div>
-            <img src="assets/images/icons/double-arrow-down.svg" alt=""
-                 class="sidebar-chevron @(_showPopup ? "sidebar-chevron--open" : "")" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 class="sidebar-chevron @(_showPopup ? "sidebar-chevron--open" : "")">
+                <path d="M6 9l6 6 6-6" stroke="#A99BCB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
         </div>
         @if (_showPopup)
         {
@@ -66,8 +116,7 @@
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                          stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="3" />
-                        <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                     </svg>
                     Settings
                 </NavLink>
@@ -90,4 +139,6 @@
     bool _showPopup;
     void TogglePopup() => _showPopup = !_showPopup;
     void ClosePopup() => _showPopup = false;
+
+    readonly int[] _barHeights = [40, 60, 45, 75, 55, 90, 65, 50, 80, 70, 95, 60, 85, 72];
 }

@@ -1,0 +1,546 @@
+@page "/dashboard/ai-agents/{AgentId}/orientation"
+@layout DashboardLayout
+@inject NavigationManager Nav
+@inject AiAgentsState AiAgentsState
+@inject IJSRuntime JS
+@using Parrot.Web.Components.Pages.Dashboard.AiAgents
+@using Microsoft.JSInterop
+@implements IDisposable
+
+@{
+    var agent = AiAgentsState.GetAgent(AgentId);
+}
+
+@if (agent is null)
+{
+    <div style="padding:2rem"><h2>Agent not found</h2></div>
+}
+else
+{
+    <div class="ori-page">
+
+        <!-- action bar -->
+        <div class="ori-action-bar">
+            <button class="ori-save-btn" @onclick="Exit">Save &amp; exit</button>
+            <button class="ori-close-btn" @onclick="Exit">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="ori-body">
+
+            <!-- ───────── CHAT COLUMN ───────── -->
+            <section class="ori-chat">
+
+                <!-- agent strip -->
+                <div class="ori-chat-strip">
+                    <div class="ori-agent-avatar-lg">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff">
+                            <path d="M12 2.5l1.9 5.1 5.1 1.9-5.1 1.9L12 16.5l-1.9-5.1L5 9.5l5.1-1.9z" />
+                        </svg>
+                    </div>
+                    <div class="ori-chat-strip-info">
+                        <div class="ori-chat-strip-name-row">
+                            <span class="ori-chat-agent-name">@agent.Name</span>
+                            <span class="ori-phase-badge @(_phase == "activated" ? "ori-phase-badge--active" : "")">
+                                @(_phase == "activated" ? "Active" : "First day · in orientation")
+                            </span>
+                        </div>
+                        <span class="ori-chat-agent-sub">Getting to know the part of work it will own</span>
+                    </div>
+                </div>
+
+                <!-- messages -->
+                <div class="ori-messages" id="ori-scroll">
+                    @foreach (var msg in _messages)
+                    {
+                        @if (msg.Role == "divider")
+                        {
+                            <div class="ori-msg-divider">
+                                <span class="ori-msg-divider-line"></span>
+                                <span class="ori-msg-divider-text">@msg.Text</span>
+                                <span class="ori-msg-divider-line"></span>
+                            </div>
+                        }
+                        else if (msg.Role == "agent")
+                        {
+                            <div class="ori-msg-row ori-msg-row--agent">
+                                <div class="ori-bubble-avatar">
+                                    <svg viewBox="0 0 24 24" width="17" height="17" fill="#fff">
+                                        <path d="M12 2.5l1.9 5.1 5.1 1.9-5.1 1.9L12 16.5l-1.9-5.1L5 9.5l5.1-1.9z" />
+                                    </svg>
+                                </div>
+                                <div class="ori-bubble ori-bubble--agent">@msg.Text</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="ori-msg-row ori-msg-row--user">
+                                <div class="ori-bubble ori-bubble--user">@msg.Text</div>
+                            </div>
+                        }
+                    }
+
+                    @if (_typing)
+                    {
+                        <div class="ori-msg-row ori-msg-row--agent">
+                            <div class="ori-bubble-avatar">
+                                <svg viewBox="0 0 24 24" width="17" height="17" fill="#fff">
+                                    <path d="M12 2.5l1.9 5.1 5.1 1.9-5.1 1.9L12 16.5l-1.9-5.1L5 9.5l5.1-1.9z" />
+                                </svg>
+                            </div>
+                            <div class="ori-typing">
+                                <span class="ori-typing-dot"></span>
+                                <span class="ori-typing-dot ori-typing-dot--2"></span>
+                                <span class="ori-typing-dot ori-typing-dot--3"></span>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- dock: choices + actions + input -->
+                <div class="ori-dock">
+
+                    @if (_showChoices && CurrentStep is { } cur)
+                    {
+                        <div class="ori-choices">
+                            @if (!_isMulti && cur.Defaults.Length > 0)
+                            {
+                                <button class="ori-suggested" @onclick="() => ChooseSingle(cur.Defaults[0])">
+                                    <span class="ori-suggested-tag">Suggested</span>
+                                    <span class="ori-suggested-label">@cur.Defaults[0]</span>
+                                </button>
+                            }
+                            @if (!string.IsNullOrEmpty(cur.Helper))
+                            {
+                                <div class="ori-helper-text">@cur.Helper</div>
+                            }
+                            <div class="ori-chips-wrap">
+                                @foreach (var chip in _isMulti
+                                    ? cur.Defaults.Concat(cur.Chips)
+                                    : cur.Chips)
+                                {
+                                    var label = chip;
+                                    var sel = _selected.Contains(label);
+                                    <button class="ori-chip @(sel ? "ori-chip--on" : "")"
+                                            @onclick="() => { if (_isMulti) ToggleChip(label); else _ = ChooseSingle(label); }">
+                                        @if (sel)
+                                        {
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                        }
+                                        @label
+                                    </button>
+                                }
+                            </div>
+                            @if (_isMulti)
+                            {
+                                var canConfirm = _selected.Count > 0;
+                                <button class="ori-confirm-btn @(canConfirm ? "" : "ori-confirm-btn--disabled")"
+                                        disabled="@(!canConfirm)"
+                                        @onclick="ConfirmMulti">
+                                    @(canConfirm
+                                        ? $"Looks good — continue with {_selected.Count}"
+                                        : "Select at least one")
+                                </button>
+                            }
+                        </div>
+                    }
+
+                    @if (_phase == "review")
+                    {
+                        <div class="ori-review-btns">
+                            <button class="ori-activate-btn" @onclick="Activate">
+                                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 12l5 5L20 6" />
+                                </svg>
+                                Activate agent
+                            </button>
+                            <button class="ori-test-btn" @onclick="() => _ = TestAgent()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M8 5v14l11-7z" />
+                                </svg>
+                                Test agent
+                            </button>
+                        </div>
+                    }
+
+                    @if (_phase == "activated")
+                    {
+                        <div class="ori-activated-banner">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F8A5B"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 21a9 9 0 100-18 9 9 0 000 18zM8 12l3 3 5-6" />
+                            </svg>
+                            <span class="ori-activated-text">@agent.Name is live and ready to help your customers.</span>
+                            <button class="ori-quicktest-btn" @onclick="() => _ = TestAgent()">Run a quick test</button>
+                        </div>
+                    }
+
+                    <div class="ori-input-bar @(_inputDisabled ? "ori-input-bar--disabled" : "")">
+                        <input class="ori-input" placeholder="@_inputPlaceholder" disabled="@_inputDisabled"
+                               value="@_inputValue"
+                               @oninput="e => _inputValue = e.Value?.ToString() ?? string.Empty"
+                               @onkeydown="OnKeyDown" />
+                        <button class="ori-send-btn @(_inputDisabled ? "ori-send-btn--disabled" : "")"
+                                @onclick="() => _ = Send()">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12l15-7-6 15-3-6-6-2z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ───────── PROFILE PANEL ───────── -->
+            <aside class="ori-profile-panel">
+                <div class="ori-profile-header">
+                    <div class="ori-profile-header-top">
+                        <span class="ori-profile-title">Agent profile</span>
+                        <span class="ori-profile-status-pill @(_phase == "activated" ? "ori-status-pill--active" : "ori-status-pill--orienting")">
+                            @(_phase == "activated" ? "Active" : "In orientation")
+                        </span>
+                    </div>
+                    <div class="ori-profile-caption">Filling in as you talk — @DoneCount of 6 captured</div>
+                    <div class="ori-progress-track">
+                        <div class="ori-progress-bar" style="width:@(ProgressPct.ToString("F0"))%"></div>
+                    </div>
+                </div>
+
+                @foreach (var sec in ProfileSections)
+                {
+                    <div class="ori-profile-card @(sec.Done ? "ori-profile-card--done" : "")">
+                        <div class="ori-profile-card-head">
+                            <div class="ori-profile-icon @(sec.Done ? "ori-profile-icon--done" : "")">
+                                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+                                     stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="@sec.IconPath" />
+                                </svg>
+                            </div>
+                            <span class="ori-profile-card-label">@sec.Label</span>
+                            @if (sec.Done)
+                            {
+                                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#1F8A5B"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 21a9 9 0 100-18 9 9 0 000 18zM8 12l3 3 5-6" />
+                                </svg>
+                            }
+                        </div>
+
+                        @if (sec.Done && !string.IsNullOrEmpty(sec.TextValue))
+                        {
+                            <div class="ori-profile-text-value">@sec.TextValue</div>
+                        }
+                        @if (sec.Done && sec.ListValues is { Count: > 0 })
+                        {
+                            <div class="ori-profile-list-values">
+                                @foreach (var item in sec.ListValues)
+                                {
+                                    <div class="ori-profile-list-item">
+                                        <span class="ori-profile-bullet"></span>
+                                        <span>@item</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        @if (!sec.Done)
+                        {
+                            <div class="ori-profile-skeleton">
+                                <div class="ori-skeleton-line ori-skeleton-line--90"></div>
+                                <div class="ori-skeleton-line ori-skeleton-line--60"></div>
+                            </div>
+                        }
+                    </div>
+                }
+            </aside>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string AgentId { get; set; } = string.Empty;
+
+    // ── Data model ──────────────────────────────────────────────────────────────
+    record ChatMessage(string Role, string Text);
+
+    record OrientationStep(
+        string Field, string Type, string AgentText,
+        string[] Defaults, string[] Chips, string Helper = "");
+
+    record ProfileSection(
+        string Label, string IconPath, bool Done,
+        string? TextValue = null, List<string>? ListValues = null);
+
+    static readonly OrientationStep[] Script =
+    {
+        new("org", "single",
+            "Hi — I'm so glad to be joining the team! Think of this as my first day, and you're showing me the ropes.\n\nFirst, help me picture the bigger picture: what kind of organization am I joining?",
+            new[] { "We're an online retail store — customers shop with us across web and WhatsApp, and we pride ourselves on fast, friendly support." },
+            new[] { "B2B / wholesale supplier", "Service-based business", "Marketplace with many sellers" }),
+
+        new("role", "single",
+            "Wonderful — now I know who we are and who we're here for.\n\nNext, what part of the work would you like me to own?",
+            new[] { "Front-line customer support — answer questions and resolve order & refund issues" },
+            new[] { "Sales & lead qualification", "Appointment booking", "Billing & payments" }),
+
+        new("tasks", "multi",
+            "I love that — customer support is exactly where I shine.\n\nWhich day-to-day tasks should I handle? Pick as many as you like — I've checked the ones I'd suggest starting with.",
+            new[] { "Answer product & FAQ questions", "Track & update order status", "Process refunds and returns" },
+            new[] { "Qualify and route new leads", "Collect customer feedback", "Book callbacks with the team" },
+            "Tap to add or remove a task."),
+
+        new("knowledge", "multi",
+            "Got it — I'll handle those with real care.\n\nNow, where should I learn the answers from? Point me to your sources of truth and I'll study them closely.",
+            new[] { "Help Center articles", "Refund & returns policy", "Product catalog" },
+            new[] { "Past WhatsApp conversations", "Shipping & delivery FAQ", "Internal team wiki" },
+            "These become my knowledge base."),
+
+        new("escalation", "multi",
+            "Perfect — I want to know my limits too, so customers always feel looked after.\n\nWhen should I pause and bring in a human teammate?",
+            new[] { "Customer is upset or frustrated", "Refund above $200", "Customer asks for a person" },
+            new[] { "Legal or complaint mentioned", "Payment dispute / chargeback", "Anything I'm unsure about" },
+            "I'll hand off smoothly whenever these come up."),
+
+        new("success", "multi",
+            "That makes sense — I'll always know when to tag someone in.\n\nLast one, and it's my favourite: how will we know I'm doing a great job?",
+            new[] { "First reply under 1 minute", "CSAT above 90%", "Resolve 70% without a human" },
+            new[] { "Reduce the response backlog", "Higher repeat-customer rate" },
+            "These are the goals I'll work towards.")
+    };
+
+    // ── State ───────────────────────────────────────────────────────────────────
+    readonly List<ChatMessage> _messages = new();
+    int _step = -1;
+    string _phase = "chat";
+    bool _typing;
+    readonly List<string> _selected = new();
+    string _inputValue = string.Empty;
+    bool _isTesting;
+    readonly CancellationTokenSource _cts = new();
+
+    // Profile fields
+    string? _profOrg, _profRole;
+    List<string>? _profTasks, _profKnowledge, _profEscalation, _profSuccess;
+
+    // ── Computed ─────────────────────────────────────────────────────────────────
+    bool _showChoices => _phase == "chat" && _step >= 0 && !_typing;
+    OrientationStep? CurrentStep => _step >= 0 && _step < Script.Length ? Script[_step] : null;
+    bool _isMulti => CurrentStep?.Type == "multi";
+    bool _inputDisabled => _typing || _phase != "chat" || _step < 0;
+
+    string _inputPlaceholder => _phase switch
+    {
+        "review"    => "Review the profile, then activate me →",
+        "activated" => "I'm live — run a test above",
+        _ when _isMulti => "Add your own…",
+        _ => "Type your answer…"
+    };
+
+    int DoneCount => new[]
+    {
+        !string.IsNullOrEmpty(_profOrg),
+        !string.IsNullOrEmpty(_profRole),
+        _profTasks is { Count: > 0 },
+        _profKnowledge is { Count: > 0 },
+        _profEscalation is { Count: > 0 },
+        _profSuccess is { Count: > 0 }
+    }.Count(x => x);
+
+    double ProgressPct => DoneCount * 100.0 / 6;
+
+    IEnumerable<ProfileSection> ProfileSections => new[]
+    {
+        new ProfileSection("About the organization",
+            "M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 10h.01M15 10h.01M9 13h.01M15 13h.01",
+            !string.IsNullOrEmpty(_profOrg), TextValue: _profOrg),
+
+        new ProfileSection("Role & scope",
+            "M12 12a4 4 0 100-8 4 4 0 000 8zM4 20c0-3.4 3.6-6 8-6s8 2.6 8 6",
+            !string.IsNullOrEmpty(_profRole), TextValue: _profRole),
+
+        new ProfileSection("Key tasks & playbook",
+            "M9 6h11M9 12h11M9 18h11M4 5.5l1 1 2-2M4 11.5l1 1 2-2M4 17.5l1 1 2-2",
+            _profTasks is { Count: > 0 }, ListValues: _profTasks),
+
+        new ProfileSection("Knowledge sources",
+            "M5 4h9a3 3 0 013 3v13H8a3 3 0 00-3 3V4z",
+            _profKnowledge is { Count: > 0 }, ListValues: _profKnowledge),
+
+        new ProfileSection("Escalation rules",
+            "M12 3l7 3v6c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6l7-3zM12 9v4M12 16v.5",
+            _profEscalation is { Count: > 0 }, ListValues: _profEscalation),
+
+        new ProfileSection("Success criteria",
+            "M4 19V5M4 19h16M8 15l3-3 3 2 4-5",
+            _profSuccess is { Count: > 0 }, ListValues: _profSuccess)
+    };
+
+    // ── Lifecycle ────────────────────────────────────────────────────────────────
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender) _ = StartOrientation();
+    }
+
+    async Task StartOrientation()
+    {
+        try
+        {
+            await Task.Delay(650, _cts.Token);
+            await AskStep(0);
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    // ── Chat engine ──────────────────────────────────────────────────────────────
+    async Task AskStep(int index)
+    {
+        _typing = true;
+        await InvokeAsync(StateHasChanged);
+        try { await Task.Delay(1000, _cts.Token); }
+        catch (OperationCanceledException) { return; }
+
+        _typing = false;
+        _step = index;
+        _selected.Clear();
+        if (Script[index].Type == "multi")
+            _selected.AddRange(Script[index].Defaults);
+        _messages.Add(new("agent", Script[index].AgentText));
+        await InvokeAsync(StateHasChanged);
+        await ScrollToBottom();
+    }
+
+    async Task Advance(string displayText, object value)
+    {
+        _messages.Add(new("user", displayText));
+        SetProfile(Script[_step].Field, value);
+        await InvokeAsync(StateHasChanged);
+        await ScrollToBottom();
+
+        var next = _step + 1;
+        if (next < Script.Length)
+        {
+            await AskStep(next);
+        }
+        else
+        {
+            _typing = true;
+            await InvokeAsync(StateHasChanged);
+            try { await Task.Delay(1100, _cts.Token); }
+            catch (OperationCanceledException) { return; }
+
+            _typing = false;
+            _phase = "review";
+            _step = Script.Length;
+            _messages.Add(new("agent",
+                "Amazing — I think I've got everything I need for day one!\n\nTake a look at my profile on the right. When it feels right, activate me and I'll get started. I can't wait to start helping your customers."));
+            await InvokeAsync(StateHasChanged);
+            await ScrollToBottom();
+        }
+    }
+
+    void SetProfile(string field, object value)
+    {
+        switch (field)
+        {
+            case "org":        _profOrg        = value as string; break;
+            case "role":       _profRole       = value as string; break;
+            case "tasks":      _profTasks      = value as List<string>; break;
+            case "knowledge":  _profKnowledge  = value as List<string>; break;
+            case "escalation": _profEscalation = value as List<string>; break;
+            case "success":    _profSuccess    = value as List<string>; break;
+        }
+    }
+
+    async Task ChooseSingle(string label) => await Advance(label, label);
+
+    void ToggleChip(string label)
+    {
+        if (_selected.Contains(label)) _selected.Remove(label);
+        else _selected.Add(label);
+        StateHasChanged();
+    }
+
+    async Task ConfirmMulti()
+    {
+        if (_selected.Count == 0) return;
+        var cur = Script[_step];
+        var all = cur.Defaults.Concat(cur.Chips).ToList();
+        var ordered = all.Where(x => _selected.Contains(x)).ToList();
+        var extras  = _selected.Where(x => !all.Contains(x)).ToList();
+        var final   = ordered.Concat(extras).ToList();
+        await Advance(string.Join(",  ", final), final);
+    }
+
+    async Task Send()
+    {
+        var text = _inputValue.Trim();
+        if (string.IsNullOrEmpty(text) || _phase != "chat" || _step < 0 || _typing) return;
+
+        _inputValue = string.Empty;
+        if (_isMulti)
+        {
+            if (!_selected.Contains(text)) _selected.Add(text);
+            StateHasChanged();
+        }
+        else
+        {
+            await Advance(text, text);
+        }
+    }
+
+    async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await Send();
+    }
+
+    async Task Activate()
+    {
+        _phase = "activated";
+        _messages.Add(new("agent",
+            "Thank you — I won't let you down. I'm switching on now and watching the channels.\n\nWhenever you want, send me a test message and see how I respond."));
+        await InvokeAsync(StateHasChanged);
+        await ScrollToBottom();
+    }
+
+    async Task TestAgent()
+    {
+        if (_isTesting) return;
+        _isTesting = true;
+        _messages.Add(new("divider", "Quick test"));
+        _messages.Add(new("user", "Hi, I'd like a refund for order #4821 — it arrived damaged."));
+        _typing = true;
+        await InvokeAsync(StateHasChanged);
+        await ScrollToBottom();
+        try { await Task.Delay(1300, _cts.Token); }
+        catch (OperationCanceledException) { return; }
+
+        _typing = false;
+        _messages.Add(new("agent",
+            "I'm so sorry your order arrived damaged — that's never the experience we want for you. I can absolutely start a refund for order #4821 right away.\n\nCould you confirm the email address on the order so I can pull it up?"));
+        _isTesting = false;
+        await InvokeAsync(StateHasChanged);
+        await ScrollToBottom();
+    }
+
+    async Task ScrollToBottom()
+    {
+        try { await JS.InvokeVoidAsync("oriScrollToBottom"); }
+        catch { /* ignore if JS not ready */ }
+    }
+
+    void Exit() => Nav.NavigateTo($"/dashboard/ai-agents/{AgentId}");
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}

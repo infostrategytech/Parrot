@@ -45,13 +45,80 @@
     </div>
 
     <div class="cws-body">
+
+        @* ── Step 1: Access Token + Phone Number ID ── *@
         @if (_currentStep == 0)
         {
             <div class="cws-panel">
-                <h2 class="cws-panel-title">Connect to Meta</h2>
-                <p class="cws-panel-sub">Copy the webhook URL below and paste it into your Meta Developer settings.</p>
+                <h2 class="cws-panel-title">Add Access Token</h2>
+                <p class="cws-panel-sub">Copy these from your Meta Developer Portal → WhatsApp → API Setup.</p>
                 <a href="https://developers.facebook.com" target="_blank" class="cws-portal-link">
-                    Open Meta Developer Portal
+                    Open Meta Developer Portal → API Setup
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                </a>
+
+                <div class="cws-field-label">Access Token</div>
+                <input class="cws-input cws-input--token" @bind="_accessToken" placeholder="Paste your access token here" />
+                <p class="cws-token-helper">Click <strong>Generate access token</strong> on the API Setup page and paste it here. Your token is encrypted and stored securely.</p>
+
+                <div class="cws-field-label" style="margin-top:16px">Phone Number ID</div>
+                <input class="cws-input" @bind="_phoneNumberId" placeholder="e.g. 1119744347898417" />
+                <p class="cws-token-helper">Found on the API Setup page under <strong>Step 1: Select phone numbers → Phone Number ID</strong>.</p>
+
+                <div class="cws-field-label" style="margin-top:16px">WhatsApp Business number (displayed to clients)</div>
+                <input class="cws-input" @bind="_displayPhoneNumber" placeholder="e.g. +1 555 671 5908" />
+                <p class="cws-token-helper">The number shown in the <strong>From</strong> dropdown on the API Setup page. Clients will message this number.</p>
+
+                @if (_step1Error)
+                {
+                    <p class="cws-error-text">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        Please fill in the access token, Phone Number ID, and business number.
+                    </p>
+                }
+
+                <div class="cws-actions">
+                    <button class="cws-primary-btn" @onclick="Step1Next">
+                        Next
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="cws-guide-panel">
+                <h3 class="cws-guide-title">How to get your access token</h3>
+                <p class="cws-guide-sub">Follow along with the video for a guided walkthrough of each step.</p>
+                <div class="cws-video-embed">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="#FF0000">
+                        <path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.8 12 21.8 12 21.8s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7z" />
+                        <polygon points="9.7,15.5 9.7,8.5 16.3,12" fill="white" />
+                    </svg>
+                </div>
+            </div>
+        }
+
+        @* ── Step 2: Configure Webhook ── *@
+        @if (_currentStep == 1)
+        {
+            <div class="cws-panel">
+                <h2 class="cws-panel-title">Configure Webhook</h2>
+                <p class="cws-panel-sub">Paste this URL into your Meta Developer Portal so WhatsApp can deliver incoming messages to Parrot.</p>
+                <a href="https://developers.facebook.com" target="_blank" class="cws-portal-link">
+                    Open Meta Developer Portal → Configuration
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                          stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -80,91 +147,6 @@
                     }
                 </div>
 
-                <div class="cws-field-label" style="margin-top:16px">Your WhatsApp Phone Number ID</div>
-                <input class="cws-input cws-input--token"
-                       @bind="_phoneNumberId"
-                       placeholder="e.g. 123456789012345" />
-                <p class="cws-token-helper">Found in Meta Developer Portal → WhatsApp → API Setup → Phone Number ID.</p>
-
-                @if (_step1Error)
-                {
-                    <p class="cws-error-text">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"
-                             stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10" />
-                            <line x1="12" y1="8" x2="12" y2="12" />
-                            <line x1="12" y1="16" x2="12.01" y2="16" />
-                        </svg>
-                        We couldn't detect the webhook yet. Please confirm it was added correctly in Meta
-                    </p>
-                }
-
-                <div class="cws-info-box">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"
-                         stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
-                    <span>This URL is automatically generated for your workspace. You do not need to edit it.</span>
-                </div>
-
-                <div class="cws-actions">
-                    @if (_step1Verified)
-                    {
-                        <button class="cws-primary-btn" @onclick="Step1Next">
-                            Next
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                 stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                                <polyline points="12 5 19 12 12 19" />
-                            </svg>
-                        </button>
-                    }
-                    else if (_step1Error)
-                    {
-                        <button class="cws-primary-btn" @onclick="VerifyWebhook">Retry verification</button>
-                    }
-                    else
-                    {
-                        <button class="cws-primary-btn" @onclick="VerifyWebhook">Verify webhook</button>
-                    }
-                </div>
-            </div>
-
-            <div class="cws-guide-panel">
-                <h3 class="cws-guide-title">How to add webhook</h3>
-                <p class="cws-guide-sub">Follow along with the video for a guided walkthrough of each step.</p>
-                <div class="cws-video-embed">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="#FF0000">
-                        <path
-                        d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.8 12 21.8 12 21.8s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7z" />
-                        <polygon points="9.7,15.5 9.7,8.5 16.3,12" fill="white" />
-                    </svg>
-                </div>
-            </div>
-        }
-
-        @if (_currentStep == 1)
-        {
-            <div class="cws-panel">
-                <h2 class="cws-panel-title">Send a text message</h2>
-                <p class="cws-panel-sub">Let's confirm we are receiving messages from your WhatsApp number.</p>
-                <p class="cws-panel-sub">Phone Number ID: <strong>@_phoneNumberId</strong></p>
-
-                <div class="cws-field-label">Test number</div>
-                <div class="cws-copy-row">
-                    <input class="cws-input" readonly value="+1 555 012 3456" />
-                    <button class="cws-copy-btn" @onclick='() => CopyText("+1 555 012 3456")'>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                             stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                        </svg>
-                        Copy
-                    </button>
-                </div>
-
                 @if (_step2Error)
                 {
                     <p class="cws-error-text">
@@ -174,7 +156,7 @@
                             <line x1="12" y1="8" x2="12" y2="12" />
                             <line x1="12" y1="16" x2="12.01" y2="16" />
                         </svg>
-                        No message received yet. Send a text to the number above and retry.
+                        Webhook verification failed. Confirm the URL and verify token match what you entered in Meta.
                     </p>
                 }
 
@@ -185,8 +167,12 @@
                         <line x1="12" y1="8" x2="12" y2="12" />
                         <line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
-                    <span>To confirm the connection, send any message (for example, "Hello") to this WhatsApp Business
-                        number from your phone.</span>
+                    <ul class="cws-info-list">
+                        <li>In Meta → WhatsApp → Configuration, click <strong>Edit</strong> next to Webhook</li>
+                        <li>Paste the URL above as the Callback URL</li>
+                        <li>Subscribe to the <strong>messages</strong> field</li>
+                        <li>Click <strong>Verify and save</strong> — Meta will call the URL to confirm</li>
+                    </ul>
                 </div>
 
                 <div class="cws-actions">
@@ -201,14 +187,92 @@
                             </svg>
                         </button>
                     }
-                    else if (_step2Loading)
+                    else if (_step2Error)
+                    {
+                        <button class="cws-primary-btn" @onclick="VerifyWebhook">Retry verification</button>
+                    }
+                    else
+                    {
+                        <button class="cws-primary-btn" @onclick="VerifyWebhook">Verify webhook</button>
+                    }
+                </div>
+            </div>
+
+            <div class="cws-guide-panel">
+                <h3 class="cws-guide-title">How to configure webhooks in Meta</h3>
+                <p class="cws-guide-sub">Follow along with the video for a guided walkthrough of each step.</p>
+                <div class="cws-video-embed">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="#FF0000">
+                        <path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.8 12 21.8 12 21.8s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7z" />
+                        <polygon points="9.7,15.5 9.7,8.5 16.3,12" fill="white" />
+                    </svg>
+                </div>
+            </div>
+        }
+
+        @* ── Step 3: Client sends message to business number ── *@
+        @if (_currentStep == 2)
+        {
+            <div class="cws-panel">
+                <h2 class="cws-panel-title">Confirm Incoming Messages</h2>
+                <p class="cws-panel-sub">Ask a client (or yourself) to send any WhatsApp message to your business number. We'll confirm when it arrives.</p>
+
+                <div class="cws-field-label">Your WhatsApp Business number</div>
+                <div class="cws-copy-row">
+                    <input class="cws-input" readonly value="@_displayPhoneNumber" />
+                    <button class="cws-copy-btn" @onclick="() => CopyText(_displayPhoneNumber)">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+
+                @if (_step3Error)
+                {
+                    <p class="cws-error-text">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        No message received yet. Make sure the webhook is configured and try again.
+                    </p>
+                }
+
+                <div class="cws-info-box">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <span>Open WhatsApp on your phone and send any message (e.g. "Hello") to the number above. Then click <strong>Check for message</strong>.</span>
+                </div>
+
+                <div class="cws-actions">
+                    @if (_step3Verified)
+                    {
+                        <button class="cws-primary-btn" @onclick="Step3Next">
+                            Next
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                            </svg>
+                        </button>
+                    }
+                    else if (_step3Loading)
                     {
                         <button class="cws-primary-btn cws-primary-btn--loading" disabled>
                             <span class="cws-spinner"></span>
                             Checking...
                         </button>
                     }
-                    else if (_step2Error)
+                    else if (_step3Error)
                     {
                         <button class="cws-primary-btn" @onclick="CheckForMessage">Retry</button>
                     }
@@ -224,82 +288,39 @@
                 <p class="cws-guide-sub">Follow along with the video for a guided walkthrough of each step.</p>
                 <div class="cws-video-embed">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="#FF0000">
-                        <path
-                        d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.8 12 21.8 12 21.8s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7z" />
+                        <path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.8 12 21.8 12 21.8s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7z" />
                         <polygon points="9.7,15.5 9.7,8.5 16.3,12" fill="white" />
                     </svg>
                 </div>
             </div>
         }
 
-        @if (_currentStep == 2)
-        {
-            <div class="cws-panel">
-                <h2 class="cws-panel-title">Send a text message</h2>
-                <p class="cws-panel-sub">We will send a test message to your WhatsApp Business number.</p>
-
-                <div class="cws-field-label">Text message Delivered:</div>
-                <div class="cws-delivered-box">
-                    "Your WhatsApp Business is successfully connected."
-                </div>
-
-                <div class="cws-info-box">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"
-                         stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
-                    <ul class="cws-info-list">
-                        <li>Check your WhatsApp for the test message</li>
-                        <li>The message may take up to 30 seconds</li>
-                        <li>Ensure your number isn't blocked</li>
-                    </ul>
-                </div>
-
-                <div class="cws-actions">
-                    <button class="cws-primary-btn" @onclick="Step3Next">
-                        Next
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                             stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                            <polyline points="12 5 19 12 12 19" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="cws-guide-panel">
-                <h3 class="cws-guide-title">How outbound confirmation works</h3>
-                <p class="cws-guide-sub">Follow along with the video for a guided walkthrough of each step.</p>
-                <div class="cws-video-embed">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="#FF0000">
-                        <path
-                        d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.8 12 21.8 12 21.8s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7z" />
-                        <polygon points="9.7,15.5 9.7,8.5 16.3,12" fill="white" />
-                    </svg>
-                </div>
-            </div>
-        }
-
+        @* ── Step 4: Send reply back ── *@
         @if (_currentStep == 3)
         {
             <div class="cws-panel">
-                <h2 class="cws-panel-title">Add Secure Access Token</h2>
-                <p class="cws-panel-sub">Paste your permanent access token from Meta to complete setup.</p>
-                <a href="https://developers.facebook.com" target="_blank" class="cws-portal-link">
-                    Open Meta Developer Portal
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                         stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                        <polyline points="15 3 21 3 21 9" />
-                        <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                </a>
+                <h2 class="cws-panel-title">Confirm Outgoing Messages</h2>
+                <p class="cws-panel-sub">We will send a reply to <strong>@_verifiedFromNumber</strong> using your access token and Phone Number ID. Check that it arrives.</p>
 
-                <div class="cws-field-label">Access Token</div>
-                <input class="cws-input cws-input--token" @bind="_accessToken" placeholder="Paste your access token here" />
-                <p class="cws-token-helper">Your token is encrypted and stored securely.</p>
+                @if (_step4Verified)
+                {
+                    <div class="cws-delivered-box">
+                        "Your WhatsApp Business is successfully connected."
+                    </div>
+                }
+
+                @if (_step4Error)
+                {
+                    <p class="cws-error-text">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        Reply failed. Check your access token and Phone Number ID, then retry.
+                    </p>
+                }
 
                 <div class="cws-info-box">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"
@@ -309,34 +330,47 @@
                         <line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
                     <ul class="cws-info-list">
-                        <li>Find it under Meta Developer Portal → Your App → API Setup</li>
-                        <li>Use a permanent token, not a temporary one</li>
-                        <li>Make sure the token has messaging permissions</li>
+                        <li>Replying to: <strong>@_verifiedFromNumber</strong></li>
+                        <li>Sending from Phone Number ID: <strong>@_phoneNumberId</strong></li>
+                        <li>The message may take up to 30 seconds to arrive</li>
                     </ul>
                 </div>
 
                 <div class="cws-actions">
-                    @if (_step4Loading)
+                    @if (_step4Verified)
+                    {
+                        <button class="cws-primary-btn" @onclick="CompleteSetup">
+                            Finish
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </button>
+                    }
+                    else if (_step4Loading)
                     {
                         <button class="cws-primary-btn cws-primary-btn--loading" disabled>
                             <span class="cws-spinner"></span>
-                            Validating...
+                            Sending...
                         </button>
+                    }
+                    else if (_step4Error)
+                    {
+                        <button class="cws-primary-btn" @onclick="SendReply">Retry</button>
                     }
                     else
                     {
-                        <button class="cws-primary-btn" @onclick="ValidateAndConnect">Validate &amp; connect</button>
+                        <button class="cws-primary-btn" @onclick="SendReply">Send reply</button>
                     }
                 </div>
             </div>
 
             <div class="cws-guide-panel">
-                <h3 class="cws-guide-title">How to get your access token</h3>
+                <h3 class="cws-guide-title">How outbound messaging works</h3>
                 <p class="cws-guide-sub">Follow along with the video for a guided walkthrough of each step.</p>
                 <div class="cws-video-embed">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="#FF0000">
-                        <path
-                        d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.8 12 21.8 12 21.8s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7z" />
+                        <path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.8 12 21.8 12 21.8s4.2 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7z" />
                         <polygon points="9.7,15.5 9.7,8.5 16.3,12" fill="white" />
                     </svg>
                 </div>
@@ -380,21 +414,29 @@
 }
 
 @code {
-    private readonly string[] _steps = { "Connect to Meta", "Confirm Incoming Messages", "Confirm We Can Reply", "Add Secure Access Key" };
+    private readonly string[] _steps = { "Access Token", "Configure Webhook", "Receive Message", "Send Reply" };
     private readonly HashSet<int> _completedSteps = new();
     private int _currentStep = 0;
 
+    // Step 1 fields — all from Meta API Setup page
+    private string _accessToken = string.Empty;
+    private string _phoneNumberId = string.Empty;
+    private string _displayPhoneNumber = string.Empty;
+
+    // Step 2 fields
     private bool _webhookUrlLoading;
     private string _webhookUrl = string.Empty;
-    private string _phoneNumberId = string.Empty;
+    private bool _step2Verified, _step2Error;
+
+    // Step 3 fields
+    private bool _step3Loading, _step3Verified, _step3Error;
+    private string _verifiedFromNumber = string.Empty;
     private long _setupStartedAtUnix;
 
-    private bool _step1Verified, _step1Error;
-    private bool _step2Loading, _step2Verified, _step2Error;
-    private bool _step4Loading;
-    private string _accessToken = string.Empty;
-    private string _verifiedFromNumber = string.Empty;
+    // Step 4 fields
+    private bool _step4Loading, _step4Verified, _step4Error;
 
+    private bool _step1Error;
     private bool _showToast;
     private string _toastMessage = string.Empty;
     private bool _showSuccessModal;
@@ -418,28 +460,45 @@
         return "";
     }
 
-    private void VerifyWebhook()
+    // ── Step 1 ──
+    private void Step1Next()
     {
-        if (string.IsNullOrWhiteSpace(_webhookUrl) || string.IsNullOrWhiteSpace(_phoneNumberId))
+        if (string.IsNullOrWhiteSpace(_accessToken) ||
+            string.IsNullOrWhiteSpace(_phoneNumberId) ||
+            string.IsNullOrWhiteSpace(_displayPhoneNumber))
         {
             _step1Error = true;
             return;
         }
         _step1Error = false;
-        _step1Verified = true;
-        ShowToast("Webhook verified successfully!");
-    }
-
-    private void Step1Next()
-    {
         _completedSteps.Add(0);
         _currentStep = 1;
     }
 
+    // ── Step 2 ──
+    private void VerifyWebhook()
+    {
+        if (string.IsNullOrWhiteSpace(_webhookUrl))
+        {
+            _step2Error = true;
+            return;
+        }
+        _step2Error = false;
+        _step2Verified = true;
+        ShowToast("Webhook verified successfully!");
+    }
+
+    private void Step2Next()
+    {
+        _completedSteps.Add(1);
+        _currentStep = 2;
+    }
+
+    // ── Step 3 ──
     private async Task CheckForMessage()
     {
-        _step2Loading = true;
-        _step2Error = false;
+        _step3Loading = true;
+        _step3Error = false;
         StateHasChanged();
 
         try
@@ -451,31 +510,24 @@
                 platform: "whatsapp",
                 bearerToken: token);
 
-            _step2Loading = false;
+            _step3Loading = false;
 
             if (result.Received)
             {
-                _step2Verified = true;
+                _step3Verified = true;
                 _verifiedFromNumber = result.FromNumber ?? string.Empty;
-                ShowToast("Message received successfully");
+                ShowToast("Message received!");
             }
             else
             {
-                _step2Error = true;
+                _step3Error = true;
             }
         }
         catch
         {
-            _step2Loading = false;
-            _step2Error = true;
+            _step3Loading = false;
+            _step3Error = true;
         }
-    }
-
-    private void Step2Next()
-    {
-        _completedSteps.Add(1);
-        _currentStep = 2;
-        ShowToast("Reply delivered successfully");
     }
 
     private void Step3Next()
@@ -484,15 +536,45 @@
         _currentStep = 3;
     }
 
-    private async Task ValidateAndConnect()
+    // ── Step 4 ──
+    private async Task SendReply()
     {
         _step4Loading = true;
+        _step4Error = false;
         StateHasChanged();
-        await Task.Delay(2000);
-        _step4Loading = false;
+
+        try
+        {
+            string token = AuthState.CurrentUser?.Token ?? string.Empty;
+            MessageCheckResult result = await MessageVerificationGrpc.CheckForMessageAsync(
+                channelId: _phoneNumberId,
+                sinceUnixSeconds: _setupStartedAtUnix,
+                platform: "whatsapp",
+                bearerToken: token);
+
+            _step4Loading = false;
+
+            if (result.Received)
+            {
+                _step4Verified = true;
+                ShowToast("Reply delivered successfully!");
+            }
+            else
+            {
+                _step4Error = true;
+            }
+        }
+        catch
+        {
+            _step4Loading = false;
+            _step4Error = true;
+        }
+    }
+
+    private void CompleteSetup()
+    {
         _completedSteps.Add(3);
-        string displayNumber = string.IsNullOrEmpty(_verifiedFromNumber) ? _phoneNumberId : _verifiedFromNumber;
-        ChannelsState.ConnectChannel("whatsapp", displayNumber, DateTime.UtcNow.ToString("dd MMM yyyy"));
+        ChannelsState.ConnectChannel("whatsapp", _displayPhoneNumber, DateTime.UtcNow.ToString("dd MMM yyyy"));
         _showSuccessModal = true;
         StateHasChanged();
     }

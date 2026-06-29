@@ -103,6 +103,14 @@
                                 <span class="aia-stat-val">@agent.MessagesToday</span>
                             </div>
                         </div>
+                        <div class="aia-card-divider"></div>
+                        <button type="button" class="aia-orientation-btn" @onclick:stopPropagation
+                                @onclick="() => GoToOrientation(agentId)">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                            </svg>
+                            Give Orientation
+                        </button>
                     </div>
                 }
             </div>
@@ -133,14 +141,15 @@
     }
 
     private void GoToAgent(string id) => Nav.NavigateTo($"/dashboard/ai-agents/{id}");
+    private void GoToOrientation(string id) => Nav.NavigateTo($"/dashboard/ai-agents/{id}/orientation");
 
     private static string GetMascotGif(string mascot) => mascot switch
     {
-        "Bolt" => "/assets/images/gifs/bolt-mascott.gif",
-        "Aegis" => "/assets/images/gifs/aegis-mascott.gif",
-        "Buzz" => "/assets/images/gifs/buzz-mascott.gif",
-        "Luna" => "/assets/images/gifs/luna-mascott.gif",
-        "Atlas" => "/assets/images/gifs/owl-animation.gif",
-        _ => "/assets/images/gifs/nova-mascott.gif"
+        "Atlas" => "/assets/images/avatars/avatar-2.png",
+        "Bolt" => "/assets/images/avatars/avatar-3.png",
+        "Aegis" => "/assets/images/avatars/avatar-4.png",
+        "Buzz" => "/assets/images/avatars/avatar-5.png",
+        "Luna" => "/assets/images/avatars/avatar-6.png",
+        _ => "/assets/images/avatars/avatar-1.png"
     };
 }

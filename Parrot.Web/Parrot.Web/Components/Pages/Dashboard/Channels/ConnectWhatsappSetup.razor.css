@@ -12,7 +12,7 @@
 }
 
 .cws-cancel-link:hover {
-    color: #111827;
+    color: #1F2937;
 }
 
 /* Stepper */
@@ -32,7 +32,7 @@
 }
 
 .cws-step--active {
-    color: #4C1D95;
+    color: #53279E;
     font-weight: 500;
 }
 
@@ -47,7 +47,7 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: #E5E7EB;
+    background: #E8E8EB;
     font-size: 0.75rem;
     font-weight: 600;
     color: #9CA3AF;
@@ -56,18 +56,18 @@
 
 .cws-step--active .cws-step-indicator {
     background: transparent;
-    color: #4C1D95;
+    color: #53279E;
 }
 
 .cws-step--done .cws-step-indicator {
-    background: #4C1D95;
+    background: #53279E;
     color: #fff;
 }
 
 .cws-step-divider {
     flex: 1;
     height: 1px;
-    background: #E5E7EB;
+    background: #E8E8EB;
     margin: 0 0.75rem;
     min-width: 2rem;
 }
@@ -86,15 +86,15 @@
     flex-direction: column;
     gap: 0.75rem;
     padding: 1.5rem;
-    border: 1px solid #E5E7EB;
-    border-radius: 0.75rem;
+    border: 1px solid #E8E8EB;
+    border-radius: 15px;
     background: #fff;
 }
 
 .cws-panel-title {
     font-size: 1.125rem;
     font-weight: 600;
-    color: #111827;
+    color: #1F2937;
     margin: 0;
 }
 
@@ -111,7 +111,7 @@
     gap: 0.25rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #4C1D95;
+    color: #53279E;
     text-decoration: underline;
 }
 
@@ -131,7 +131,7 @@
 .cws-input {
     flex: 1;
     padding: 0.625rem 0.875rem;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E8E8EB;
     border-radius: 0.5rem;
     font-size: 0.875rem;
     color: #6B7280;
@@ -155,7 +155,7 @@
     align-items: center;
     gap: 0.375rem;
     padding: 0.625rem 1rem;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E8E8EB;
     border-radius: 0.5rem;
     background: #fff;
     font-size: 0.875rem;
@@ -197,7 +197,7 @@
 
 .cws-delivered-box {
     padding: 0.75rem 1rem;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E8E8EB;
     border-radius: 0.5rem;
     background: #F9FAFB;
     font-size: 0.875rem;
@@ -221,7 +221,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.5rem;
-    background: #4C1D95;
+    background: #53279E;
     color: #fff;
     border: none;
     border-radius: 0.5rem;
@@ -232,11 +232,11 @@
 }
 
 .cws-primary-btn:hover {
-    background: #3b1678;
+    background: #3D1E82;
 }
 
 .cws-primary-btn--loading {
-    background: #C4B5FD;
+    background: #D3BDF9;
     cursor: not-allowed;
 }
 
@@ -270,7 +270,7 @@
 .cws-guide-title {
     font-size: 1rem;
     font-weight: 600;
-    color: #111827;
+    color: #1F2937;
     margin: 0;
 }
 
@@ -349,7 +349,7 @@
 .cws-success-title {
     font-size: 1.125rem;
     font-weight: 700;
-    color: #111827;
+    color: #1F2937;
     margin: 0;
 }
 

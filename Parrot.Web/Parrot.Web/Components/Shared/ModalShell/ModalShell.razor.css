@@ -20,7 +20,7 @@
     transform: translate(-50%, -50%);
     z-index: 1001;
     background: #fff;
-    border-radius: 1rem;
+    border-radius: 15px;
     width: 100%;
     max-width: 520px;
     max-height: 90vh;
@@ -86,7 +86,7 @@
 
 .modal-divider {
     height: 1px;
-    background: #E5E7EB;
+    background: #E8E8EB;
     margin-top: 1rem;
     flex-shrink: 0;
 } 
@@ -107,7 +107,7 @@
     display: flex;
     gap: 0.75rem;
     justify-content: flex-end;
-    border-top: 1px solid #E5E7EB;
+    border-top: 1px solid #E8E8EB;
     flex-shrink: 0;
 }
 
@@ -124,7 +124,7 @@
 
 .modal-dialog--confirm .modal-footer {
     padding: 1rem 0 0;
-    border-top: 1px solid #E5E7EB;
+    border-top: 1px solid #E8E8EB;
     justify-content: stretch;
     gap: 0.75rem;
 }
@@ -133,7 +133,7 @@
 ::deep .modal-title {
     font-size: 1.0625rem;
     font-weight: 700;
-    color: #111827;
+    color: #1F2937;
     margin: 0 0 0.25rem;
 }
 
@@ -180,7 +180,7 @@
     gap: 0.25rem;
     font-size: 0.8125rem;
     font-weight: 500;
-    color: #7C3AED;
+    color: #53279E;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -196,15 +196,15 @@
     border: 1px solid #D1D5DB;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    color: #111827;
+    color: #1F2937;
     outline: none;
     box-sizing: border-box;
     transition: border-color 0.15s ease;
 }
 
 ::deep .modal-input:focus {
-    border-color: #7C3AED;
-    box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
+    border-color: #53279E;
+    box-shadow: 0 0 0 3px rgba(155,111,232,0.22);
 }
 
 ::deep .modal-textarea {
@@ -213,7 +213,7 @@
     border: 1px solid #D1D5DB;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    color: #111827;
+    color: #1F2937;
     resize: vertical;
     min-height: 5.5rem;
     outline: none;
@@ -223,8 +223,8 @@
 }
 
 ::deep .modal-textarea:focus {
-    border-color: #7C3AED;
-    box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
+    border-color: #53279E;
+    box-shadow: 0 0 0 3px rgba(155,111,232,0.22);
 }
 
 ::deep .modal-select-wrap { position: relative; }
@@ -235,7 +235,7 @@
     border: 1px solid #D1D5DB;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    color: #111827;
+    color: #1F2937;
     background: #fff;
     appearance: none;
     outline: none;
@@ -244,7 +244,7 @@
     transition: border-color 0.15s ease;
 }
 
-::deep .modal-select:focus { border-color: #7C3AED; }
+::deep .modal-select:focus { border-color: #53279E; }
 
 ::deep .modal-select-arrow {
     position: absolute;
@@ -267,7 +267,7 @@
     justify-content: space-between;
     padding: 0.875rem 1rem;
     background: #F9FAFB;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E8E8EB;
     border-radius: 0.625rem;
     gap: 1rem;
 }
@@ -299,18 +299,18 @@
 
 ::deep .modal-btn--cancel {
     background: #fff;
-    border: 1.5px solid #E5E7EB;
+    border: 1.5px solid #E8E8EB;
     color: #374151;
 }
 
 ::deep .modal-btn--cancel:hover { background: #F9FAFB; }
 
 ::deep .modal-btn--save {
-    background: #7C3AED;
+    background: #53279E;
     color: #fff;
 }
 
-::deep .modal-btn--save:hover:not(:disabled) { background: #6D28D9; }
+::deep .modal-btn--save:hover:not(:disabled) { background: #3D1E82; }
 ::deep .modal-btn--save:disabled { opacity: 0.5; cursor: not-allowed; }
 
 ::deep .modal-btn--delete {
@@ -365,8 +365,8 @@
 }
 
 ::deep .cat-add-btn:hover:not(:disabled) {
-    border-color: #7C3AED;
-    color: #7C3AED;
+    border-color: #53279E;
+    color: #53279E;
 }
 
 ::deep .cat-add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -376,7 +376,7 @@
     flex-direction: column;
     gap: 0.625rem;
     background: #F9FAFB;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E8E8EB;
     border-radius: 0.625rem;
     padding: 0.875rem;
 }
@@ -405,7 +405,7 @@
     align-items: center;
     justify-content: space-between;
     background: #fff;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E8E8EB;
     border-radius: 0.5rem;
     padding: 0.5rem 0.625rem;
 }

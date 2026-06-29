@@ -19,7 +19,7 @@
     background: #ffffff;
     border: none;
     padding: 0;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14), 0 0 0 3px rgba(124, 58, 237, 0.12);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14), 0 0 0 3px rgba(155,111,232,0.18);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -31,7 +31,7 @@
 }
 
 .mascot-figure:hover {
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18), 0 0 0 3px rgba(124, 58, 237, 0.26);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18), 0 0 0 3px rgba(155,111,232,0.35);
     transform: scale(1.05);
     animation-play-state: paused;
 }
@@ -82,7 +82,7 @@
     display: inline-block;
     width: 2px;
     height: 0.85em;
-    background: #7C3AED;
+    background: #53279E;
     margin-left: 1px;
     vertical-align: text-bottom;
     border-radius: 1px;

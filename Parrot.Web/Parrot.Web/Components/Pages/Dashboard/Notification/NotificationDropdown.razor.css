@@ -19,8 +19,8 @@
 
 .notif-bell:hover,
 .notif-bell--active {
-    border-color: #7C3AED;
-    color: #7C3AED;
+    border-color: #53279E;
+    color: #53279E;
 }
 
 .notif-bell-icon {
@@ -37,7 +37,7 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #7C3AED;
+    background: #53279E;
     border: 1.5px solid #fff;
 }
 
@@ -53,7 +53,7 @@
     right: 0;
     width: 360px;
     background: #ffffff;
-    border-radius: 1rem;
+    border-radius: 15px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     z-index: 100;
     overflow: hidden;
@@ -76,13 +76,13 @@
 .notif-header-title {
     font-size: 0.9375rem;
     font-weight: 700;
-    color: #111827;
+    color: #1F2937;
 }
 
 .notif-mark-all {
     background: none;
     border: none;
-    color: #7C3AED;
+    color: #53279E;
     font-size: 0.8125rem;
     font-weight: 500;
     cursor: pointer;
@@ -118,7 +118,7 @@
 }
 
 .notif-item--unread .notif-item-title {
-    color: #111827;
+    color: #1F2937;
     font-weight: 600;
 }
 
@@ -127,7 +127,7 @@
     height: 2.25rem;
     border-radius: 50%;
     background: rgba(124, 58, 237, 0.1);
-    color: #7C3AED;
+    color: #53279E;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -151,12 +151,12 @@
 
 .notif-item-desc {
     font-size: 0.8125rem;
-    color: #6b7280;
+    color: #6B7280;
     line-height: 1.5;
 }
 
 .notif-item-time {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: #9CA3AF;
     margin-top: 0.2rem;
 }

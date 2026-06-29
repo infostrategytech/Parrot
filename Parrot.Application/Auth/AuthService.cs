@@ -1,6 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Parrot.Application.DTOs.Auth;
 using Parrot.Application.Email;
@@ -18,19 +20,22 @@ public class AuthService : IAuthService
     private readonly IEmailService _emailService;
     private readonly EmailSettings _emailSettings;
     private readonly IAppLogger<AuthService> _logger;
+    private readonly IWebHostEnvironment _env;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         IJwtHelper jwtHelper,
         IEmailService emailService,
         IOptions<EmailSettings> emailSettings,
-        IAppLogger<AuthService> logger)
+        IAppLogger<AuthService> logger,
+        IWebHostEnvironment env)
     {
         _userManager = userManager;
         _jwtHelper = jwtHelper;
         _emailService = emailService;
         _emailSettings = emailSettings.Value;
         _logger = logger;
+        _env = env;
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -73,6 +78,7 @@ public class AuthService : IAuthService
             {
                 _logger.LogWarning("Login attempt before email verification. Email: {Email}", request.Email);
             }
+            //allow users login when verfication is abandonned but prompt them to verify email
 
             throw new UnauthorizedException("Please verify your email address before logging in.");
         }
@@ -110,7 +116,10 @@ public class AuthService : IAuthService
             throw new ValidationException("An error occurred while creating the user.");
         }
 
-        await SendVerificationEmailAsync(user);
+        if (!_env.IsDevelopment())
+        {
+            await SendVerificationEmailAsync(user);
+        }
 
         using (_logger.BeginEntityScope("User", user.Id))
         {

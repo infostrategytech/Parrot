@@ -6,8 +6,8 @@
 
 .dt-table-wrap {
     overflow-x: auto;
-    border-radius: 0.75rem;
-    border: 1px solid #E5E7EB;
+    border-radius: 15px;
+    border: 1px solid #E8E8EB;
     background: #fff;
 }
 
@@ -24,7 +24,7 @@
     font-weight: 600;
     color: #6B7280;
     background: #F9FAFB;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E8E8EB;
     white-space: nowrap;
 }
 
@@ -82,7 +82,7 @@
     height: 2rem;
     padding: 0 0.4rem;
     border-radius: 0.375rem;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E8E8EB;
     background: #fff;
     color: #374151;
     font-size: 0.8125rem;
@@ -95,18 +95,18 @@
 }
 
 .dt-page-btn:hover:not(:disabled) {
-    border-color: #7C3AED;
-    color: #7C3AED;
+    border-color: #53279E;
+    color: #53279E;
 }
 
 .dt-page-btn--active {
-    background: #7C3AED;
-    border-color: #7C3AED;
+    background: #53279E;
+    border-color: #53279E;
     color: #fff;
 }
 
 .dt-page-btn--active:hover {
-    background: #7C3AED !important;
+    background: #53279E !important;
     color: #fff !important;
 }
 
@@ -146,7 +146,7 @@
     right: 0;
     top: calc(100% + 4px);
     background: #fff;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E8E8EB;
     border-radius: 0.5rem;
     box-shadow: 0 4px 16px rgba(0,0,0,0.10);
     z-index: 50;

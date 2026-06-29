@@ -103,6 +103,8 @@
             var agent = AiAgentsState.GetAgent(segs[2]);
             agentName = agent?.Name ?? "Agent";
         }
+        if (segs.Length >= 4 && segs[3] == "orientation")
+            return $"{agentName} / Orientation";
         if (segs.Length >= 5 && segs[3] == "playbooks")
         {
             var agent = AiAgentsState.GetAgent(segs[2]);

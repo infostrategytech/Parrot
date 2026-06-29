@@ -1,0 +1,212 @@
+@page "/dashboard/ai-agents/{AgentId}/builder"
+@layout DashboardLayout
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@inject AiAgentsState AiAgentsState
+@inject NavigationManager Nav
+@implements IAsyncDisposable
+
+<div class="abc-page">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="abc-topbar">
+    <div class="abc-topbar-left">
+      <div class="abc-topbar-icon">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#53279E" stroke-width="1.8">
+          <rect x="4" y="8" width="16" height="11" rx="3"/>
+          <circle cx="9" cy="13.5" r="1.4" fill="#53279E" stroke="none"/>
+          <circle cx="15" cy="13.5" r="1.4" fill="#53279E" stroke="none"/>
+          <path d="M12 8V4M9 4h6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="abc-topbar-breadcrumb">
+        <span class="abc-topbar-section">AI Agents</span>
+        <span class="abc-topbar-sep">/</span>
+        <span class="abc-topbar-title">@_agentName</span>
+        <span class="abc-status-badge abc-status-badge--draft">DRAFT</span>
+      </div>
+    </div>
+    <div class="abc-topbar-right">
+      <div class="abc-tab-group">
+        <button class="abc-tab @(_view == "builder" ? "abc-tab--active" : "")" @onclick='() => SetView("builder")'>Builder</button>
+        <button class="abc-tab @(_view == "mascot"  ? "abc-tab--active" : "")" @onclick='() => SetView("mascot")'>Mascot states</button>
+      </div>
+      <button class="abc-btn abc-btn--ghost" @onclick="ValidateCanvas">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+          <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="9"/>
+        </svg>
+        Validate
+      </button>
+      <button class="abc-btn abc-btn--primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Test &amp; Save
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== CONTEXT BAR ===== -->
+  <div class="abc-contextbar">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#53279E" stroke-width="1.7">
+      <path d="M4 5h16M4 5v14M4 19h16M9 9h7M9 13h5" stroke-linecap="round"/>
+    </svg>
+    <span class="abc-contextbar-title">Billing &amp; Refunds</span>
+    <span class="abc-contextbar-type">playbook</span>
+    <span class="abc-contextbar-div"></span>
+    <span class="abc-contextbar-count">Canvas</span>
+    <div class="abc-contextbar-status">
+      <span class="abc-live-dot"></span>
+      Pip is guiding you
+    </div>
+  </div>
+
+  <!-- ===== MAIN VIEW AREA ===== -->
+  <div class="abc-view-area">
+
+    @if (_view == "builder")
+    {
+      <div id="@_canvasHostId" class="abc-canvas-host" style="position:relative;flex:1;min-height:0;"></div>
+    }
+
+    @if (_view == "mascot")
+    {
+      <div class="abc-mascot-view abc-scroll">
+        <div class="abc-mascot-content">
+
+          <div class="abc-mascot-hero-title">Meet Pip — the build guide</div>
+          <p class="abc-mascot-hero-sub">Pip lives in the corner of the canvas and reacts to what you do. A breathing idle keeps the app alive, curiosity follows your cursor, and small reactions celebrate progress or flag issues — never alarming, always friendly.</p>
+
+          <div class="abc-mascot-grid">
+            @foreach (var (pose, color, name, desc) in _mascotPoses)
+            {
+              <div class="abc-mascot-card">
+                <div class="abc-mascot-card-preview abc-mascot-card-preview--@pose">
+                  <div class="abc-mascot-pip-wrap">
+                    @((MarkupString)PipSvg(pose))
+                  </div>
+                </div>
+                <div class="abc-mascot-card-info">
+                  <div class="abc-mascot-card-header">
+                    <span class="abc-mascot-dot" style="background:@color;"></span>
+                    <span class="abc-mascot-pose-name">@name</span>
+                  </div>
+                  <p class="abc-mascot-pose-desc">@desc</p>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Questionnaire guide card -->
+          <div class="abc-mascot-guide-card">
+            <div class="abc-mascot-guide-pip">
+              @((MarkupString)PipSvg("greet"))
+            </div>
+            <div class="abc-mascot-guide-body">
+              <div class="abc-mascot-guide-title">Questionnaire guide</div>
+              <p class="abc-mascot-guide-sub">Pip turns configuration into a plain-language conversation. Each question appears in a speech bubble with tappable answers — no jargon, no empty form fields.</p>
+              <div class="abc-mascot-guide-bubble">
+                <span class="abc-mascot-guide-q">Where should billing answers come from?</span>
+                <div class="abc-mascot-guide-opts">
+                  <span class="abc-mascot-opt">Knowledge base</span>
+                  <span class="abc-mascot-opt">Live system</span>
+                  <span class="abc-mascot-opt">A human agent</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
+
+@code {
+    [Parameter] public string AgentId { get; set; } = string.Empty;
+
+    private string _view = "builder";
+    private string _agentName = "Atlas";
+    private string _canvasHostId = string.Empty;
+    private IJSObjectReference? _module;
+    private bool _canvasInitialized;
+
+    private static readonly (string pose, string color, string name, string desc)[] _mascotPoses =
+    [
+        ("idle",      "#5FC9BF", "Idle",      "Gentle breathing loop, occasional blink, and a slow head tilt every few seconds so it never feels frozen."),
+        ("curious",   "#53279E", "Curious",   "Head tilts and eyes track the cursor or the hovered node — Pip is paying attention to what you're doing."),
+        ("happy",     "#28AA63", "Happy",     "A quick bounce and wing-flap when you connect nodes or finish a step. Celebratory, then settles back."),
+        ("concerned", "#C8102E", "Concerned", "A soft, worried look when validation flags an issue — brows lower and eyes half-close. Gentle, never alarming."),
+    ];
+
+    protected override void OnInitialized()
+    {
+        _canvasHostId = "abc-cv-host-" + Guid.NewGuid().ToString("N")[..8];
+        var agent = AiAgentsState.GetAgent(AgentId);
+        if (agent is not null) _agentName = agent.Name;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        _module = await JS.InvokeAsync<IJSObjectReference>("import", "/js/agent-builder.js");
+        if (_view == "builder") await InitCanvas();
+    }
+
+    private async Task InitCanvas()
+    {
+        if (_module is null || _canvasInitialized) return;
+        _canvasInitialized = true;
+        await _module.InvokeVoidAsync("init", _canvasHostId);
+    }
+
+    private async Task SetView(string view)
+    {
+        _view = view;
+        _canvasInitialized = false;
+        StateHasChanged();
+        if (view == "builder")
+        {
+            await Task.Yield();
+            await InitCanvas();
+        }
+    }
+
+    private async Task ValidateCanvas()
+    {
+        if (_module is not null)
+            await _module.InvokeVoidAsync("validate", _canvasHostId);
+    }
+
+    private static string PipSvg(string pose) => $"""
+        <svg class="abc-pip-svg abc-pip-svg--{pose}" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+          <path d="M30 95 Q22 112 36 118 Q50 112 64 118 Q78 112 70 95" fill="#3D1E82"/>
+          <ellipse cx="50" cy="82" rx="28" ry="24" fill="#53279E"/>
+          <path d="M24 74 Q12 90 24 106 Q32 90 40 82" fill="#3D1E82"/>
+          <path d="M76 74 Q88 90 76 106 Q68 90 60 82" fill="#3D1E82"/>
+          <circle cx="50" cy="44" r="26" fill="#6D34C9"/>
+          <ellipse cx="45" cy="51" rx="15" ry="12" fill="#F5F0FF"/>
+          <path d="M38 51 L28 57 L39 60 Z" fill="#D97706"/>
+          <circle cx="42" cy="42" r="8" fill="white"/>
+          <circle cx="43" cy="42" r="5" fill="#1F2937"/>
+          <circle cx="41.5" cy="40.5" r="1.8" fill="white"/>
+          <ellipse cx="57" cy="51" rx="9" ry="6" fill="rgba(251,191,36,.35)"/>
+          <path d="M44 20 Q42 11 47 7 Q53 12 51 22" fill="#8B5CF6"/>
+          <path d="M52 18 Q52 9 57 5 Q62 11 58 22" fill="#A78BFA"/>
+          <path d="M42 106 L38 114 M42 106 L44 114 M42 106 L47 112" stroke="#53279E" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <path d="M58 106 L54 114 M58 106 L60 114 M58 106 L63 112" stroke="#53279E" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+        </svg>
+        """;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is not null)
+        {
+            try { await _module.InvokeVoidAsync("dispose", _canvasHostId); }
+            catch { /* page already unloaded */ }
+            await _module.DisposeAsync();
+        }
+    }
+}

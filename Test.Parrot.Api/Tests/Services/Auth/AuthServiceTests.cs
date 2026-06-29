@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -18,6 +19,7 @@ public class AuthServiceTests
     private readonly Mock<IJwtHelper> _jwtHelperMock;
     private readonly Mock<IEmailService> _emailServiceMock;
     private readonly Mock<IAppLogger<AuthService>> _loggerMock;
+    private readonly Mock<IWebHostEnvironment> _envMock;
     private readonly AuthService _sut;
 
     public AuthServiceTests()
@@ -29,6 +31,8 @@ public class AuthServiceTests
         _jwtHelperMock = new Mock<IJwtHelper>();
         _emailServiceMock = new Mock<IEmailService>();
         _loggerMock = new Mock<IAppLogger<AuthService>>();
+        _envMock = new Mock<IWebHostEnvironment>();
+        _envMock.SetupGet(e => e.EnvironmentName).Returns("Production");
 
         _loggerMock
             .Setup(l => l.BeginEntityScope(It.IsAny<string>(), It.IsAny<string>()))
@@ -58,7 +62,8 @@ public class AuthServiceTests
             _jwtHelperMock.Object,
             _emailServiceMock.Object,
             emailSettings,
-            _loggerMock.Object);
+            _loggerMock.Object,
+            _envMock.Object);
     }
 
     // ---------------------------------------------------------------------------

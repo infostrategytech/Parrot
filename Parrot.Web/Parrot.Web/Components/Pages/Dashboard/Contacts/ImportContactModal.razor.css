@@ -3,7 +3,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    border: 1.5px solid #7C3AED;
+    border: 1.5px solid #53279E;
     border-radius: 0.5rem;
     background: #fff;
     font-size: 0.875rem;
@@ -15,7 +15,7 @@
 }
 
 .ic-download-btn:hover {
-    background: #F5F3FF;
+    background: #FAF7FF;
 }
 
 .ic-template-hint {
@@ -43,8 +43,8 @@
 }
 
 .ic-dropzone:hover {
-    border-color: #7C3AED;
-    background: #F5F3FF;
+    border-color: #53279E;
+    background: #FAF7FF;
 }
 
 .ic-drop-icon-wrap {
@@ -59,13 +59,13 @@
 }
 
 .ic-drop-icon-wrap--done {
-    background: #EDE9FE;
+    background: #F1E9FF;
 }
 
 .ic-drop-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #111827;
+    color: #1F2937;
     text-align: center;
 }
 
