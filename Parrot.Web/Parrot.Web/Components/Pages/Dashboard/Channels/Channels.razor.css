@@ -1,12 +1,12 @@
-/* Styles moved to app.css to avoid Blazor scoped CSS issues inside @foreach */
+/* Styles kept here for Blazor scoped specificity — mirrors app.css channel rules */
 
 .channels-info-banner {
     display: flex;
     align-items: center;
     gap: 0.625rem;
     padding: 0.875rem 1rem;
-    background: #FFFBEB;
-    border: 1.5px dashed #F59E0B;
+    background: rgba(83,39,158,0.06);
+    border: 1.5px dashed rgba(83,39,158,0.35);
     border-radius: 0.5rem;
     font-size: 0.875rem;
     color: #374151;
@@ -23,9 +23,18 @@
     flex-direction: column;
     gap: 0.5rem;
     padding: 1.25rem;
-    border: 1px solid #E8E8EB;
+    border: 1px solid #EDE9FE;
+    border-top: 3px solid rgba(83,39,158,0.18);
     border-radius: 15px;
     background: #fff;
+    box-shadow: 0 2px 8px rgba(83,39,158,0.06);
+    transition: box-shadow .22s, transform .22s cubic-bezier(.2,.8,.2,1), border-color .18s;
+}
+
+.channel-card:hover {
+    transform: translateY(-3px);
+    border-top-color: #53279E;
+    box-shadow: 0 16px 32px -10px rgba(83,39,158,.22), 0 0 0 1px #D3BDF9;
 }
 
 .channel-card-header {
@@ -45,30 +54,36 @@
     align-items: center;
     gap: 0.375rem;
     font-size: 0.8125rem;
-    color: #6B7280;
+    color: #9CA3AF;
+    background: #F9FAFB;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid #E5E7EB;
 }
 
 .channel-card-status--connected {
-    color: #28AA63;
+    color: #059669;
+    background: rgba(5,150,105,0.08);
+    border-color: rgba(5,150,105,0.2);
 }
 
 .channel-status-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: #9CA3AF;
+    background: #D1D5DB;
     display: inline-block;
 }
 
 .channel-card-status--connected .channel-status-dot {
-    background: #28AA63;
+    background: #059669;
 }
 
 .channel-card-name {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #1F2937;
-    margin: 0.25rem 0 0;
+    margin: 0.375rem 0 0;
 }
 
 .channel-card-desc {
@@ -84,7 +99,7 @@
     justify-content: space-between;
     margin-top: 0.5rem;
     padding-top: 0.75rem;
-    border-top: 1px solid #F3F4F6;
+    border-top: 1px solid rgba(83,39,158,0.1);
 }
 
 .channel-card-meta-item {
@@ -102,31 +117,35 @@
     gap: 0.5rem;
     width: 100%;
     padding: 0.625rem 1rem;
-    border: 1px solid #E8E8EB;
+    border: 1.5px solid rgba(83,39,158,0.3);
     border-radius: 0.5rem;
-    background: #fff;
+    background: rgba(83,39,158,0.04);
     font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
+    font-weight: 600;
+    color: #53279E;
     cursor: pointer;
     margin-top: 0.25rem;
-    transition: background 0.15s;
+    transition: background 0.15s, border-color 0.15s;
+    box-sizing: border-box;
 }
 
 .channel-card-btn:hover {
-    background: #F9FAFB;
+    background: rgba(83,39,158,0.09);
+    border-color: #53279E;
 }
 
 .channel-card-btn--disconnect {
     color: #DC2626;
     border-color: #FECACA;
+    background: #fff;
 }
 
 .channel-card-btn--disconnect:hover {
     background: #FEF2F2;
+    border-color: #DC2626;
 }
 
-/* Connect Whatsapp Intro Modal */
+/* ── Connect WhatsApp modal ── */
 .cwm-video-row {
     display: flex;
     align-items: center;
@@ -203,8 +222,8 @@
     align-items: flex-start;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background: #FFFBEB;
-    border: 1.5px dashed #F59E0B;
+    background: rgba(83,39,158,0.06);
+    border: 1.5px dashed rgba(83,39,158,0.3);
     border-radius: 0.5rem;
     font-size: 0.8125rem;
     color: #374151;

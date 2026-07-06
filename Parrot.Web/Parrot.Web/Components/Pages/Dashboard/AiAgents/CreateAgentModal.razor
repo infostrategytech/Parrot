@@ -42,6 +42,59 @@
                     <span class="cam-toggle-thumb"></span>
                 </button>
             </div>
+
+            <!-- Employment section -->
+            <div class="cam-section-divider">
+                <span class="cam-section-label">Employment</span>
+            </div>
+            <p class="cam-section-hint">Assign this agent to an organization and define its role.</p>
+
+            <div class="cam-field">
+                <label class="cam-label">Organization</label>
+                <div class="cam-select-wrap">
+                    <select class="cam-select" value="@_organization"
+                            @onchange='e => _organization = e.Value?.ToString() ?? ""'>
+                        <option value="">-- No organization --</option>
+                        @foreach (var org in _organizations)
+                        {
+                            <option value="@org">@org</option>
+                        }
+                    </select>
+                    <svg class="cam-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="cam-field">
+                <label class="cam-label">Role <span class="cam-optional">(Optional)</span></label>
+                <div class="cam-select-wrap">
+                    <select class="cam-select" value="@_employmentRole"
+                            @onchange='e => _employmentRole = e.Value?.ToString() ?? ""'>
+                        <option value="">-- Select role --</option>
+                        @foreach (var role in _roles)
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    </select>
+                    <svg class="cam-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="cam-toggle-row">
+                <div class="cam-toggle-info">
+                    <span class="cam-toggle-label">Deploy immediately</span>
+                    <span class="cam-toggle-sub">Make this agent live under the selected organization right away.</span>
+                </div>
+                <button type="button" class="cam-toggle @(_deployNow ? "cam-toggle--on" : "")"
+                        @onclick="() => _deployNow = !_deployNow">
+                    <span class="cam-toggle-thumb"></span>
+                </button>
+            </div>
         </div>
     </BodyContent>
     <FooterContent>
@@ -58,6 +111,21 @@
     private string _description = string.Empty;
     private string _selectedMascot = "Nova";
     private bool _humanTakeover;
+    private string _organization = string.Empty;
+    private string _employmentRole = string.Empty;
+    private bool _deployNow = true;
+
+    private static readonly string[] _organizations =
+    [
+        "iBakers Ltd.", "Main Workspace", "Sales Division", "Support Team"
+    ];
+
+    private static readonly string[] _roles =
+    [
+        "Customer Support", "Sales", "Billing & Payments",
+        "Lead Qualification", "Booking & Scheduling",
+        "Product Information", "General Assistant"
+    ];
 
     private record MascotOption(string Name, string Gif);
 

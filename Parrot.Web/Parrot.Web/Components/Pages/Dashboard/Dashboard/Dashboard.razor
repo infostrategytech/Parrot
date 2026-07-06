@@ -2,6 +2,7 @@
 @layout DashboardLayout
 @using Parrot.Web.Components.Pages.Dashboard.Dashboard
 @inject IJSRuntime JS
+@inject NavigationManager Nav
 @implements IAsyncDisposable
 
 <OnboardingModal />
@@ -84,7 +85,7 @@
             {
                 var idx = i;
                 var done = _done[idx];
-                <div class="db-setup-item @(done ? "db-setup-item--done" : "")" @onclick="() => ToggleCheck(idx)">
+                <div class="db-setup-item @(done ? "db-setup-item--done" : "")" @onclick="() => HandleChecklistClick(idx)">
                     <span class="db-setup-check @(done ? "db-setup-check--filled" : "")">
                         @if (done)
                         {
@@ -200,7 +201,22 @@
         _clockStr = _now.ToString("hh:mm:ss tt");
     }
 
-    private void ToggleCheck(int idx) => _done[idx] = !_done[idx];
+    private static readonly string?[] _checklistRoutes =
+    [
+        "/dashboard/business-setup",
+        "/dashboard/channels",
+        "/dashboard/ai-agents",
+        "/dashboard/ai-agents"
+    ];
+
+    private void HandleChecklistClick(int idx)
+    {
+        var route = _checklistRoutes[idx];
+        if (route is not null)
+            Nav.NavigateTo(route);
+        else
+            _done[idx] = !_done[idx];
+    }
 
     private static string Spark(int[] data)
     {

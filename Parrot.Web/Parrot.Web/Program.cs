@@ -6,6 +6,7 @@ using Parrot.Web.Features.Dashboard.Catalog.State;
 using Parrot.Web.Features.Dashboard.Channels.Services;
 using Parrot.Web.Features.Dashboard.Channels.State;
 using Parrot.Web.Features.Dashboard.Contacts.State;
+using Parrot.Web.Components.Pages.Dashboard.BusinessSetup.Services;
 using Parrot.Web.Components.Pages.Dashboard.Conversations;
 using Parrot.Web.Features.Dashboard.QaInsights.State;
 using Parrot.Web.Features.Dashboard.TaskRequests.State;
@@ -39,6 +40,7 @@ builder.Services.AddHttpClient<IForgotPasswordService, ForgotPasswordService>(c 
 builder.Services.AddHttpClient<IResetPasswordService, ResetPasswordService>(c => c.BaseAddress = new Uri(apiBaseUrl));
 builder.Services.AddHttpClient<IVerifyEmailService, VerifyEmailService>(c => c.BaseAddress = new Uri(apiBaseUrl));
 builder.Services.AddHttpClient<IIntegrationsService, IntegrationsService>(c => c.BaseAddress = new Uri(apiBaseUrl));
+builder.Services.AddHttpClient<IBusinessSetupService, BusinessSetupService>(c => c.BaseAddress = new Uri(apiBaseUrl));
 
 builder.Services.AddGrpcClient<MessageVerificationService.MessageVerificationServiceClient>(o =>
 {

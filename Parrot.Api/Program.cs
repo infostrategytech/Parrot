@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Anthropic;
 using Parrot.Application.Agents;
 using Parrot.Application.Auth;
 using Parrot.Application.Email;
 using Parrot.Application.Integrations;
+using Parrot.Application.Integrations.BusinessEnrichment;
 using Parrot.Application.Logging;
 using Parrot.Application.Models;
 using Parrot.Application.Utils;
@@ -39,6 +41,10 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(Email
 builder.Services.Configure<WhatsAppSettings>(builder.Configuration.GetSection(WhatsAppSettings.SectionName));
 builder.Services.Configure<FacebookSettings>(builder.Configuration.GetSection(FacebookSettings.SectionName));
 builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(KafkaSettings.SectionName));
+builder.Services.Configure<BrightDataSettings>(builder.Configuration.GetSection(BrightDataSettings.SectionName));
+builder.Services.Configure<AnthropicSettings>(builder.Configuration.GetSection(AnthropicSettings.SectionName));
+AnthropicSettings anthropicSettings = builder.Configuration.GetSection(AnthropicSettings.SectionName).Get<AnthropicSettings>()
+    ?? new AnthropicSettings();
 
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -191,6 +197,10 @@ builder.Services.AddSingleton<IFacebookPageRegistry, InMemoryFacebookPageRegistr
 builder.Services.AddScoped<RequestContext>();
 builder.Services.AddScoped<IRequestContext>(sp => sp.GetRequiredService<RequestContext>());
 builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
+builder.Services.AddHttpClient<IBrightDataScraperService, BrightDataScraperService>(c =>
+    c.BaseAddress = new Uri("https://api.brightdata.com/"));
+builder.Services.AddSingleton(new AnthropicClient { ApiKey = anthropicSettings.ApiKey });
+builder.Services.AddScoped<IBusinessProfileEnrichmentService, BusinessProfileEnrichmentService>();
 
 // Controllers & OpenAPI
 builder.Services.AddControllers();
