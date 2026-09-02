@@ -293,10 +293,16 @@ Secrets never belong in `appsettings.json`. Locally use
 
 ## Deployment
 
-Push to `main` builds three images, pushes them to Google Artifact Registry,
-and redeploys them onto a GCE VM over SSH. The full setup — GCP bootstrap,
-Workload Identity Federation, Managed Kafka, VM provisioning, and the required
-GitHub secrets and variables — is in **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**.
+The intended pipeline builds three images on a push to `main`, pushes them to
+Google Artifact Registry, and redeploys them onto a GCE VM over SSH. The full
+setup — GCP bootstrap, Workload Identity Federation, Managed Kafka, VM
+provisioning, and the required GitHub secrets and variables — is in
+**[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**.
+
+**It is not running today.** `.github/workflows/deploy.yml` is excluded from
+version control by [.gitignore](.gitignore) line 39 and has never reached
+GitHub, so pushing to `main` deploys nothing. See
+[Publishing the deploy workflow](docs/DEPLOYMENT.md#publishing-the-deploy-workflow).
 
 ---
 
@@ -307,11 +313,12 @@ Fix them before treating the deploy pipeline as working.
 
 | Issue | Impact | Where |
 |---|---|---|
-| `/healthz` is not implemented on any service | The production Compose healthchecks and the post-deploy smoke test both target `/healthz` and will never pass — containers report unhealthy and the deploy job fails | [Program.cs](Parrot.Api/Program.cs), [infra/docker-compose.prod.yml](infra/docker-compose.prod.yml), [deploy.yml](.github/workflows/deploy.yml) |
-| `deploy.yml` runs a bare `dotnet restore`/`build`/`test` | Fails immediately with `MSB1011` — the repo root has two solution files. The deploy workflow cannot currently reach the build stage | [deploy.yml](.github/workflows/deploy.yml) |
+| `.gitignore` ignores all of `.github/` | `deploy.yml` is untracked and absent from GitHub, so **no deploy pipeline exists**; the rule sits under a `# vscode` comment and was meant to be `.vscode/` | [.gitignore](.gitignore) |
+| `/healthz` is not implemented on any service | The production Compose healthchecks and the post-deploy smoke test both target `/healthz` and will never pass — containers report unhealthy and the deploy job fails | [Program.cs](Parrot.Api/Program.cs), [infra/docker-compose.prod.yml](infra/docker-compose.prod.yml) |
+| `deploy.yml` runs a bare `dotnet restore`/`build`/`test` | Fails immediately with `MSB1011` — the repo root has two solution files. The deploy workflow cannot reach the build stage | `.github/workflows/deploy.yml` |
 | Ingestor dies on the first `ConsumeException` | `catch (ConsumeException)` sits outside the consume loop, so one transient broker error stops ingestion permanently while the process stays "up" | [Worker.cs:139-142](WhatsAppMessageIngestor/Worker.cs#L139-L142) |
 | `.env.prod` template writes `KAFKA__CONSUMERGROUP` | The setting is `ConsumerGroupId`, so the value is ignored and the consumer silently joins the default group | [infra/vm/setup-vm.sh](infra/vm/setup-vm.sh) |
-| `Parrot.Web` has no Dockerfile and no deploy step | The dashboard is not built, pushed, or deployed by CI — only the API, gRPC service, and ingestor are | [.github/workflows/deploy.yml](.github/workflows/deploy.yml) |
+| `Parrot.Web` has no Dockerfile and no deploy step | The dashboard is not built, pushed, or deployed by CI — only the API, gRPC service, and ingestor are | `.github/workflows/deploy.yml` |
 
 ---
 

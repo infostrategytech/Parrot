@@ -80,10 +80,18 @@ flowchart LR
     style smoke fill:#fff4e5,stroke:#d98324
 ```
 
-Defined in [.github/workflows/deploy.yml](../.github/workflows/deploy.yml),
-triggered on every push to `main`. A separate
-[build.yml](../.github/workflows/build.yml) runs build, test with coverage, and
-`dotnet format --verify-no-changes` on `main`, `develop`, and pull requests.
+Defined in `.github/workflows/deploy.yml`, triggered on every push to `main`.
+A separate [build.yml](../.github/workflows/build.yml) runs build, test with
+coverage, and `dotnet format --verify-no-changes` on `main`, `develop`, and
+pull requests.
+
+> **`deploy.yml` is not in version control and does not exist on GitHub.**
+> [.gitignore](../.gitignore) line 39 ignores `.github/` — under a `# vscode`
+> comment, so `.vscode/` was almost certainly what was meant. `build.yml`
+> survives only because it was committed before that rule was added. The
+> deploy workflow therefore lives on one developer's machine, GitHub has never
+> run it, and pushing to `main` deploys nothing. Fix this before relying on
+> anything below: see [Publishing the deploy workflow](#publishing-the-deploy-workflow).
 
 On the VM, `/app/deploy.sh` (installed by `setup-vm.sh`) does the actual
 rollout:
@@ -314,8 +322,30 @@ release that adds one.
 
 ## Before your first deploy
 
-The pipeline has three defects that will stop a green deploy. Fix them, or
+The pipeline has four defects that will stop a green deploy. Fix them, or
 know exactly what you are working around.
+
+### Publishing the deploy workflow
+
+**0. `deploy.yml` is untracked, so there is no pipeline at all.**
+[.gitignore](../.gitignore) line 39 ignores the whole `.github/` directory —
+it sits under a `# vscode` comment, so `.vscode/` was the intent. Nothing
+below runs until the workflow is actually on the default branch:
+
+```bash
+# correct the rule
+sed -i '' 's|^\.github/$|.vscode/|' .gitignore
+
+git add .gitignore .github/workflows/deploy.yml
+git commit -m "ci: publish deploy workflow, stop ignoring .github/"
+```
+
+Confirm with `gh workflow list` — "Deploy to Production" should appear.
+Committing this workflow arms production deploys on every push to `main`, so
+land the fixes below first, and consider requiring manual approval on the
+`production` GitHub environment the deploy job already targets.
+
+### Remaining defects
 
 **1. `deploy.yml` cannot restore.** Its `test` job runs a bare
 `dotnet restore`, which fails with `MSB1011` because the root holds both
